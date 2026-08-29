@@ -23,8 +23,10 @@ if (!version || !/^\d+\.\d+\.\d+(-[a-z0-9.]+)?$/.test(version)) {
 
 /** 自动探测本机代理（git 直连 github.com 常被断；走代理可通）。 */
 function detectProxy() {
-  const fromGit = execFileSync('git', ['config', '--get', 'http.proxy'], { cwd: ROOT, encoding: 'utf8' }).trim()
-  if (fromGit) return fromGit
+  try {
+    const fromGit = execFileSync('git', ['config', '--get', 'http.proxy'], { cwd: ROOT, encoding: 'utf8' }).trim()
+    if (fromGit) return fromGit
+  } catch { /* 未配置代理 */ }
   const env = process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy
   if (env) return env
   try {
@@ -51,7 +53,7 @@ writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf8')
 console.log(`版本: ${oldVersion} → ${version}`)
 
 // 1) npm publish（scripts/publish.mjs；token 走 env NPM_TOKEN 或 ~/.npmrc）
-npmRun(['node', join(ROOT, 'scripts', 'publish.mjs')])
+run(process.execPath, [join(ROOT, 'scripts', 'publish.mjs')])
 console.log('✅ npm publish 完成')
 
 // 2) git commit + tag + push（凭据管理器 + 代理）
