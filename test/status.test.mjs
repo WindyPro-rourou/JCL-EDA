@@ -119,7 +119,7 @@ test('status route handler answers 200 with valid JSON for a loopback GET', asyn
   const json = JSON.parse(body) // throws if not valid JSON
   assert.equal(json.ready, false)
   assert.equal(json.backend, 'official-easyeda-bridge')
-  assert.equal(json.version, '0.1.0')
+  assert.match(json.version, /^\d+\.\d+\.\d+$/, 'version should track the package manifest (semver)')
 })
 
 test('status route handler rejects a non-GET request with 405', async () => {

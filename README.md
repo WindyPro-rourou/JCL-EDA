@@ -75,14 +75,14 @@ cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA
 
 ## 如何运行 / 开发
 
-> 见上方「安装（开箱即用，三步）」。开发自检：`npm run test:all`（json-gen 14 例 + 插件 52 例 + 自检）与 `npm run check`；发布：`node scripts/publish.mjs [--dry]`（需 `$env:NPM_TOKEN`）；**发版**：`node scripts/release.mjs --version=0.1.1`（需 `$env:NPM_TOKEN` + `$env:GH_TOKEN`，自动 bump → npm publish → GitHub push，走本机代理）。插件规范详见 `docs/plugin-spec.md` 与 `docs/plugin.md`。
+> 见上方「安装（开箱即用，三步）」。开发自检：`npm run test:all`（插件 60+ 例 + 生成器 14 例 + 自检）与 `npm run check`；发布：`node scripts/publish.mjs [--dry]`（需 `$env:NPM_TOKEN`）；**发版**：`node scripts/release.mjs --version=<新版本>`（自动 bump → npm publish → git commit+tag+push；push 走系统凭据管理器 + 自动探测代理；打 tag 后 CI 自动发布）。插件规范详见 `docs/plugin-spec.md` 与 `docs/plugin.md`。
 
 ## 当前进度
 
 - [x] DSH 插件规范 + 官方桥（easyeda-api-skill）安装/启动/连接/自愈
 - [x] 云端实时全流程真机验证（esp32_multitool）：14 大类放置（原理图+PCB）、引脚级连线、焊盘级布线、DRC/网表/BOM、PCB 元件/过孔/走线、截图、紧急保存（详见 `docs/verification-report.md`）
 - [x] 面板记录式时间线（持久化/撤回/清空）+ 紧急保存 + 框内定位 + 能力清单
-- [x] 安装发布链路：`npm i github:WindyPro-rourou/JCL-EDA` 开箱即用；npm 包 `@windypro-rourou/dsh-eda@0.1.0`
+- [x] 安装发布链路：`npm i github:WindyPro-rourou/JCL-EDA`（或 `npm i @windypro-rourou/dsh-eda`）开箱即用；版本随 release 脚本一致（tag v* 自动发布）
 
 **测试（全部通过）**：插件 52/52、生成器 14/14、自检 OK、v6 样本 62/62 + 13/13。
 

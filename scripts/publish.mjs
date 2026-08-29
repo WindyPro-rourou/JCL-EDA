@@ -41,9 +41,15 @@ const work = await mkdtemp(join(tmpdir(), 'eda-pub-'))
 try {
   await writeFile(join(work, 'package.json'), JSON.stringify(staged, null, 2) + '\n', 'utf8')
   // 用 work 目录里的 package.json 做为发布上下文（lib/src 在 ROOT → cwd 必须在 ROOT；
-  // 简单方案：把 lib/src/patch/readme 复制进 work（小仓库，快））
+  // 简单方案：按 package.json 的 files[] 语义复制进 work（与 files 单一来源，
+  // 防止"写死清单"与 files[] 漂移——0.1.1 丢 skill/ 的根因）。
   const { cp } = await import('node:fs/promises')
-  for (const entry of ['lib', 'src', 'skill', 'cordis.patch.yml', 'README.md']) {
+  const entries = []
+  for (const f of staged.files ?? []) {
+    const top = f.split('/')[0]
+    if (!entries.includes(top)) entries.push(top)
+  }
+  for (const entry of entries) {
     await cp(join(ROOT, entry), join(work, entry), { recursive: true, filter: (p) => !/(^|[\\/])(node_modules|test|fixtures|scripts)([\\/]|$)/.test(p) && !/\.test\.js$/.test(p) && !/\.bundle\.js$/.test(p) })
   }
   const token = process.env.NPM_TOKEN
@@ -54,8 +60,14 @@ try {
   const files = listing[0].files.map((f) => f.path)
   console.log('包内文件（前 20）：')
   for (const f of files.slice(0, 20)) console.log('  ', f)
-  if (!files.includes('src/json-gen.js')) throw new Error('src/ 未进包！中止')
-  if (!files.includes('cordis.patch.yml')) throw new Error('cordis.patch.yml 未进包！中止')
+  // 进包断言（fail-fast）：这些缺失会直接让下游功能损坏，必须拦截
+  const MUST_HAVE = ['src/json-gen.js', 'cordis.patch.yml', 'lib/skill.js', 'skill/SKILL.md', 'skill/INDEX.md']
+  const missing = MUST_HAVE.filter((f) => !files.includes(f))
+  if (missing.length > 0) throw new Error(`关键文件未进包（中止）：${missing.join(', ')}`)
+  console.log(`[check] 关键文件: ${MUST_HAVE.map((f) => `${f}${files.includes(f) ? '✓' : '✗'}`).join(' ')}`)
+  if (staged.scripts && Object.keys(staged.scripts).length > 0) {
+    throw new Error('stage 包 package.json 不应携带 scripts（防发布后 npm run <script> 递归/缺失）')
+  }
 
   if (DRY) {
     console.log('[dry] 未发布。校验通过。')

@@ -1,0 +1,2 @@
+# 统一行尾为 LF（消除每次 git 提示 LF/CRLF 的噪音）
+* text=auto eol=lf

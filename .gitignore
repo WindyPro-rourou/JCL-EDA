@@ -1,4 +1,4 @@
-# node_modules (incl. the @deepseek-ai junction used only for dev-time test resolution)
+﻿# node_modules (incl. the @deepseek-ai junction used only for dev-time test resolution)
 node_modules/
 
 # smoke/dev artifacts
@@ -12,3 +12,6 @@ plugin/lib/*.bundle.js
 # OS
 .DS_Store
 Thumbs.db
+
+# dev scratch (one-off probes/diags; keep only reusable tools in scripts/)
+scratch/
