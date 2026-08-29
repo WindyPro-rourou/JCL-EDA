@@ -1,16 +1,16 @@
 /**
- * dsh-lichuang-eda self-check: imports the host half, mounts it on a stub
- * cordis context, and verifies every DSH surface the plugin must touch:
+ * @windypro-rourou/dsh-eda self-check: imports the host half, mounts it on a
+ * stub cordis context, and verifies every DSH surface the plugin must touch:
  *   (a) ctx.tools.register — at least the eda_status tool,
  *   (b) ctx.webServer.register — the /api/dsh-eda/status route,
  *   (c) ctx.systemPrompt.section — the plugin announcement,
  *   (d) ctx.provide — the 'eda' service handle.
  *
- * Run: node plugin/selfcheck.mjs   (exit code 0 = PASS, non-zero = FAIL)
+ * Run: node selfcheck.mjs   (exit code 0 = PASS, non-zero = FAIL)
  *
- * The stub context mirrors dsh-logcat's selfcheck.mjs stub, plus a `provide`
- * method so the real cordis provide path (not the plain-object fallback) is
- * exercised. Requires @deepseek-ai/dsh-tools to resolve — see README "测试/自检".
+ * The stub context carries a `provide` method so the real cordis provide path
+ * (not the plain-object fallback) is exercised. Requires
+ * @deepseek-ai/dsh-tools to resolve — see README "测试/自检".
  */
 import { apply, name, inject } from './lib/index.js'
 
