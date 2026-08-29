@@ -71,7 +71,7 @@ cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA
 
 ## 如何运行 / 开发
 
-> 见上方「安装（开箱即用，三步）」。开发自检：`npm run test:all`（json-gen 14 例 + 插件 52 例 + 自检）与 `npm run check`；发布：`node scripts/publish.mjs [--dry]`（需 `$env:NPM_TOKEN`）。插件规范详见 `docs/plugin-spec.md` 与 `docs/plugin.md`。
+> 见上方「安装（开箱即用，三步）」。开发自检：`npm run test:all`（json-gen 14 例 + 插件 52 例 + 自检）与 `npm run check`；发布：`node scripts/publish.mjs [--dry]`（需 `$env:NPM_TOKEN`）；**发版**：`node scripts/release.mjs --version=0.1.1`（需 `$env:NPM_TOKEN` + `$env:GH_TOKEN`，自动 bump → npm publish → GitHub push，走本机代理）。插件规范详见 `docs/plugin-spec.md` 与 `docs/plugin.md`。
 
 ## 当前进度
 
