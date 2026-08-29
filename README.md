@@ -40,7 +40,7 @@ cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA
 ## 目录结构（仓库根 = 插件包）
 
 ```
-├─ lib/                           ← 插件本体（服务端：apply() 13 工具/7 路由/系统提示 + 时间线/快照/布局/能力清单）
+├─ lib/                           ← 插件本体（服务端：apply() 17 工具/7 路由/系统提示 + 时间线/快照/布局/能力清单）
 │   ├─ index.js / backend.js / installer.js / snapshot.js / activity.js / layout.js / capabilities.js
 │   └─ client.js                  ← 浏览器端：平台仪表盘（连接卡/轨迹时间线/撤回/清空/紧急保存）
 ├─ src/                           ← 离线生成器（标准版 JSON：json-gen / validate / nl-to-design + 14 例测试）
@@ -51,7 +51,7 @@ cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA
 └─ package.json                   ← @windypro-rourou/dsh-eda（files 含 lib/src/patch；npm i github:… 即装）
 ```
 
-## 已注册的 agent 工具（13 个）
+## 已注册的 agent 工具（17 个）
 
 | 工具 | 用途 |
 |---|---|
@@ -62,7 +62,11 @@ cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA
 | `eda_exec` | **云端实时生成的双手**：执行任意官方 `eda.*` 代码（需已连接；自动记录新建图元→可撤回） |
 | `eda_pick_spot` | **框内定位**：读页面尺寸+已有图元 → 返回互不冲突的框内网格空位（放元件前必调） |
 | `eda_capabilities` | **能力清单**：官方 eda.* API 结构化目录（域/方法/用法/坑/实测片段）——agent 主动查询 |
+| `eda_board_overview` | **画板全览**：当前文档图元/网络/页面尺寸摘要（agent 的眼睛，画前画后都可用） |
+| `eda_trace` | **现场截图**：缩放适配 → PNG 存 `~/.dsh/eda/shots/`（效果确认/视觉留档） |
 | `eda_snapshot` | **紧急保存**：画板现场（`.epro2`+SVG 预览+网表/BOM）+ 动作日志 → `~/.dsh/eda/snapshots/` |
+| `eda_verify` | **一键验收**：DRC + 网表 + BOM 一次返回（画完即验） |
+| `eda_skill_read` | **官方 skill 全库查阅**：读 SKILL.md / references/classes/*.md / guide 等官方文档（写 eda.* 前必查） |
 | `eda_sch_drc` / `eda_get_netlist` / `eda_get_bom` | DRC（verbose）/ 网表（File.text）/ BOM（二进制 xlsx→base64） |
 
 **生命周期**：插件加载时若检测到官方桥已安装，**自动启动并自动连接**（无需人工）；面板实时显示 装没装 / 端口 / 是否就绪。

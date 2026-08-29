@@ -475,5 +475,11 @@ await eda.pcb_PrimitiveComponent.delete(pcbIds); await eda.pcb_PrimitiveVia.dele
 7. **快照即答案**：任何"画完了/乱套了/怕丢"的情况 → `eda_snapshot`（会存 .epro2 + SVG 预览 +
    网表/BOM + 动作日志，0 降级）。
 
+## 附七：官方 Skill 全库接入（eda_skill_read）
 
+官方 easyeda-api-skill 知识已随插件 vendored（包内 `skill/`：SKILL.md 总纲、references/classes/*.md 逐类 API、
+guide/、user-guide/、format/）。**规划任何画板动作前**：`eda_skill_read`（doc='INDEX.md'）看导航 →
+按任务找类文档 → 读该类文档 → `eda_exec` 落地。建议顺序：INDEX.md → SKILL.md（坐标系/常见错误）→
+目标类文档（如 references/classes/SCH_PrimitiveComponent.md）→ 参考资料中的示例代码。
+文档很长时分页：truncated=true 时用 nextOffset 继续读。
 
