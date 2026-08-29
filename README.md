@@ -7,8 +7,9 @@
 ## 安装（开箱即用，三步）
 
 ```bash
-# 1) 安装到 DSH web profile（GitHub 源，或 npm: npm i @windypro-rourou/dsh-eda）
-cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA
+# 1) 安装到 DSH web profile（全部 GitHub 源，公开仓库匿名 clone）
+cd ~/.dsh/profiles/web
+git clone https://github.com/WindyPro-rourou/JCL-EDA.git node_modules/@windypro-rourou/dsh-eda
 
 # 2) 在 profile 的 cordis.patch.yml 追加一行（已有则跳过）
 - insert:
@@ -83,7 +84,7 @@ cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA
 - [x] DSH 插件规范 + 官方桥（easyeda-api-skill）安装/启动/连接/自愈
 - [x] 云端实时全流程真机验证（esp32_multitool）：14 大类放置（原理图+PCB）、引脚级连线、焊盘级布线、DRC/网表/BOM、PCB 元件/过孔/走线、截图、紧急保存（详见 `docs/verification-report.md`）
 - [x] 面板记录式时间线（持久化/撤回/清空）+ 紧急保存 + 框内定位 + 能力清单
-- [x] 安装发布链路：`npm i github:WindyPro-rourou/JCL-EDA`（或 `npm i @windypro-rourou/dsh-eda`）开箱即用；版本随 release 脚本一致（tag v* 自动发布）
+- [x] 安装发布链路：`git clone https://github.com/WindyPro-rourou/JCL-EDA.git`（GitHub 源开箱即用）· npm registry 仅作发布镜像；版本随 release 脚本一致（tag v* 自动发布）
 
 **测试（全部通过）**：插件 52/52、生成器 14/14、自检 OK、v6 样本 62/62 + 13/13。
 

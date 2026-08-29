@@ -1,13 +1,15 @@
 # @windypro-rourou/dsh-eda — 插件说明
 
-本仓库根即插件包：`npm i github:WindyPro-rourou/JCL-EDA` 开箱即用（详见根 `README.md`「安装」）。
+本仓库根即插件包：`git clone https://github.com/WindyPro-rourou/JCL-EDA.git` 开箱即用（详见根 `README.md`「安装」）。
 
 ## 如何加载到 DSH Web GUI
 
 ```bash
-# 1) 安装到 DSH web profile（二选一）
-cd ~/.dsh/profiles/web && npm i github:WindyPro-rourou/JCL-EDA     # GitHub 源（推荐）
-cd ~/.dsh/profiles/web && npm i @windypro-rourou/dsh-eda            # npm registry（scope 公开后）
+# 1) 安装到 DSH web profile（全部 GitHub 源：clone 后目录名 = 包名）
+cd ~/.dsh/profiles/web
+git clone https://github.com/WindyPro-rourou/JCL-EDA.git         node_modules/@windypro-rourou/dsh-eda
+git clone https://github.com/WindyPro-rourou/dsh-logcat.git      node_modules/@windypro-rourou/dsh-logcat
+git clone https://github.com/WindyPro-rourou/dsh-code-studio.git node_modules/@windypro-rourou/dsh-code-studio
 
 # 2) 在 profile 的 cordis.patch.yml 追加（已有则跳过）：
 #   - insert:
