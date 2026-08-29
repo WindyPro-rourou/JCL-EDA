@@ -1,0 +1,14 @@
+# node_modules (incl. the @deepseek-ai junction used only for dev-time test resolution)
+node_modules/
+
+# smoke/dev artifacts
+.smoke/
+*.log
+npm-debug.log*
+
+# build outputs (not part of the source repo)
+plugin/lib/*.bundle.js
+
+# OS
+.DS_Store
+Thumbs.db

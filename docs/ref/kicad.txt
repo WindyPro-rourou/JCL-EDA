@@ -1,0 +1,1860 @@
+
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+EasyEDA | Developer Documentation | KiCad
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+  
+    
+      
+      
+        
+          
+          
+            
+            
+            
+              
+                
+  
+    
+Introduction
+      
+        
+EasyEDA Standard File Types
+        
+EasyEDA Pro File Types
+      
+    
+    
+EasyEDA Standard Format
+      
+        
+JSON Document Structure
+        
+Shape Array Encoding
+        
+Coordinate System and Scaling
+        
+Schematic Shape Types
+        
+PCB Shape Types
+        
+Layer Mapping
+      
+    
+    
+EasyEDA Pro Format
+      
+        
+ZIP Archive Structure
+        
+project.json Structure
+        
+JSON Lines Format
+        
+Coordinate System and Scaling
+        
+Schematic Line Types
+        
+PCB Line Types
+        
+Symbol and Footprint Line Types
+        
+Pro Layer Mapping
+      
+    
+    
+Schematic
+      
+        
+Imported Elements
+        
+Limitations
+      
+    
+    
+Layout
+      
+        
+Imported Elements
+        
+Limitations
+      
+    
+    
+Undocumented Areas
+  
+                
+              
+            
+          
+          
+Import Formats
+&nbsp;>&nbsp;
+EasyEDA
+          
+          
+				
+            
+            
+            
+              
+                
+                  
+                  
+                
+              
+            
+          
+        
+      
+      
+      
+        
+          
+            
+            
+EasyEDA
+Introduction
+KiCad imports designs from two EasyEDA format families: EasyEDA Standard (also known
+as JLCEDA Standard / LCEDA Standard) and EasyEDA Pro (also known as JLCEDA Pro / LCEDA
+Pro).  These formats have different file structures and use separate parsers.  EasyEDA Standard stores design data as JSON with tilde-delimited shape
+strings.  EasyEDA Pro stores design data as ZIP archives containing JSON Lines files.
+EasyEDA Standard File Types
+.json
+ — single JSON document containing a schematic sheet, symbol, PCB, or
+footprint
+.zip
+ — archive containing one or more JSON documents
+EasyEDA Pro File Types
+.epro
+ — project archive (renamed ZIP)
+.zip
+ — project archive
+.elibz
+ — library archive
+.efoo
+ — individual footprint file
+.esym
+ — individual symbol file
+EasyEDA Standard does not support project-level import.  EasyEDA Pro provides a
+      project chooser when the archive contains multiple schematics or boards.
+EasyEDA Standard Format
+JSON Document Structure
+Each EasyEDA Standard file is a JSON object with the following top-level fields:
+Field
+Type
+Description
+docType
+integer or string
+Document type (may appear here or inside 
+head
+)
+head
+object
+Header with 
+docType
+, 
+editorVersion
+, 
+title
+,
+                                   
+description
+, origin 
+x
+/
+y
+, and optional 
+c_para
+                                   component parameters
+canvas
+string
+Canvas configuration data
+title
+string
+Document title
+shape
+array of strings
+Design elements as tilde-delimited shape strings
+dataStr
+object
+Additional data (PCB layers, DRC rules, etc.)
+The 
+head.docType
+ field determines what content the file contains.  Its value may
+be encoded as either an integer or a string representation of an integer.
+DOC_TYPE Values
+Value
+Enum Name
+Description
+1
+SCHEMATIC_SHEET
+Single schematic sheet
+2
+SYMBOL
+Schematic symbol definition
+3
+PCB
+PCB layout
+4
+PCB_COMPONENT
+Footprint definition
+5
+SCHEMATIC_LIST
+Container holding multiple schematic sheets in a
+                             
+schematics
+ array
+14
+PCB_MODULE
+PCB module (sub-board)
+For DOC_TYPE 5 (SCHEMATIC_LIST), the JSON object contains a 
+schematics
+ array where
+each element is a complete DOCUMENT object with its own 
+head
+, 
+shape
+, and other
+fields.  KiCad imports each sheet and creates sub-sheets automatically.
+Component Parameters (c_para)
+The 
+head.c_para
+ object and the 
+dataStr
+ field carry component-level metadata.  For
+symbols and footprints this includes 
+package
+, 
+pre
+ (reference prefix),
+Contributor
+, 
+link
+ (datasheet URL), and 
+Model_3D
+.  For PCBs, 
+dataStr
+ contains
+a 
+layers
+ array, an optional 
+uuid
+, and an optional 
+DRCRULE
+ object with track
+width, clearance, via diameter, and via drill constraints.
+Shape Array Encoding
+All design elements in the 
+shape
+ array use a common encoding.  Each shape is a
+single tilde-delimited (
+~
+) string.  The first field is a type prefix; remaining
+fields are positional parameters specific to that type.
+Multi-line shapes use the delimiter 
+@$
+ to join lines that were originally separate
+entries.  When parsing, the importer replaces 
+@$
+ with newline characters and splits
+on newlines.
+Pin definitions within symbol shapes use the separator 
+^^
+ to delimit pin sub-parts
+(dot position, path/color, name, number, and optional decoration data).
+Coordinate System and Scaling
+EasyEDA Standard uses a coordinate system where values are in abstract units.  The
+schematic parser converts these to KiCad internal units using:
+ScaleSize(value) = round(MilsToIU(value * 10))
+This multiplies the EasyEDA value by 10 to get mils, then converts mils to KiCad
+internal units (nanometers).
+The PCB parser uses a different formula:
+ScaleSize(value) = round((value * 254000.0) / 100.0) * 100
+This converts from EasyEDA PCB units (which are 10 mil increments) to KiCad internal
+units with rounding to the nearest 100nm.
+Both parsers support relative positioning through 
+m_relOrigin
+, which is set to the
+document or component origin.  Positions are computed as 
+ScaleSize(value - origin)
+.
+Schematic Shape Types
+Schematic documents and symbol definitions share many of the same shape types.  When a
+shape appears at the schematic level (inside a 
+LIB
+ compound or at the top level), it
+is parsed in a schematic coordinate context.  When it appears in a symbol definition,
+positions are relative to the symbol origin.
+Top-Level Schematic Shapes
+Prefix
+Parameter Layout
+LIB
+LIB
+x
+y
+params
+rotation
+~importFlag
+layer~…​
+ followed by child shape lines
+  joined with 
+#@$
+.  The 
+params
+ field is a backtick-delimited key-value list
+  (e.g., 
+name
+`R1``package``0402`).  Rotation is in degrees.  The layer
+  field (index 7) indicates front (1) or back (2) placement for PCB footprints.
+F
+F
+flagTypename
+x
+y
+angle~…​
+ with pin sub-parts separated by 
+^^
+.  The third
+  
+^^
+-segment contains the value text, position, angle, alignment, font, and size.
+  Flag type names determine the power symbol style (e.g., 
+part_netLabel_gnD
+ for
+  power ground, 
+part_netLabel_VCC
+ for VCC bar).  The special flag type
+  
+part_netLabel_netPort
+ creates a global label instead of a power symbol.
+W
+W
+points
+strokeColor
+lineWidth
+strokeStyle
+fillColor
+~locked
+.  Points is a
+  space-delimited list of x,y coordinate pairs.  Creates wire segments between
+  consecutive points.
+N
+N
+x
+y
+angle
+netname
+halign
+textX
+textY
+fontname~fontSize
+.  Creates a net label
+  at the specified position with the given rotation and text alignment.
+O
+O
+x
+y
+.  Creates a no-connect marker at the specified position.
+J
+J
+x
+y~diameter
+.  Creates a junction at the specified position.
+T
+T
+textType
+x
+y
+angle
+color
+fontname
+fontSize
+~baselineAlign
+text
+visible~halign
+.
+  Creates a text element.  The 
+textType
+ field is unused at the schematic level.
+  Text supports 
+\n
+ for newlines and HTML entity encoding.  The 
+halign
+ field
+  accepts 
+start
+, 
+middle
+, 
+end
+, or 
+inherit
+.  The 
+baselineAlign
+ field controls
+  vertical positioning relative to the text baseline (supports SVG values like
+  
+alphabetic
+, 
+central
+, 
+middle
+, 
+hanging
+, etc.).
+R
+R
+x
+y
+rx
+ry
+width
+height
+strokeColor
+lineWidth
+strokeStyle
+fillColor~~locked
+.
+  Creates a rectangle.  The 
+rx
+/
+ry
+ fields specify corner radii but are not currently
+  imported (rounded rectangles become sharp rectangles).
+I
+I
+x
+y
+width
+height
+angle
+imageUrl
+~
+transformData
+.  Creates an image from a data
+  URL (base64-encoded SVG or raster).  The 
+transformData
+ field contains CSS-like
+  transforms (
+scale
+, 
+translate
+, 
+rotate
+) applied in reverse order.
+Symbol Shape Types
+These shapes appear inside symbol definitions (within 
+LIB
+ compound shapes or
+standalone symbol files).
+Prefix
+Parameter Layout
+PL
+PL
+points
+strokeColor
+lineWidth
+strokeStyle
+fillColor
+~locked
+.  Polyline drawn
+  through space-delimited x,y coordinate pairs.
+PG
+PG
+points
+strokeColor
+lineWidth
+strokeStyle
+fillColor
+~locked
+.  Closed polygon
+  using the same point format as 
+PL
+.
+PT
+PT
+pathData
+strokeColor
+lineWidth
+strokeStyle
+fillColor
+~locked
+.  Freedraw shape
+  using SVG-like path commands (M, L, A, C, Z).
+Pimage
+Pimage
+~
+angle
+x
+y
+width
+height~dataUrl
+.  Embedded image within a symbol, using
+  a base64 data URL.  Supports SVG and raster formats.
+A
+A
+pathData
+strokeColor
+lineWidth
+strokeStyle
+fillColor~~locked
+.  Arc shape using
+  SVG path data containing M and A commands.
+R
+R
+x
+y
+rx
+ry
+width
+height
+strokeColor
+lineWidth
+strokeStyle
+fillColor~~locked
+.
+  Rectangle within a symbol.  Corner radii are parsed but not applied.
+E
+E
+cx
+cy
+rx
+ry
+strokeColor
+lineWidth
+strokeStyle
+fillColor~~locked
+.  Ellipse
+  defined by center and radii.  Only the X radius is used (treated as a circle).
+P
+Pin definition using 
+^^
+ separators between five or seven sub-parts.
+  Sub-part 0: 
+P
+show
+elecType
+pinNumber
+x
+y
+rotation
+.
+  Sub-part 1: 
+dotX~dotY
+ (pin dot position).
+  Sub-part 2: 
+pathData
+color
+…​
+ (pin line path, parsed as 
+M x,y h length
+ or
+  
+M x,y v length
+).
+  Sub-part 3: 
+nameVisible
+~
+~pinName
+ (pin name and visibility).
+  Sub-part 4: 
+numVisible
+~
+~pinNumber
+ (pin number and visibility).
+  Optional sub-parts 5-6: 
+hasDot
+dotX
+dotY
+ and 
+hasClock~clockPath
+ for inverted
+  and clock pin decorations.
+T
+T
+textType
+x
+y
+angle
+color
+fontname
+fontSize
+~baselineAlign
+text
+visible~halign
+.
+  Text element within a symbol.  The 
+textType
+ field determines the field role:
+  
+P
+ maps to the reference field, 
+N
+ maps to the value field, any other value
+  creates a plain text item.
+Pin Electrical Types
+Pin electrical types are encoded as single-character numeric strings in the 
+elecType
+field of pin definitions.
+Value
+KiCad Mapping
+0
+Unspecified
+1
+Input
+2
+Output
+3
+Bidirectional
+4
+Passive
+Stroke Styles
+Line stroke styles are encoded as numeric strings.
+Value
+Style
+0
+Solid
+1
+Dash
+2
+Dot
+Power Flag Styles
+Power symbols use a numeric style identifier that determines the generated KiCad
+symbol graphics.
+Value
+Style Name
+Flag Type Name
+0
+Circle
+part_netLabel_Bar
+ (flipped)
+1
+Arrow
+(generic)
+2
+Bar
+part_netLabel_gNd
+, 
+part_netLabel_VCC
+ (flipped),
+                               
+part_netLabel_+5V
+ (flipped), 
+part_netLabel_VEE
+,
+                               
+part_netLabel_-5V
+3
+Wave
+(generic)
+4
+Power Ground
+part_netLabel_gnD
+5
+Signal Ground
+part_netLabel_GNd
+6
+Earth
+part_netLabel_GnD
+7
+GOST Arrow
+(generic)
+8
+GOST Power Ground
+(generic)
+9
+GOST Earth
+(generic)
+10
+GOST Bar
+(generic)
+PCB Shape Types
+PCB documents use the same tilde-delimited shape encoding.  Shapes appear at the board
+level or within 
+LIB
+ compound shapes representing footprints.
+Prefix
+Parameter Layout
+LIB
+LIB
+x
+y
+params
+rotation
+~importFlag
+layer~…​
+ followed by child shapes joined
+  with 
+#@$
+.  The 
+params
+ field uses backtick-delimited key-value pairs.  Layer 1
+  is front, layer 2 is back.
+TRACK
+TRACK
+width
+layer
+netname
+points
+.  Points is a space-delimited coordinate list.
+  Creates PCB track segments between consecutive coordinate pairs.  On non-copper
+  layers, segments are created as graphical shapes instead.
+CIRCLE
+CIRCLE
+cx
+cy
+radius
+width
+layer
+~~netname
+.  Creates a circle with the given
+  center, radius, and stroke width on the specified layer.
+RECT
+RECT
+x
+y
+width
+height
+layer
+~strokeWidth
+fillColor~~netname
+.  Creates a filled
+  or unfilled rectangle.
+ARC
+ARC
+strokeWidth
+layer
+netname
+pathData
+.  The path data uses SVG-style M and A
+  commands to define the arc geometry.  Arc center is computed from start, end, radius,
+  far-flag, and direction-flag using the standard SVG arc algorithm.
+DIMENSION
+DIMENSION
+layer
+shapeData
+~
+textHeight
+~
+lineWidth
+.  The shape data contains SVG
+  path commands defining dimension lines.  These are imported as grouped line segments,
+  not native KiCad dimension objects.
+SOLIDREGION
+SOLIDREGION
+layer
+netname
+pathData
+type
+.  Creates either a board cutout (when
+  layer is 
+11
+) or a filled zone.  The 
+type
+ field may be 
+cutout
+ (rule area
+  preventing zone fills) or empty (solid fill with full pad connection).
+COPPERAREA
+COPPERAREA
+strokeWidth
+layer
+netname
+pathData
+clearance
+fillStyle
+~thermal
+  keepIsland
+fillData
+~fillOrder
+~
+improveFabrication
+spokeWidth
+.
+  Creates a copper zone with fill data.  The 
+fillData
+ field is a JSON array of
+  polygon contour arrays.  
+thermal
+ may be 
+direct
+ (full pad connection).
+  
+keepIsland
+ may be 
+yes
+ (never remove islands).  
+fillOrder
+ controls zone
+  priority (higher values have lower priority).  
+spokeWidth
+ sets thermal relief
+  spoke width.
+SVGNODE
+SVGNODE~jsonData
+.  The JSON payload has 
+nodeType
+ (1 for element nodes),
+  
+layerid
+, and 
+attrs
+.  On layer 19 with 
+c_etype=outline3D
+, this defines a 3D
+  model reference with 
+uuid
+, 
+title
+, 
+c_origin
+, 
+c_rotation
+, 
+c_width
+,
+  
+c_height
+, and 
+z
+ offset.  On other layers, the 
+d
+ attribute contains SVG path
+  data defining filled polygon outlines.
+TEXT
+TEXT
+textType
+x
+y
+strokeWidth
+rotation
+layer
+fontSize
+text
+geometry
+~
+  display~font
+.  The 
+textType
+ field maps to footprint fields: 
+P
+ for reference,
+  
+N
+ for value.  The 
+display
+ field set to 
+none
+ creates a hidden field.
+VIA
+VIA
+x
+y
+diameter
+netname
+drillRadius
+.  Creates a through-hole via.  Inside
+  footprints, creates a PTH pad instead.
+HOLE
+HOLE
+x
+y
+radius
+uuid
+.  Creates an NPTH (non-plated through-hole) drill.  At the
+  board level, a standalone footprint is created to contain the hole.
+PAD
+PAD
+shape
+x
+y
+width
+height
+layer
+netname
+number
+holeDia
+polyPoints
+rotation
+  uuid
+holeLength
+plated
+~pasteExpansion
+maskExpansion
+.
+  Pad shape types: 
+ELLIPSE
+ (oval), 
+RECT
+ (rectangle), 
+OVAL
+ (circle if equal
+  dimensions, oval otherwise), 
+POLYGON
+ (custom shape from point data).
+  Layer 
+11
+ indicates through-hole; the 
+plated
+ field (
+Y
+/
+N
+) determines PTH vs.
+  NPTH.  Layer 1 is front SMD, layer 2 is back SMD.
+Layer Mapping
+EasyEDA Standard uses numeric layer identifiers that map to KiCad layers.
+EasyEDA Layer
+KiCad Layer
+Description
+1
+F.Cu
+Front copper
+2
+B.Cu
+Back copper
+3
+F.SilkS
+Front silkscreen
+4
+B.SilkS
+Back silkscreen
+5
+F.Paste
+Front solder paste
+6
+B.Paste
+Back solder paste
+7
+F.Mask
+Front solder mask
+8
+B.Mask
+Back solder mask
+10
+Edge.Cuts
+Board outline
+11
+Eco1.User
+Multi-layer / board cutout
+12
+Dwgs.User
+Document layer
+13
+F.Fab
+Front fabrication
+14
+B.Fab
+Back fabrication
+15
+Eco2.User
+Eco2 user layer
+19
+F.Fab
+3D model layer
+21-50
+In1.Cu-In30.Cu
+Inner copper layers
+EasyEDA Pro Format
+ZIP Archive Structure
+EasyEDA Pro files are ZIP archives with the following internal structure:
+File
+Description
+project.json
+Project manifest with schematics, boards, PCBs, devices, symbols,
+                     footprints, and their relationships
+device.json
+Device library manifest (in 
+.elibz
+ archives)
+footprint.json
+Footprint library manifest (in 
+.elibz
+ archives)
+symbol.json
+Symbol library manifest (in 
+.elibz
+ archives)
+*.esch
+Schematic sheet (JSON Lines format)
+*.epcb
+PCB layout (JSON Lines format)
+*.esym
+Symbol definition (JSON Lines format)
+*.efoo
+Footprint definition (JSON Lines format)
+*.eblob
+Binary blob data (embedded images)
+*.ecop
+Poured copper data (JSON Lines format)
+project.json Structure
+The project manifest is a standard JSON object with the following top-level keys:
+schematics
+ — map of schematic UUIDs to objects with 
+name
+ and 
+sheets
+ (each
+sheet has 
+id
+, 
+name
+, 
+uuid
+)
+boards
+ — map of board UUIDs to objects with 
+schematic
+ and 
+pcb
+ UUID references
+pcbs
+ — map of PCB UUIDs to PCB names or objects with 
+title
+devices
+ — map of device UUIDs to objects with 
+source
+, 
+description
+, 
+title
+,
+version
+, 
+tags
+, 
+custom_tags
+, and 
+attributes
+ (containing 
+Symbol
+, 
+Footprint
+,
+3D Model
+, 
+3D Model Title
+, 
+3D Model Transform
+, and custom attributes)
+symbols
+ — map of symbol UUIDs to objects with 
+source
+, 
+title
+, 
+version
+,
+type
+ (symbol type integer), 
+desc
+, 
+tags
+, and 
+custom_tags
+footprints
+ — map of footprint UUIDs to objects with 
+source
+, 
+title
+, 
+version
+,
+type
+, 
+desc
+, 
+tags
+, and 
+custom_tags
+Symbol Types
+Value
+Enum Name
+Description
+2
+NORMAL
+Standard schematic symbol
+18
+POWER_PORT
+Power port (creates global power label)
+19
+NETPORT
+Net port (creates global label)
+20
+SHEET_SYMBOL
+Sheet symbol for hierarchy
+22
+SHORT
+Short symbol
+JSON Lines Format
+Internal design files (
+.esch
+, 
+.epcb
+, 
+.esym
+, 
+.efoo
+) use the JSON Lines format
+where each line is a standalone JSON array.  The first element of each array is a
+string type identifier that determines how the remaining elements are interpreted.
+Empty lines serve as section separators.  In 
+.efoo
+ files, an empty line separates
+footprint data from PCB data, allowing both to coexist in a single file.
+Coordinate System and Scaling
+EasyEDA Pro uses a different coordinate system from Standard.  The Y axis is inverted
+relative to KiCad (EasyEDA Pro Y increases downward; KiCad schematic Y increases
+upward).
+The schematic parser scales values as:
+ScaleSize(value) = round(MilsToIU(value * 10))
+ScalePos(x, y) = (ScaleSize(x), -ScaleSize(y))
+The PCB parser uses a different scale factor:
+ScaleSize(value) = round(value * 25400.0 / 500.0) * 500
+ScalePos(x, y) = (ScaleSize(x), -ScaleSize(y))
+Both include Y-axis inversion in position calculations.  The PCB scale formula converts
+from EasyEDA Pro units to nanometers with rounding to the nearest 500nm.
+Schematic Line Types
+Type Identifier
+Array Layout
+HEAD
+[&#34;HEAD&#34;, config]
+ where 
+config
+ is an object with 
+originX
+, 
+originY
+, 
+maxId
+,
+  
+version
+, and 
+symbolType
+ (integer matching the SYMBOL_TYPE enum).
+COMPONENT
+[&#34;COMPONENT&#34;, id, name, x, y, rotation, mirror, customProps, unk]
+.  Places a
+  component instance.  Attributes for this component (Device, Symbol, Designator,
+  etc.) are linked via ATTR lines with matching 
+parentId
+.
+WIRE
+[&#34;WIRE&#34;, id, geometry, lineStyle]
+.  The 
+geometry
+ field is an array of coordinate
+  arrays, where each sub-array defines a polyline segment as 
+[x1, y1, x2, y2, …​]
+.
+ATTR
+[&#34;ATTR&#34;, id, parentId, key, value, keyVisible, valVisible, x, y, rotation,
+  fontStyle]
+.  Attributes attach to their parent by 
+parentId
+.  When 
+parentId
+ is
+  empty, the attribute belongs to the document root.  Standard keys include 
+Device
+,
+  
+Symbol
+, 
+Designator
+, 
+Name
+, 
+Value
+, 
+Global Net Name
+, 
+Description
+,
+  
+Footprint
+, and 
+Unique ID
+.
+RECT
+[&#34;RECT&#34;, id, x1, y1, x2, y2, …​, lineStyleId]
+.  Rectangle with start and end
+  corners.
+CIRCLE
+[&#34;CIRCLE&#34;, id, cx, cy, radius, lineStyleId]
+.  Circle with center and radius.
+ARC
+[&#34;ARC&#34;, id, startX, startY, midX, midY, endX, endY, lineStyleId]
+.  Arc defined by
+  start, midpoint, and end.
+POLY
+[&#34;POLY&#34;, id, [x1, y1, x2, y2, …​], closed, lineStyleId]
+.  Polyline or polygon
+  with coordinate array.
+BEZIER
+[&#34;BEZIER&#34;, id, [x1, y1, cx1, cy1, cx2, cy2, x2, y2], lineStyleId]
+.  Cubic bezier
+  curve with start, two control points, and end.
+TEXT
+[&#34;TEXT&#34;, id, x, y, angle, text, fontStyleId]
+.  Text element with position,
+  rotation, and named font style reference.
+OBJ
+[&#34;OBJ&#34;, id, unk, …​]
+.  Embedded image object.  Two variants exist depending on
+  whether element 3 is a number (inline format with x, y, w, h, angle, flipped,
+  dataUrl) or a string (mime-prefixed format with mimeType, x, y, w, h, angle, data).
+  Images may reference 
+blob:objectId
+ URLs that resolve through the blob map.
+PIN
+[&#34;PIN&#34;, id, unk1, unk2, x, y, length, rotation, unk3, invertedFlag]
+.  Pin
+  definition within a symbol.  
+invertedFlag
+ value of 2 indicates an inverted
+  (bubble) pin.  Pin attributes (Pin Name, Pin Number, Pin Type, NO_CONNECT) are
+  linked via ATTR lines.
+PART
+[&#34;PART&#34;, partId]
+.  Marks the beginning of a new unit in a multi-unit symbol.
+LINESTYLE
+[&#34;LINESTYLE&#34;, id, …​]
+.  Named line style definition with color, dash pattern,
+  and thickness.
+FONTSTYLE
+[&#34;FONTSTYLE&#34;, id, unk1, unk2, color, fontName, fontSize, …​, valign, halign]
+.
+  Named font style definition.  Font size is scaled by 0.62 during import.  Alignment
+  values: 0=top/left, 1=center, 2=bottom/right.
+PCB Line Types
+Type Identifier
+Array Layout
+LAYER
+[&#34;LAYER&#34;, layerId, layerType, layerName, enableFlag]
+.  Layer configuration.  When
+  
+enableFlag
+ is non-zero, the layer is added to the board’s enabled layer set.
+NET
+[&#34;NET&#34;, netname]
+.  Net declaration.  All nets must be declared before they are
+  referenced by other elements.
+RULE
+[&#34;RULE&#34;, ruleType, ruleName, isDefault, ruleData]
+.  Design rule.  Rule type 
+3
+  is track width (data: 
+[units, min, opt, max]
+).  Rule type 
+1
+ is clearance
+  (data: 
+[units, clearanceTable]
+).
+VIA
+[&#34;VIA&#34;, id, unk, netname, unk2, x, y, drill, diameter]
+.  Through-hole via
+  placement.
+LINE
+[&#34;LINE&#34;, id, unk, netname, layer, startX, startY, endX, endY, width]
+.  Single
+  track segment.
+ARC
+[&#34;ARC&#34;, id, unk, netname, layer, startX, startY, endX, endY, angle, width]
+.
+  Arc track segment.  The 
+angle
+ field is the included arc angle in degrees; arc
+  center is computed from start, end, and angle using perpendicular bisector geometry.
+POLY
+[&#34;POLY&#34;, id, unk, netname, layer, thickness, polyData]
+.  Graphical polyline.
+  The 
+polyData
+ field is a JSON array using the Pro polygon encoding (see below).
+FILL
+[&#34;FILL&#34;, id, unk, netname, layer, width, unk2, polyDataList]
+.  Solid copper fill.
+  Creates a zone with the fill polygon as pre-poured data.  Angles in fill poly data
+  are scaled by 10x.
+POUR
+[&#34;POUR&#34;, id, unk, netname, layer, lineWidth, pourName, fillOrder, polyDataList]
+.
+  Copper pour zone outline.  
+fillOrder
+ determines zone priority.  Poured copper
+  data is provided separately through POURED lines or 
+.ecop
+ files.
+POURED
+[&#34;POURED&#34;, pouredId, parentPourId, unk, isPoly, polyData]
+.  Poured copper fill
+  data linked to a POUR by 
+parentPourId
+.  The 
+isPoly
+ flag distinguishes between
+  solid fill contours and thermal relief spoke geometry.
+TEARDROP
+[&#34;TEARDROP&#34;, id, netname, layer, polyData]
+.  Teardrop shape imported as a
+  pre-filled zone with unspecified teardrop type.
+REGION
+[&#34;REGION&#34;, id, unk, layer, width, flags, polyDataList]
+.  Rule area or board
+  outline.  The 
+flags
+ set determines restrictions: flag 2 = no footprints, flag 5 =
+  no tracks, flag 6/8 = no zone fills, flag 7 = no copper at all (tracks, vias, pads,
+  fills).
+PAD
+[&#34;PAD&#34;, id, unk, netname, layer, padNumber, x, y, orientation, holeData, shapeData,
+  …​, drillDirection]
+.
+  The 
+holeData
+ array is 
+[holeType, width, height]
+ where holeType is 
+ROUND
+ or
+  
+SLOT
+.  A hole with zero dimensions creates an SMD pad.
+  The 
+shapeData
+ array is 
+[shapeName, …​]
+ where shapeName is 
+RECT
+  (
+[w, h, cornerRadiusPct]
+), 
+ELLIPSE
+ (
+[w, h]
+), 
+OVAL
+ (
+[w, h]
+), or
+  
+POLY
+/
+POLYGON
+ (
+[polyData]
+).
+IMAGE
+[&#34;IMAGE&#34;, id, unk, layer, x, y, width, height, angle, mirror, polyDataList]
+.
+  Reference image defined by polygon outlines scaled to the specified dimensions.
+OBJ
+[&#34;OBJ&#34;, id, unk, layer, unk2, x, y, width, height, angle, flipped, imageUrl]
+.
+  Bitmap image with support for blob URLs.
+STRING
+[&#34;STRING&#34;, id, unk, layer, x, y, text, font, height, strokeWidth, …​, align,
+  angle, inverted, unk, mirror]
+.  PCB text element.  The 
+align
+ field uses a 1-9
+  grid (1=top-left through 9=bottom-right).
+COMPONENT
+[&#34;COMPONENT&#34;, compId, unk, layer, x, y, orientation, localAttribs]
+.  Places a
+  footprint instance.  The 
+localAttribs
+ field is a map of attribute overrides.
+  Component attributes (Device, Footprint, Designator) and pad nets are linked via
+  ATTR and PAD_NET lines with matching component ID.
+ATTR
+[&#34;ATTR&#34;, id, unk, parentId, layer, x, y, key, value, keyVisible, valVisible,
+  fontName, height, strokeWidth, …​, textOrigin, rotation, inverted]
+.  PCB attribute
+  attached to a component or standalone.  The 
+textOrigin
+ field uses the same 1-9
+  alignment grid as STRING.
+PAD_NET
+[&#34;PAD_NET&#34;, compId, padNumber, netname]
+.  Assigns a net to a specific pad within
+  a component.
+DOCTYPE
+Document type identifier line (appears in some file formats).
+HEAD
+Header configuration line.
+Pro Polygon Encoding
+EasyEDA Pro uses a JSON array encoding for polygon contour data, distinct from the
+SVG-like path strings in Standard.  Elements alternate between coordinate pairs and
+command strings:
+Command
+Parameters
+(numbers)
+x, y
+ — sets the current point
+L
+followed by 
+x, y
+ pairs — line-to commands
+ARC
+angle, endX, endY
+ — arc from current point to end with given angle
+CARC
+angle, endX, endY
+ — same as ARC (alternate name)
+C
+cx1, cy1, cx2, cy2, x, y
+ — cubic bezier curve
+CIRCLE
+cx, cy, radius
+ — standalone circle
+R
+x, y, width, height, angle [, cornerRadius]
+ — rectangle with optional
+               rounded corners and rotation
+In fill data from 
+.epcb
+ files, arc angles are multiplied by 10 and must be divided
+during import.
+Symbol and Footprint Line Types
+Symbol files (
+.esym
+) use the same line types as schematic files (HEAD, PIN, ATTR,
+PART, RECT, CIRCLE, ARC, POLY, BEZIER, TEXT, OBJ, LINESTYLE, FONTSTYLE).
+Footprint files (
+.efoo
+) use the same line types as PCB files (POLY, PAD, FILL, ATTR,
+REGION).  An empty line in a 
+.efoo
+ file separates the footprint data from additional
+PCB-level data.
+Pro Layer Mapping
+EasyEDA Pro uses a different layer numbering scheme from Standard.
+EasyEDA Pro Layer
+KiCad Layer
+Description
+1
+F.Cu
+Front copper
+2
+B.Cu
+Back copper
+3
+F.SilkS
+Front silkscreen
+4
+B.SilkS
+Back silkscreen
+5
+F.Mask
+Front solder mask
+6
+B.Mask
+Back solder mask
+7
+F.Paste
+Front solder paste
+8
+B.Paste
+Back solder paste
+9
+F.Fab
+Front fabrication
+10
+B.Fab
+Back fabrication
+11
+Edge.Cuts
+Board outline
+12
+Edge.Cuts
+Multi-layer (also maps to Edge.Cuts)
+13
+Dwgs.User
+Document layer
+14
+Eco2.User
+Eco2 user layer
+15-44
+In1.Cu-In30.Cu
+Inner copper layers
+48
+F.Fab
+Component shape layer
+49
+F.Fab
+Component marking
+53
+User.4
+3D shell outline
+54
+User.5
+3D shell top
+55
+User.6
+3D shell bottom
+56
+User.7
+Drill drawing
+Note that the solder mask and paste layer numbering differs between Standard and Pro.
+In Standard, paste is layers 5/6 and mask is 7/8.  In Pro, mask is layers 5/6 and
+paste is 7/8.
+Schematic
+Imported Elements
+Symbol instances with reference, value, and custom fields
+Multi-sheet schematics (Standard creates sub-sheets automatically; Pro supports
+sheet hierarchy)
+Wires, net labels, junctions, and no-connect markers
+Power symbols with multiple flag styles (circle, arrow, bar, wave, power ground,
+signal ground, earth, and GOST variants)
+Global labels (net ports)
+Text elements with font, size, rotation, and alignment
+Rectangles and images (SVG and raster, both inline and blob-referenced)
+Pin electrical types and visibility control
+Multi-unit symbols (Pro)
+Components with symbol references and device attribute mapping (Pro)
+Named font and line style lookups (Pro)
+Limitations
+Rounded rectangles are not supported; corner radius values are ignored.
+Ellipses are treated as circles using only the X radius.
+Image and bitmap rotation is not applied in Pro.
+Per-unit symbol attributes are limited to unit 1 in Pro.
+Standalone 
+.esym
+ file import is partially disabled.
+Layout
+Imported Elements
+Board outline with automatic shape healing (segments within 1.5mm are joined)
+Tracks, vias, and arcs with width, layer, and net assignment
+Pads with multiple shape types:
+Standard: ellipse (oval), rectangle, oval, polygon (custom)
+Pro: rectangle (with optional corner radius percentage for rounded rect), ellipse,
+oval, polygon
+Pad attributes (SMD, PTH, NPTH) with front/back/through-hole layer configuration
+Copper zones with fill data, thermal relief, island removal, and priority
+Solid regions including board cutouts
+Copper pours with pre-poured data (Pro)
+Teardrops converted to zones (Pro)
+Rule areas with configurable restrictions (no copper, no tracks, no fills, no
+footprints)
+Circles, rectangles, arcs, dimensions, and text
+SVG node shapes with filled polygon outlines (Standard)
+3D model references with offset, rotation, and fit dimensions
+Footprints with auto-generated courtyard if missing
+Layer mapping for up to 30 inner copper layers
+DRC rules (track width, clearance, via diameter, via drill)
+Solder paste and mask expansion per pad
+Reference images (Pro)
+Net assignment from project data (Pro)
+Limitations
+Dimensions are imported as grouped line segments, not native dimension objects
+(Standard).
+3D model paths are hardcoded to 
+${KIPRJMOD}/EASYEDA_MODELS/
+.
+Component rotation is limited to 90-degree increments in some cases (Pro).
+Poured copper from 
+.ecop
+ files is disabled by default (Pro).
+The importer is read-only.
+Undocumented Areas
+The following aspects of the EasyEDA formats are not fully understood or documented:
+The complete set of 
+canvas
+ field parameters in Standard format documents.
+Exact behavior of all stroke style and fill mode combinations.
+The full range of 
+SVGNODE
+ node types beyond type 1 (element nodes).
+Image transform concatenation edge cases in Standard format.
+The complete set of REGION flags in Pro format beyond flags 2, 5, 6, 7, and 8.
+Differences between JLCEDA V2 and V3 attribute naming (Pro uses both 
+NAME
+/
+NUMBER
+and 
+Pin Name
+/
+Pin Number
+ depending on the editor version).
+The 
+unk
+ fields present in many Pro line types, which appear to be reserved or
+format-version-dependent.
+            
+ Last Modified 
+2026-02-10
+            
+          
+        
+      
+    
+    
+      
+      
+        
+  
+        
+        
+          
+            
+            
+Search
+            
+            
+          
+        
+        
+        
+        
+        
+        
+        
+        
+      
+      
+        
+      
+      
+        
+          
+          
+ Getting Started
+          
+ Build
+          
+Getting Started
+          
+Linux
+          
+macOS
+          
+Windows (MSYS2)
+          
+Windows (Visual Studio)
+          
+Build Options
+          
+ Rules and Guidelines
+          
+Code Style Policy
+          
+Commit Message Format Policy
+          
+Code Contribution Policy
+          
+Stable Release Policy
+          
+Code Design Guidelines
+          
+Icon Design Guidelines
+          
+KiCad Developer Culture
+          
+User Interface Policy
+          
+Anti-Patterns
+          
+Tool-Generated Content Policy
+          
+ Components
+          
+Settings Framework
+          
+Tool Framework
+          
+Plugins Framework
+          
+Testing
+          
+S-Expressions
+          
+ APIs and Bindings
+          
+KiCad IPC API
+          
+For KiCad Developers
+          
+For Add-on Developers
+          
+HTTP Libraries
+          
+PCB Python Bindings
+          
+ Source Code Docs
+          
+ Translation
+          
+ KiCad Addons
+          
+ File Formats
+          
+S-Expression Format
+          
+Footprint Library File Format
+          
+Board File Format
+          
+Symbol Library File Format
+          
+Schematic File Format
+          
+Work Sheet File Format
+          
+ Legacy Formats (4.0 up to 6.0)
+          
+Legacy Board Format (pre 4.0)
+          
+ Import Formats
+          
+Allegro
+          
+Altium
+          
+CADSTAR
+          
+Eagle
+          
+EasyEDA
+          
+Fabmaster
+          
+gEDA / Lepton EDA
+          
+LTspice
+          
+P-CAD
+          
+PADS
+          
+        
+        
+          
+More
+          
+            
+ GitLab repo
+          
+        
+        
+        
+          
+          
+            
+              
+                
+                  
+                  
+&nbsp;
+                  
+                    
+Language
+                    
+                      
+English
+                    
+                  
+                  
+                
+              
+              
+                
+                  
+                  
+&nbsp;
+                  
+                    
+Theme
+                    
+                      
+Auto
+                      
+Zen Light
+                      
+Zen Dark
+                    
+                  
+                  
+                
+                
+              
+              
+                
+                  
+                  
+&nbsp;
+                  
+                    
+Clear History
+                  
+                  
+                
+              
+            
+          
+          
+	    
+Built with 
+ by 
+Hugo
+          
+        
+      
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  

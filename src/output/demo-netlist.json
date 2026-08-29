@@ -1,0 +1,75 @@
+{
+  "source": "demo.json",
+  "generatedBy": "dsh-lichuang-eda json-gen.js deriveNetlist",
+  "components": [
+    {
+      "designator": "R1",
+      "pins": [
+        {
+          "number": "1"
+        },
+        {
+          "number": "2"
+        }
+      ]
+    },
+    {
+      "designator": "LED1",
+      "pins": [
+        {
+          "number": "1"
+        },
+        {
+          "number": "2"
+        }
+      ]
+    }
+  ],
+  "nets": [
+    {
+      "name": "Net1",
+      "label": null,
+      "pins": [
+        {
+          "designator": "LED1",
+          "number": "1"
+        },
+        {
+          "designator": "R1",
+          "number": "1"
+        }
+      ],
+      "wireVertices": 4,
+      "closed": true
+    },
+    {
+      "name": "5V",
+      "label": "5V",
+      "pins": [
+        {
+          "designator": "R1",
+          "number": "2"
+        }
+      ],
+      "wireVertices": 0,
+      "closed": true
+    },
+    {
+      "name": "GND",
+      "label": "GND",
+      "pins": [
+        {
+          "designator": "LED1",
+          "number": "2"
+        }
+      ],
+      "wireVertices": 0,
+      "closed": true
+    }
+  ],
+  "checks": {
+    "ok": true,
+    "errors": [],
+    "warnings": []
+  }
+}

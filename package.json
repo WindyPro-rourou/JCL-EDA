@@ -1,0 +1,18 @@
+{
+  "name": "dsh-lichuang-eda-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "dsh-lichuang-eda workspace: 嘉立创 EDA 助手（插件 + 标准版 JSON 生成器 + 校验 + 测试门禁）",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "scripts": {
+    "gen": "node src/json-gen.js",
+    "test": "node --test src/json-gen.test.js",
+    "test:json": "node --test --experimental-test-isolation=none src/json-gen.test.js",
+    "test:plugin": "node plugin/selfcheck.mjs && node --experimental-test-isolation=none --test \"plugin/test/*.test.mjs\"",
+    "test:all": "npm run test:json && npm run test:plugin",
+    "check": "node --check plugin/lib/index.js && node --check plugin/lib/client.js && node --check plugin/lib/backend.js"
+  }
+}
