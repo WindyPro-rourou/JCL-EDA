@@ -33,6 +33,9 @@ const rootPkg = JSON.parse(await readFile(join(ROOT, 'package.json'), 'utf8'))
 const tmpRc = existsSync(npmCli) ? null : null
 const staged = { ...rootPkg }
 if (PKG_NAME) staged.name = PKG_NAME
+// 发布时 npm 会执行包内 scripts 生命周期（如 publish/prepublishOnly）；暂存副本里没有 scripts/，
+// 会触发递归失败。发布产物不需要 scripts，直接剥掉，避免 execute 到不存在的 scripts/publish.mjs。
+delete staged.scripts
 
 const work = await mkdtemp(join(tmpdir(), 'eda-pub-'))
 try {
@@ -40,7 +43,7 @@ try {
   // 用 work 目录里的 package.json 做为发布上下文（lib/src 在 ROOT → cwd 必须在 ROOT；
   // 简单方案：把 lib/src/patch/readme 复制进 work（小仓库，快））
   const { cp } = await import('node:fs/promises')
-  for (const entry of ['lib', 'src', 'cordis.patch.yml', 'README.md']) {
+  for (const entry of ['lib', 'src', 'skill', 'cordis.patch.yml', 'README.md']) {
     await cp(join(ROOT, entry), join(work, entry), { recursive: true, filter: (p) => !/(^|[\\/])(node_modules|test|fixtures|scripts)([\\/]|$)/.test(p) && !/\.test\.js$/.test(p) && !/\.bundle\.js$/.test(p) })
   }
   const token = process.env.NPM_TOKEN
