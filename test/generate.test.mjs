@@ -359,3 +359,41 @@ test('POST /api/dsh-eda/bridge 路由：合法 JSON + 无 ReferenceError（安�
     assert.match(json.error ?? '', /未安装|未连接|官方桥/)
   }
 })
+
+test('eda_place / eda_wire / eda_netflag / eda_save: 注册 + 未连接时明确错误而非崩溃', async () => {
+  const { tools } = mountPlugin()
+  const base = { signal: new AbortController().signal }
+
+  // eda_place: 合法 keyword → 未连接错误
+  const place = findTool(tools, 'eda_place')
+  assert.ok(place, 'eda_place registered')
+  const pr = await place.execute({ keyword: 'LED' }, base)
+  assert.equal(pr.ok, false)
+  assert.match(pr.error, /未连接/)
+
+  // eda_wire: 合法 points（2 点水平段）→ 未连接错误
+  const wire = findTool(tools, 'eda_wire')
+  assert.ok(wire, 'eda_wire registered')
+  const wr = await wire.execute({ points: [100, 100, 200, 100] }, base)
+  assert.equal(wr.ok, false)
+  assert.match(wr.error, /未连接/)
+  // 参数校验在未连接之前：points<4 → 参数错误而非未连接
+  const wp = await wire.execute({ points: [100, 100] }, base)
+  assert.equal(wp.ok, false)
+  assert.match(wp.error, /至少两个点/)
+  assert.doesNotMatch(wp.error, /未连接/)
+
+  // eda_netflag: 合法参数 → 未连接错误
+  const netflag = findTool(tools, 'eda_netflag')
+  assert.ok(netflag, 'eda_netflag registered')
+  const nf = await netflag.execute({ type: 'Ground', net: 'GND', x: 100, y: 100 }, base)
+  assert.equal(nf.ok, false)
+  assert.match(nf.error, /未连接/)
+
+  // eda_save: 无参数 → 未连接错误
+  const save = findTool(tools, 'eda_save')
+  assert.ok(save, 'eda_save registered')
+  const sv = await save.execute({}, base)
+  assert.equal(sv.ok, false)
+  assert.match(sv.error, /未连接/)
+})

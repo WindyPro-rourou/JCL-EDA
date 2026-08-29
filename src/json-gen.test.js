@@ -38,6 +38,9 @@ import {
   pinPoints,
 } from './validate.js'
 
+// ---- nl-to-design 模板目录（供模板卡/关键词路由测试）----
+import { templateById, translateRequest, TEMPLATE_CATALOG } from './nl-to-design.js'
+
 const pinsOf = (pins) => pins.map((p) => `${p.designator}.${p.number}`).sort()
 const sheetPinsOf = (pins) => pins.map((p) => `${p.designator}.${p.number}`).sort()
 
@@ -120,6 +123,51 @@ test('pinPoints：resistor/led 引脚几何与生成器一致（±50/±40）', (
   assert.deepEqual(r.map((p) => [p.x, p.y]), [[450, 300], [350, 300]])
   const l = pinPoints({ ref: 'D1', type: 'led', pos: { x: 700, y: 300 } })
   assert.deepEqual(l.map((p) => [p.x, p.y]), [[740, 300], [660, 300]])
+})
+
+test('pinPoints：capacitor/diode/switch 引脚几何与生成器一致', () => {
+  // capacitor/switch: ±50；diode: ±40（阳极右/阴极左）
+  assert.deepEqual(pinPoints({ ref: 'C1', type: 'capacitor', pos: { x: 400, y: 300 } }).map((p) => [p.x, p.y]),
+    [[450, 300], [350, 300]])
+  assert.deepEqual(pinPoints({ ref: 'S1', type: 'switch', pos: { x: 400, y: 300 } }).map((p) => [p.x, p.y]),
+    [[450, 300], [350, 300]])
+  assert.deepEqual(pinPoints({ ref: 'D1', type: 'diode', pos: { x: 700, y: 300 } }).map((p) => [p.x, p.y]),
+    [[740, 300], [660, 300]])
+})
+
+test('capacitor 去耦：VCC→C→GND 生成 + 结构 lint + 连通性 + 网表自检 全通过', () => {
+  const cap = {
+    name: 'cap-bypass',
+    components: [{ ref: 'C1', type: 'capacitor', value: '0.1u', pos: { x: 400, y: 300 } }],
+    wires: [],
+    nets: [{ name: '5V', points: [[450, 300]] }, { name: 'GND', points: [[350, 300]] }],
+  }
+  const sheet = generateSchematic(cap)
+  assert.equal(validateSchematic(sheet).ok, true, validateSchematic(sheet).errors.join('; '))
+  assert.equal(checkConnectivity(cap).ok, true, checkConnectivity(cap).errors.join('; '))
+  const nl = deriveNetlistFromSheet(sheet)
+  assert.equal(nl.checks.ok, true, nl.checks.errors.join('; '))
+  const byName = Object.fromEntries(nl.nets.map((n) => [n.name, n]))
+  assert.ok(byName['5V'] && byName['GND'], '应含 5V/GND 命名网')
+})
+
+test('新符号：capacitor/diode/switch 混合设计 generateSchematic 不抛错且结构 lint 通过', () => {
+  const mix = {
+    name: 'mix',
+    components: [
+      { ref: 'R1', type: 'resistor', value: '1k', pos: { x: 200, y: 300 } },
+      { ref: 'C1', type: 'capacitor', value: '0.1u', pos: { x: 400, y: 460 } },
+      { ref: 'D1', type: 'diode', value: '1N4007', pos: { x: 600, y: 300 } },
+      { ref: 'S1', type: 'switch', value: 'SW', pos: { x: 850, y: 300 } },
+    ],
+    wires: [],
+    nets: [{ name: '5V', points: [[150, 300]] }, { name: 'GND', points: [[900, 300]] }],
+  }
+  const sheet = generateSchematic(mix)
+  assert.equal(validateSchematic(sheet).ok, true, validateSchematic(sheet).errors.join('; '))
+  const prefixes = {}
+  for (const s of sheet.shape) prefixes[s.split('~')[0]] = (prefixes[s.split('~')[0]] ?? 0) + 1
+  assert.equal(prefixes.LIB, 4, '应有 4 个元件 LIB')
 })
 
 test('wrapAsProject：docType=5 工程包装，dataStr 与平面单片一致', () => {
@@ -231,10 +279,26 @@ test('不支持的元件类型：generateSchematic 抛出明确错误', () => {
     () =>
       generateSchematic({
         ...DEFAULT_DESIGN,
-        components: [{ ref: 'X1', type: 'capacitor', value: '1u', pos: { x: 0, y: 0 } }],
+        components: [{ ref: 'X1', type: 'ic', value: 'X', pos: { x: 0, y: 0 } }],
       }),
     /不支持的元件类型/,
   )
+})
+
+test('new-symbol templates: cap-bypass/diode-protect/switch-demo 生成 ok 且设计闭合', () => {
+  const supported = TEMPLATE_CATALOG.filter((t) => t.supported === true)
+  assert.ok(supported.length >= 5, '应有 ≥5 个支持模板: ' + supported.map((t) => t.id).join(', '))
+  for (const id of ['cap-bypass', 'diode-protect', 'switch-demo']) {
+    const r = templateById(id)
+    assert.equal(r.ok, true, `${id} 应生成成功: ${r.note || ''}`)
+    assert.ok(r.design, `${id} 应有 design`)
+    const res = checkConnectivity(r.design)
+    assert.equal(res.ok, true, `${id} 连通性应通过: ${res.errors.join('; ')}`)
+  }
+  // 关键词路由
+  assert.ok(translateRequest('帮我加一个电源去耦电容').ok, '电容关键词应路由到模板')
+  assert.ok(translateRequest('一个二极管防反接电路').ok, '二极管关键词应路由')
+  assert.ok(translateRequest('开关电路').ok, '开关关键词应路由')
 })
 
 test('demo-netlist.json 与 demo.json 联动：生成器 main 产物可复现（幂等形状）', async () => {
@@ -243,4 +307,124 @@ test('demo-netlist.json 与 demo.json 联动：生成器 main 产物可复现（
   assert.equal(ok, true)
   assert.equal(netlist.checks.ok, true, netlist.checks.errors.join('; '))
   assert.equal(netlist.nets.length, 3)
+})
+
+// ============================================================================
+// 任务 4 新增：4 种新符号 + 3 个新模板 + pinPoints 全类型
+// ============================================================================
+
+test('新符号：inductor/crystal/battery/fuse 生成 + 结构 lint 通过（各 1 个 LIB）', () => {
+  const cases = [
+    ['L1', 'inductor', '10u'],
+    ['Y1', 'crystal', '16MHz'],
+    ['BT1', 'battery', '3.7V'],
+    ['F1', 'fuse', '1A'],
+  ]
+  for (const [ref, type, value] of cases) {
+    const sheet = generateSchematic({ components: [{ ref, type, value, pos: { x: 400, y: 300 } }], nets: [] })
+    const lint = validateSchematic(sheet)
+    assert.equal(lint.ok, true, `${type} 结构 lint 应通过: ${lint.errors.join('; ')}`)
+    const libs = sheet.shape.filter((s) => s.startsWith('LIB'))
+    assert.equal(libs.length, 1, `${type} 应恰有 1 个 LIB`)
+    assert.ok(libs[0].includes('spiceSymbolName'), `${type} LIB 应包含 spiceSymbolName`)
+  }
+})
+
+test('pinPoints：新 6 类 → ±50；diode → ±40（与 led 同档）', () => {
+  // 两脚间距 100（±50）：电容/开关/电感/晶振/电池/保险丝（引脚1 右、引脚2 左）
+  for (const type of ['capacitor', 'switch', 'inductor', 'crystal', 'battery', 'fuse']) {
+    assert.deepEqual(
+      pinPoints({ ref: 'X1', type, pos: { x: 400, y: 300 } }).map((p) => [p.x, p.y]),
+      [[450, 300], [350, 300]],
+      `${type} 应为 ±50`,
+    )
+  }
+  // 两脚间距 80（±40）：二极管与 LED 同档（阳极右=引脚1，阴极左=引脚2）
+  assert.deepEqual(pinPoints({ ref: 'D1', type: 'diode', pos: { x: 700, y: 300 } }).map((p) => [p.x, p.y]),
+    [[740, 300], [660, 300]])
+  assert.deepEqual(pinPoints({ ref: 'L1', type: 'led', pos: { x: 700, y: 300 } }).map((p) => [p.x, p.y]),
+    [[740, 300], [660, 300]])
+})
+
+test('rc-delay 组合电路：translateRequest → 生成 + 结构 lint + 连通 + 网表自检 全通过', () => {
+  const rd = translateRequest('一个 RC 延时电路')
+  assert.equal(rd.ok, true, rd.note || '')
+  assert.equal(rd.title, 'RC 延时电路')
+  const types = rd.design.components.map((c) => c.type)
+  assert.ok(types.includes('resistor') && types.includes('capacitor'), `应含 resistor/capacitor: ${types.join(', ')}`)
+  const sheet = generateSchematic(rd.design)
+  assert.equal(validateSchematic(sheet).ok, true, validateSchematic(sheet).errors.join('; '))
+  assert.equal(checkConnectivity(rd.design).ok, true, checkConnectivity(rd.design).errors.join('; '))
+  const nl = deriveNetlistFromSheet(sheet)
+  assert.equal(nl.checks.ok, true, nl.checks.errors.join('; '))
+  const byName = Object.fromEntries(nl.nets.map((n) => [n.name, n]))
+  assert.ok(byName['5V'] && byName['GND'], 'rc-delay 应含 5V/GND 命名网')
+})
+
+test('diode-protect 组合电路：生成 + 结构 lint + 连通 + 网表自检 全通过', () => {
+  const dp = translateRequest('用二极管保护一下')
+  assert.equal(dp.ok, true, dp.note || '')
+  assert.ok(dp.design.components.some((c) => c.type === 'diode'), '应含二极管')
+  const sheet = generateSchematic(dp.design)
+  assert.equal(validateSchematic(sheet).ok, true, validateSchematic(sheet).errors.join('; '))
+  assert.equal(checkConnectivity(dp.design).ok, true, checkConnectivity(dp.design).errors.join('; '))
+  const nl = deriveNetlistFromSheet(sheet)
+  assert.equal(nl.checks.ok, true, nl.checks.errors.join('; '))
+})
+
+test('battery-switch-led 组合电路：生成 + 结构 lint + 连通 + 网表自检 全通过', () => {
+  const bsl = templateById('battery-switch-led')
+  assert.equal(bsl.ok, true, bsl.note || '')
+  const types = bsl.design.components.map((c) => c.type)
+  assert.ok(types.includes('battery') && types.includes('switch') && types.includes('led'),
+    `应含 battery/switch/led: ${types.join(', ')}`)
+  const sheet = generateSchematic(bsl.design)
+  assert.equal(validateSchematic(sheet).ok, true, validateSchematic(sheet).errors.join('; '))
+  assert.equal(checkConnectivity(bsl.design).ok, true, checkConnectivity(bsl.design).errors.join('; '))
+  const nl = deriveNetlistFromSheet(sheet)
+  assert.equal(nl.checks.ok, true, nl.checks.errors.join('; '))
+})
+
+test('nl-to-design：rc-delay / diode-protect / battery-switch-led 关键词命中且模板目录已登记', () => {
+  // 模板目录登记：3 条新模板均 supported:true
+  for (const id of ['rc-delay', 'diode-protect', 'battery-switch-led']) {
+    const meta = TEMPLATE_CATALOG.find((t) => t.id === id)
+    assert.ok(meta, `TEMPLATE_CATALOG 应包含 ${id}`)
+    assert.equal(meta.supported, true, `${id} 应为 supported:true`)
+  }
+  // 关键词路由
+  const rc = translateRequest('一个 RC 延时电路')
+  assert.equal(rc.ok, true)
+  assert.ok(rc.design.components.some((c) => c.type === 'capacitor'), 'rc-delay 应含 capacitor')
+
+  const dp = translateRequest('用二极管保护一下')
+  assert.equal(dp.ok, true)
+  assert.ok(dp.design.components.some((c) => c.type === 'diode'), 'diode-protect 应含 diode')
+
+  const bsl = translateRequest('电池开关灯')
+  assert.equal(bsl.ok, true)
+  const t = bsl.design.components.map((c) => c.type)
+  assert.ok(t.includes('switch') && t.includes('battery'), `电池开关灯应含 switch/battery: ${t.join(', ')}`)
+})
+
+test('9 种符号混合 generateSchematic 结构 lint 通过（含新 4 种）', () => {
+  const mix = {
+    components: [
+      { ref: 'R1', type: 'resistor', value: '1k', pos: { x: 200, y: 300 } },
+      { ref: 'L1', type: 'inductor', value: '10u', pos: { x: 400, y: 300 } },
+      { ref: 'C1', type: 'capacitor', value: '0.1u', pos: { x: 600, y: 300 } },
+      { ref: 'D1', type: 'diode', value: '1N4007', pos: { x: 800, y: 300 } },
+      { ref: 'Y1', type: 'crystal', value: '16MHz', pos: { x: 1000, y: 300 } },
+      { ref: 'BT1', type: 'battery', value: '3.7V', pos: { x: 1200, y: 300 } },
+      { ref: 'F1', type: 'fuse', value: '1A', pos: { x: 1400, y: 300 } },
+      { ref: 'S1', type: 'switch', value: 'SW', pos: { x: 1600, y: 300 } },
+      { ref: 'LED1', type: 'led', value: 'red', pos: { x: 1800, y: 300 } },
+    ],
+    wires: [],
+    nets: [],
+  }
+  const sheet = generateSchematic(mix)
+  assert.equal(validateSchematic(sheet).ok, true, validateSchematic(sheet).errors.join('; '))
+  const libs = sheet.shape.filter((s) => s.startsWith('LIB'))
+  assert.equal(libs.length, 9, '应有 9 个元件 LIB')
 })

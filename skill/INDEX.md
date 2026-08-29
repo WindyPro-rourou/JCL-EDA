@@ -2,6 +2,8 @@
 
 本目录为官方 easyeda-api-skill 文档的 vendored 拷贝（含 SKILL.md 总纲、官方 README、format/ 文档格式、guide/ 教程、references/ 参考文档）。agent 通过 `eda_skill_read` 查阅：`doc` 参数填本文件内的相对路径，如 `references/classes/SCH_PrimitiveComponent.md`。
 
+**线上权威源（与本站文档对应，可 web 交叉核对）**：<https://prodocs.easyeda.com/cn/api/reference/pro-api.html>（官方「扩展 API 参考」，类/枚举与 vendored 同代；若线上有更新版本差异，以 prodocs 为准并反馈。
+
 ## 入口
 
 | 文件 | 内容 |

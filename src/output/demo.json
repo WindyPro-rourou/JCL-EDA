@@ -8,7 +8,7 @@
     },
     "c_spiceCmd": "null",
     "hasIdFlag": true,
-    "uuid": "f6fcb04bffec11ada578a2debb29e780",
+    "uuid": "47e8f22f0b5a5751d3f92751ccff7179",
     "x": "0",
     "y": "0",
     "portOfADImportHack": "",
@@ -17,11 +17,11 @@
   },
   "canvas": "CA~1200~800~#FFFFFF~yes~#CCCCCC~10~1200~800~line~10~pixel~5~0~0",
   "shape": [
-    "LIB~400~300~package`NONE`nameAlias`Value`Value`10k`spicePre`R`spiceSymbolName`resistor`~0~0~gge100#@$T~P~400~274~0~#000080~Arial~~~~~comment~R1~1~start~gge99~0~pinpart#@$T~N~400~326~0~#000080~Arial~~~~~comment~10k~1~start~gge98~0~pinpart#@$R~370~290~~~60~20~#000000~1~0~none~gge95~0~#@$P~show~0~1~450~300~0~gge96~0^^450~300^^M 430 300 h 20~#880000^^1~436~296~0~1~start~~~#000000^^0~444~296~0~1~end~~~#000000^^0~463~300^^0~M 447 297 L 444 300 L 447 303#@$P~show~0~2~350~300~180~gge97~0^^350~300^^M 370 300 h -20~#880000^^1~364~296~0~2~start~~~#000000^^0~356~296~0~2~end~~~#000000^^0~337~300^^0~M 353 297 L 356 300 L 353 303",
-    "LIB~700~300~package`NONE`nameAlias`Value`Value`red`spicePre`D`spiceSymbolName`led`~0~0~gge107#@$T~P~700~274~0~#000080~Arial~~~~~comment~LED1~1~start~gge106~0~pinpart#@$T~N~700~326~0~#000080~Arial~~~~~comment~red~1~start~gge105~0~pinpart#@$PL~680 290 720 300 680 310 680 290~#A00000~1~0~none~gge101~0#@$PL~675 292 675 308~#A00000~1~0~none~gge102~0#@$P~show~0~1~740~300~0~gge103~0^^740~300^^M 720 300 h 20~#880000^^1~726~296~0~A~start~~~#000000^^0~734~296~0~1~end~~~#000000^^0~753~300^^0~M 737 297 L 734 300 L 737 303#@$P~show~0~2~660~300~180~gge104~0^^660~300^^M 680 300 h -20~#880000^^1~674~296~0~K~start~~~#000000^^0~666~296~0~2~end~~~#000000^^0~647~300^^0~M 663 297 L 666 300 L 663 303",
-    "W~450 300 450 380 740 380 740 300~#0099FF~1~0~none~gge108~0",
-    "N~350~300~0~#880000~5V~gge109~start~352~297.5~Times New Roman~7pt~0",
-    "F~part_netLabel_gnD~660~300~0~gge110~~0^^660~300^^GND~#000000~647~326~0~start~1~Times New Roman~9pt~flag_gge110^^PL~660 290 660 300~#000000~1~0~transparent~gge110_p1~0^^PL~651 290 669 290~#000000~1~0~transparent~gge110_p2~0^^PL~654 288 666 288~#000000~1~0~transparent~gge110_p3~0^^PL~657 286 663 286~#000000~1~0~transparent~gge110_p4~0^^PL~659 284 661 284~#000000~1~0~transparent~gge110_p5~0"
+    "LIB~400~300~package`NONE`nameAlias`Value`Value`10k`spicePre`R`spiceSymbolName`resistor`~0~0~gge145#@$T~P~400~274~0~#000080~Arial~~~~~comment~R1~1~start~gge144~0~pinpart#@$T~N~400~326~0~#000080~Arial~~~~~comment~10k~1~start~gge143~0~pinpart#@$R~370~290~~~60~20~#000000~1~0~none~gge140~0~#@$P~show~0~1~450~300~0~gge141~0^^450~300^^M 430 300 h 20~#880000^^1~436~296~0~1~start~~~#000000^^0~444~296~0~1~end~~~#000000^^0~463~300^^0~M 447 297 L 444 300 L 447 303#@$P~show~0~2~350~300~180~gge142~0^^350~300^^M 370 300 h -20~#880000^^1~364~296~0~2~start~~~#000000^^0~356~296~0~2~end~~~#000000^^0~337~300^^0~M 353 297 L 356 300 L 353 303",
+    "LIB~700~300~package`NONE`nameAlias`Value`Value`red`spicePre`D`spiceSymbolName`led`~0~0~gge152#@$T~P~700~274~0~#000080~Arial~~~~~comment~LED1~1~start~gge151~0~pinpart#@$T~N~700~326~0~#000080~Arial~~~~~comment~red~1~start~gge150~0~pinpart#@$PL~680 290 720 300 680 310 680 290~#A00000~1~0~none~gge146~0#@$PL~675 292 675 308~#A00000~1~0~none~gge147~0#@$P~show~0~1~740~300~0~gge148~0^^740~300^^M 720 300 h 20~#880000^^1~726~296~0~A~start~~~#000000^^0~734~296~0~1~end~~~#000000^^0~753~300^^0~M 737 297 L 734 300 L 737 303#@$P~show~0~2~660~300~180~gge149~0^^660~300^^M 680 300 h -20~#880000^^1~674~296~0~K~start~~~#000000^^0~666~296~0~2~end~~~#000000^^0~647~300^^0~M 663 297 L 666 300 L 663 303",
+    "W~450 300 450 380 740 380 740 300~#0099FF~1~0~none~gge153~0",
+    "N~350~300~0~#880000~5V~gge154~start~352~297.5~Times New Roman~7pt~0",
+    "F~part_netLabel_gnD~660~300~0~gge155~~0^^660~300^^GND~#000000~647~326~0~start~1~Times New Roman~9pt~flag_gge155^^PL~660 290 660 300~#000000~1~0~transparent~gge155_p1~0^^PL~651 290 669 290~#000000~1~0~transparent~gge155_p2~0^^PL~654 288 666 288~#000000~1~0~transparent~gge155_p3~0^^PL~657 286 663 286~#000000~1~0~transparent~gge155_p4~0^^PL~659 284 661 284~#000000~1~0~transparent~gge155_p5~0"
   ],
   "BBox": {
     "x": 290,

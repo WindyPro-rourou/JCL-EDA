@@ -274,10 +274,207 @@ export function buildLedLib(center, value, designator, opts = {}) {
   return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
 }
 
+/**
+ * 电容符号（两脚，水平）：两平行极板（竖直短线）+ 引脚引线，引脚间距 100（±50）。
+ * 位号在上、值在下。spice 前缀 C。
+ */
+export function buildCapacitorLib(center, value, designator, opts = {}) {
+  const cx = Number(center.x)
+  const cy = Number(center.y)
+  const pinLength = 20
+  const pin1x = cx + 50 // 右侧脚（旋转 0，连接点朝外）
+  const pin2x = cx - 50 // 左侧脚（旋转 180）
+  // 两平行极板，板间距 12
+  const plateL = polylineShape([[cx - 6, cy - 16], [cx - 6, cy + 16]], { color: '#000000' })
+  const plateR = polylineShape([[cx + 6, cy - 16], [cx + 6, cy + 16]], { color: '#000000' })
+  // 极板 → 引脚引线（图内可见，连接极板与引脚线）
+  const leadL = polylineShape([[cx - 30, cy], [cx - 6, cy]], { color: '#000000' })
+  const leadR = polylineShape([[cx + 30, cy], [cx + 6, cy]], { color: '#000000' })
+  const p1 = pinShape({ x: pin1x, y: cy, rotation: 0, number: 1, name: '1', id: nextId(), pinLength, color: '#880000' })
+  const p2 = pinShape({ x: pin2x, y: cy, rotation: 180, number: 2, name: '2', id: nextId(), pinLength, color: '#880000' })
+  const tValue = textShape('N', cx, cy + 26, value || '1u')
+  const tRef = textShape('P', cx, cy - 26, designator)
+  const cPara =
+    `package\`NONE\`nameAlias\`Value\`Value\`${sanitize(value || '1u')}\`spicePre\`C\`spiceSymbolName\`capacitor\``
+  const children = [tRef, tValue, plateL, plateR, leadL, leadR, p1, p2]
+  return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
+}
+
+/**
+ * 二极管符号（两脚，水平，阳极朝右）：三角形 + 阴极竖线，两脚间距 80（±40，同 LED）。
+ * 位号在上、值在下。spice 前缀 D（防反接/续流常用）。
+ */
+export function buildDiodeLib(center, value, designator, opts = {}) {
+  const cx = Number(center.x)
+  const cy = Number(center.y)
+  const pinLength = 20
+  const anodeX = cx + 40 // 阳极（右）
+  const cathodeX = cx - 40 // 阴极（左）
+  const tri = polylineShape(
+    [
+      [cx - 20, cy - 10],
+      [cx + 20, cy],
+      [cx - 20, cy + 10],
+      [cx - 20, cy - 10],
+    ],
+    { color: '#A00000' },
+  )
+  const bar = polylineShape(
+    [
+      [cx - 25, cy - 8],
+      [cx - 25, cy + 8],
+    ],
+    { color: '#A00000' },
+  )
+  const p1 = pinShape({ x: anodeX, y: cy, rotation: 0, number: 1, name: 'A', id: nextId(), pinLength, color: '#880000' })
+  const p2 = pinShape({ x: cathodeX, y: cy, rotation: 180, number: 2, name: 'K', id: nextId(), pinLength, color: '#880000' })
+  const tValue = textShape('N', cx, cy + 26, value || '1N4007')
+  const tRef = textShape('P', cx, cy - 26, designator)
+  const cPara =
+    `package\`NONE\`nameAlias\`Value\`Value\`${sanitize(value || '1N4007')}\`spicePre\`D\`spiceSymbolName\`diode\``
+  const children = [tRef, tValue, tri, bar, p1, p2]
+  return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
+}
+
+/**
+ * 开关符号（SPST，两脚，水平）：左右触点 + 斜向上扳杆（表示常开），引脚间距 100（±50）。
+ * 位号在上、值在下。spice 前缀 S。
+ */
+export function buildSwitchLib(center, value, designator, opts = {}) {
+  const cx = Number(center.x)
+  const cy = Number(center.y)
+  const pinLength = 20
+  const pin1x = cx + 50 // 右侧脚（旋转 0）
+  const pin2x = cx - 50 // 左侧脚（旋转 180）
+  const contactL = polylineShape([[cx - 20, cy - 5], [cx - 20, cy + 5]], { color: '#000000' })
+  const contactR = polylineShape([[cx + 20, cy - 5], [cx + 20, cy + 5]], { color: '#000000' })
+  const lever = polylineShape([[cx - 20, cy], [cx + 16, cy - 22]], { color: '#000000' })
+  const leadL = polylineShape([[cx - 50, cy], [cx - 20, cy]], { color: '#000000' })
+  const leadR = polylineShape([[cx + 20, cy], [cx + 50, cy]], { color: '#000000' })
+  const p1 = pinShape({ x: pin1x, y: cy, rotation: 0, number: 1, name: '1', id: nextId(), pinLength, color: '#880000' })
+  const p2 = pinShape({ x: pin2x, y: cy, rotation: 180, number: 2, name: '2', id: nextId(), pinLength, color: '#880000' })
+  const tValue = textShape('N', cx, cy + 26, value || 'SW')
+  const tRef = textShape('P', cx, cy - 26, designator)
+  const cPara =
+    `package\`NONE\`nameAlias\`Value\`Value\`${sanitize(value || 'SW')}\`spicePre\`S\`spiceSymbolName\`switch\``
+  const children = [tRef, tValue, contactL, contactR, lever, leadL, leadR, p1, p2]
+  return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
+}
+
+/**
+ * 电感符号（两脚，水平）：4 段半圆弧凸起（用 3 点折线近似），两脚间距 100（±50）。
+ * 位号在上、值在下。spice 前缀 L。
+ */
+export function buildInductorLib(center, value, designator, opts = {}) {
+  const cx = Number(center.x)
+  const cy = Number(center.y)
+  const pinLength = 20
+  const pin1x = cx + 50 // 右侧脚（旋转 0）
+  const pin2x = cx - 50 // 左侧脚（旋转 180）
+  // 4 段凸弧（各宽 20、凸高 14），对称分布在 cx-40..cx+40
+  const bumps = [
+    [[cx - 40, cy], [cx - 30, cy - 14], [cx - 20, cy]],
+    [[cx - 20, cy], [cx - 10, cy - 14], [cx, cy]],
+    [[cx, cy], [cx + 10, cy - 14], [cx + 20, cy]],
+    [[cx + 20, cy], [cx + 30, cy - 14], [cx + 40, cy]],
+  ]
+  const body = bumps.map((b) => polylineShape(b, { color: '#A00000' }))
+  const leadL = polylineShape([[cx - 40, cy], [cx - 30, cy]], { color: '#000000' })
+  const leadR = polylineShape([[cx + 30, cy], [cx + 40, cy]], { color: '#000000' })
+  const p1 = pinShape({ x: pin1x, y: cy, rotation: 0, number: 1, name: '1', id: nextId(), pinLength, color: '#880000' })
+  const p2 = pinShape({ x: pin2x, y: cy, rotation: 180, number: 2, name: '2', id: nextId(), pinLength, color: '#880000' })
+  const tValue = textShape('N', cx, cy + 26, value || '10u')
+  const tRef = textShape('P', cx, cy - 26, designator)
+  const cPara =
+    `package\`NONE\`nameAlias\`Value\`Value\`${sanitize(value || '10u')}\`spicePre\`L\`spiceSymbolName\`inductor\``
+  const children = [tRef, tValue, ...body, leadL, leadR, p1, p2]
+  return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
+}
+
+/**
+ * 晶振符号（两脚，水平）：中间矩形 + 两侧竖板，两脚间距 100（±50）。
+ * 位号在上、值在下。spice 前缀 X（晶振惯例 XTAL/Y，此处统一记作 X）。
+ */
+export function buildCrystalLib(center, value, designator, opts = {}) {
+  const cx = Number(center.x)
+  const cy = Number(center.y)
+  const pinLength = 20
+  const pin1x = cx + 50 // 右侧脚（旋转 0）
+  const pin2x = cx - 50 // 左侧脚（旋转 180）
+  const body = rectShape(cx - 12, cy - 10, 24, 20, { color: '#000000' })
+  const plateL = polylineShape([[cx - 20, cy - 10], [cx - 20, cy + 10]], { color: '#000000' })
+  const plateR = polylineShape([[cx + 20, cy - 10], [cx + 20, cy + 10]], { color: '#000000' })
+  const leadL = polylineShape([[cx - 30, cy], [cx - 20, cy]], { color: '#000000' })
+  const leadR = polylineShape([[cx + 20, cy], [cx + 30, cy]], { color: '#000000' })
+  const p1 = pinShape({ x: pin1x, y: cy, rotation: 0, number: 1, name: '1', id: nextId(), pinLength, color: '#880000' })
+  const p2 = pinShape({ x: pin2x, y: cy, rotation: 180, number: 2, name: '2', id: nextId(), pinLength, color: '#880000' })
+  const tValue = textShape('N', cx, cy + 26, value || '16MHz')
+  const tRef = textShape('P', cx, cy - 26, designator)
+  const cPara =
+    `package\`NONE\`nameAlias\`Value\`Value\`${sanitize(value || '16MHz')}\`spicePre\`X\`spiceSymbolName\`crystal\``
+  const children = [tRef, tValue, body, plateL, plateR, leadL, leadR, p1, p2]
+  return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
+}
+
+/**
+ * 电池符号（两脚，水平）：长短板交替（长板长、短板短），两脚间距 100（±50）。
+ * 位号在上、值在下。spice 前缀 BT。
+ */
+export function buildBatteryLib(center, value, designator, opts = {}) {
+  const cx = Number(center.x)
+  const cy = Number(center.y)
+  const pinLength = 20
+  const pin1x = cx + 50 // 右侧脚（旋转 0，负极侧）
+  const pin2x = cx - 50 // 左侧脚（旋转 180，正极侧）
+  const longPlate = polylineShape([[cx - 4, cy - 18], [cx - 4, cy + 18]], { color: '#000000' })
+  const shortPlate = polylineShape([[cx + 4, cy - 8], [cx + 4, cy + 8]], { color: '#000000' })
+  const leadL = polylineShape([[cx - 30, cy], [cx - 4, cy]], { color: '#000000' })
+  const leadR = polylineShape([[cx + 4, cy], [cx + 30, cy]], { color: '#000000' })
+  const p1 = pinShape({ x: pin1x, y: cy, rotation: 0, number: 1, name: '1', id: nextId(), pinLength, color: '#880000' })
+  const p2 = pinShape({ x: pin2x, y: cy, rotation: 180, number: 2, name: '2', id: nextId(), pinLength, color: '#880000' })
+  const tValue = textShape('N', cx, cy + 26, value || '3.7V')
+  const tRef = textShape('P', cx, cy - 26, designator)
+  const cPara =
+    `package\`NONE\`nameAlias\`Value\`Value\`${sanitize(value || '3.7V')}\`spicePre\`BT\`spiceSymbolName\`battery\``
+  const children = [tRef, tValue, longPlate, shortPlate, leadL, leadR, p1, p2]
+  return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
+}
+
+/**
+ * 保险丝符号（两脚，水平）：矩形 + 过中线，两脚间距 100（±50）。
+ * 位号在上、值在下。spice 前缀 F。
+ */
+export function buildFuseLib(center, value, designator, opts = {}) {
+  const cx = Number(center.x)
+  const cy = Number(center.y)
+  const pinLength = 20
+  const pin1x = cx + 50 // 右侧脚（旋转 0）
+  const pin2x = cx - 50 // 左侧脚（旋转 180）
+  const body = rectShape(cx - 16, cy - 4, 32, 8, { color: '#000000' })
+  const midLine = polylineShape([[cx - 16, cy], [cx + 16, cy]], { color: '#000000' })
+  const leadL = polylineShape([[cx - 30, cy], [cx - 16, cy]], { color: '#000000' })
+  const leadR = polylineShape([[cx + 16, cy], [cx + 30, cy]], { color: '#000000' })
+  const p1 = pinShape({ x: pin1x, y: cy, rotation: 0, number: 1, name: '1', id: nextId(), pinLength, color: '#880000' })
+  const p2 = pinShape({ x: pin2x, y: cy, rotation: 180, number: 2, name: '2', id: nextId(), pinLength, color: '#880000' })
+  const tValue = textShape('N', cx, cy + 26, value || '1A')
+  const tRef = textShape('P', cx, cy - 26, designator)
+  const cPara =
+    `package\`NONE\`nameAlias\`Value\`Value\`${sanitize(value || '1A')}\`spicePre\`F\`spiceSymbolName\`fuse\``
+  const children = [tRef, tValue, body, midLine, leadL, leadR, p1, p2]
+  return `LIB~${num(cx)}~${num(cy)}~${cPara}~0~0~${nextId()}#@$` + children.join('#@$')
+}
+
 /** 类型 → 符号构造器 */
 const SYMBOL_BUILDERS = {
   resistor: buildResistorLib,
   led: buildLedLib,
+  capacitor: buildCapacitorLib,
+  diode: buildDiodeLib,
+  switch: buildSwitchLib,
+  inductor: buildInductorLib,
+  crystal: buildCrystalLib,
+  battery: buildBatteryLib,
+  fuse: buildFuseLib,
 }
 
 // ----------------------------------------------------------------------------

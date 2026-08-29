@@ -6,8 +6,11 @@
 //   - deriveNetlist(design)    : 从 design（元件引脚/导线/网络）推导网表
 //   - checkConnectivity(design): 连通性检查（悬空引脚 / 孤立网络 / 未闭合）
 //
-// 说明：本次只支持 resistor / led 两种符号（与 SYMBOL_BUILDERS 一致），
-//       引脚几何与 buildResistorLib / buildLedLib 硬编码一致（旋转 0/180）。
+// 说明：支持 9 种两脚水平符号（与 json-gen.js 的 SYMBOL_BUILDERS 一致）：
+//       resistor / capacitor / switch / inductor / crystal / battery / fuse
+//          → 引脚间距 100（脚距 ±50，引脚1 在右 / 引脚2 在左）；
+//       led / diode → 引脚间距 80（脚距 ±40，引脚1=阳极在右 / 引脚2=阴极在左）。
+//       引脚几何与对应 buildXxxLib 硬编码一致（旋转 0/180）。
 // ============================================================================
 
 /** 坐标归一化为键（保留 2 位小数），用于去重/连通。 */
@@ -16,23 +19,35 @@ export function coordKey(x, y) {
 }
 
 /**
- * 元件引脚点（resistor: 右+50/左-50；led: 阳极+40/阴极-40；与生成器一致）。
+ * 元件引脚点（与生成器硬编码一致）：
+ *   led / diode：引脚1=阳极（右 +40），引脚2=阴极（左 -40），脚距 80；
+ *   resistor / capacitor / switch / inductor / crystal / battery / fuse：引脚1（右 +50），引脚2（左 -50），脚距 100。
  * @returns {Array<{x,y,ref,pin}>}
  */
 export function pinPoints(comp) {
   const cx = Number(comp.pos?.x ?? NaN)
   const cy = Number(comp.pos?.y ?? NaN)
   if (Number.isNaN(cx) || Number.isNaN(cy)) return []
-  if (comp.type === 'resistor') {
-    return [
-      { x: cx + 50, y: cy, ref: comp.ref, pin: 1 },
-      { x: cx - 50, y: cy, ref: comp.ref, pin: 2 },
-    ]
-  }
-  if (comp.type === 'led') {
+  // 两脚间距 80（±40）：LED / 二极管（阳极右=引脚1，阴极左=引脚2）
+  if (comp.type === 'led' || comp.type === 'diode') {
     return [
       { x: cx + 40, y: cy, ref: comp.ref, pin: 1 },
       { x: cx - 40, y: cy, ref: comp.ref, pin: 2 },
+    ]
+  }
+  // 两脚间距 100（±50）：电阻/电容/开关/电感/晶振/电池/保险丝（引脚1 右，引脚2 左）
+  if (
+    comp.type === 'resistor' ||
+    comp.type === 'capacitor' ||
+    comp.type === 'switch' ||
+    comp.type === 'inductor' ||
+    comp.type === 'crystal' ||
+    comp.type === 'battery' ||
+    comp.type === 'fuse'
+  ) {
+    return [
+      { x: cx + 50, y: cy, ref: comp.ref, pin: 1 },
+      { x: cx - 50, y: cy, ref: comp.ref, pin: 2 },
     ]
   }
   return []

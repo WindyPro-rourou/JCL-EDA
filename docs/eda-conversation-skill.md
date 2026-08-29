@@ -483,3 +483,6 @@ guide/、user-guide/、format/）。**规划任何画板动作前**：`eda_skill
 目标类文档（如 references/classes/SCH_PrimitiveComponent.md）→ 参考资料中的示例代码。
 文档很长时分页：truncated=true 时用 nextOffset 继续读。
 
+**线上权威源**：官方「扩展 API 参考」https://prodocs.easyeda.com/cn/api/reference/pro-api.html
+（与 vendored 同代文档；线上存在更新差异时以 prodocs 为准，并留意反馈。）
+
