@@ -1,9 +1,0 @@
-# dsh-lichuang-eda bundle patch: inserts the eda plugin row into the web
-# profile roster. Applied as a profile bundle layer over dsh-base; the row is
-# a bare plugin by package name — the node half (exports ".") runs in the
-# host process (/api/dsh-eda routes, agent tools, system-prompt section), and
-# the `dsh.client` declaration in package.json makes the browser half
-# (exports "./client", served at /plugins/eda/client.js) load in the web GUI.
-- insert:
-    - id: eda
-      name: '@dsh-lichuang/dsh-eda'

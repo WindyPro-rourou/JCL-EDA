@@ -1,18 +1,55 @@
 {
-  "name": "dsh-lichuang-eda-workspace",
+  "name": "@windypro-rourou/dsh-eda",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "dsh-lichuang-eda workspace: 嘉立创 EDA 助手（插件 + 标准版 JSON 生成器 + 校验 + 测试门禁）",
+  "description": "dsh-lichuang-eda (JCL-EDA): 嘉立创 EDA 助手 DSH 插件 —— 官方 eda.* API 云端实时生成（原理图/PCB）+ 离线标准版 JSON 兜底 + 面板记录式时间线（撤回/清空/紧急保存）。开箱即用：npm i 后 cordis.patch.yml insert 一行即挂载。",
+  "packageManager": "pnpm@11.22.0",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
   },
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "files": [
+    "lib/**/*.js",
+    "src/**/*.js",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WindyPro-rourou/JCL-EDA.git"
+  },
   "scripts": {
     "gen": "node src/json-gen.js",
-    "test": "node --test src/json-gen.test.js",
     "test:json": "node --test --experimental-test-isolation=none src/json-gen.test.js",
-    "test:plugin": "node plugin/selfcheck.mjs && node --experimental-test-isolation=none --test \"plugin/test/*.test.mjs\"",
+    "test:plugin": "node selfcheck.mjs && node --experimental-test-isolation=none --test \"test/*.test.mjs\"",
     "test:all": "npm run test:json && npm run test:plugin",
-    "check": "node --check plugin/lib/index.js && node --check plugin/lib/client.js && node --check plugin/lib/backend.js"
+    "check": "node --check lib/index.js && node --check lib/client.js && node --check lib/backend.js",
+    "publish:dry": "node scripts/publish.mjs --dry",
+    "publish": "node scripts/publish.mjs"
   }
 }
