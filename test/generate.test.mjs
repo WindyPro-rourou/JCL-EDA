@@ -7,6 +7,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { validateJsonSchemaValue } from '@deepseek-ai/dsh-tools'
 import { apply } from '../lib/index.js'
 
 function mountPlugin(config = {}) {
@@ -44,12 +45,39 @@ test('eda_generate_schematic_json: 中文需求 → 标准版原理图 JSON（�
   assert.equal(res.structureOk, true)
   assert.equal(res.connectivityOk, true)
   assert.deepEqual(res.errors, [])
+  assert.ok(typeof res.netSummary === 'string' && res.netSummary.length > 0, 'netSummary 返回并有值（schema 已声明）')
   const parsed = JSON.parse(res.json) // valid JSON
   assert.equal(parsed.head.docType, '1')
   assert.ok(Array.isArray(parsed.shape) && parsed.shape.length > 0)
   const proj = JSON.parse(res.projectJson)
   assert.equal(proj.docType, 5)
   assert.equal(proj.schematics[0].dataStr.head.docType, '1')
+})
+
+test('工具返回值与声明 schema 一致（成功+失败路径，防未声明字段回归）', async () => {
+  const { tools } = mountPlugin()
+  const cases = [
+    ['eda_generate_schematic_json', { description: '一个 RC 延时电路' }],
+    ['eda_template_list', {}],
+    ['eda_translate_request', { description: '电阻分压 5V 出 3.3V' }],
+    ['eda_status', {}],
+    ['eda_capabilities', {}],
+    ['eda_exec', { code: 'return 1;' }],        // 未连接 → 失败路径
+    ['eda_pick_spot', {}],                       // 未连接 → 失败路径
+    ['eda_sch_drc', {}],                         // 未连接 → 失败路径
+    ['eda_verify', {}],                          // 未连接 → 失败路径
+    ['eda_trace', {}],                           // 未连接 → 失败路径
+    ['eda_skill_read', { doc: 'SKILL.md' }],     // 离线可读 → 成功路径
+  ]
+  for (const [name, args] of cases) {
+    const tool = findTool(tools, name)
+    assert.ok(tool, `${name} registered`)
+    const res = await tool.execute(args, { signal: new AbortController().signal })
+    assert.doesNotThrow(
+      () => validateJsonSchemaValue(tool.output.schema, res),
+      `${name} 返回值违反声明 schema（含未声明字段或类型不符）`,
+    )
+  }
 })
 
 test('eda_generate_schematic_json: 不识别的需求 → ok:false 且有明确提示', async () => {
