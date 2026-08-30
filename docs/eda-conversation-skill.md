@@ -456,6 +456,7 @@ await eda.pcb_PrimitiveComponent.delete(pcbIds); await eda.pcb_PrimitiveVia.dele
 | 网表/BOM 返回 `{}` | File 对象被 JSON 序列化 | `await f.text()`（网表）/ arrayBuffer→base64（BOM xlsx） |
 | `getAll` 报「获取所有器件失败」 | 间歇性 | 重试 3 次（间隔 700ms） |
 | PCB 板框（layer 11）`pcb_PrimitiveLine.create` 四组参数全失败 | 官方无绘制 API | 板框人工/导入获得 |
+| PCB 非铜层（丝印3/阻焊5/助焊7/装配9/机械13…）用 Line 建不出「无法创建直线图元」 | `pcb_PrimitiveLine.create` 实际只接受铜层（1/2/内层） | 铜层 **BOTTOM(2) 实测可用**（双层走线✓）；非铜层 Line 受限；`pcb_PrimitiveString.create`（丝印文本）实测**挂起 30s**——勿用于自动流程 |
 | 原理图 DRC verbose 只有聚合 `[{type,count}]` | 明细在 UI 面板 | 结合 UI 查看；PCB 版有嵌套详情 |
 | 直放 PCB 元件焊盘无网络 | 电气级未互联 | 画布级可用；电气网络级待官方改进 |
 | 坐标乱放（如 sch x=3200） | 10mil 单位=A4 外 813mm | 先 `eda_pick_spot`/读尺寸再放（见定位规则） |
