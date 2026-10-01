@@ -1,10 +1,3 @@
-# 给嘉立创官方的 Bug 报告（可直接复制发 Issue）
-
-> 目标仓库：<https://github.com/easyeda/easyeda-api-skill>（Issues 发布）
-> 或官方论坛/支持渠道（同文可用）。复现脚本见文末 `## 附录：一键复现脚本`。
-
----
-
 ### [Bug] 官方文档声明的多个 eda.* API 与实现不符（实测：部分层不可创建 / 返回 true 不生效 / 接口挂起 30s）
 
 **环境**
@@ -13,8 +6,7 @@
 - 官方桥：easyeda-api-skill v1.1.28 `scripts/bridge-server.mjs`（监听 127.0.0.1:49620，握手 easyeda-bridge）
 - 测试工程：esp32_multitool（Board1 / Schematic1 / PCB1）；所有调用均经官方桥 `POST /execute` 单步执行，HTTP 200/500 与超时均有原始返回值记录。
 
-**对照基准**：官方仓库 `easyeda/easyeda-api-skill@main`（SKILL.md metadata.version = 1.1.28）——**当前线上 main 与本报告引用文档逐字节一致**（8 个关键文件已比对 IDENTICAL）。
-
+**对照基准**：官方仓库 `easyeda/easyeda-api-skill@main`（SKILL.md metadata.version = 1.1.28）
 ---
 
 #### 1) `pcb_PrimitiveLine.create`：非铜层全部失败，仅铜层（TOP=1/BOTTOM=2）可用
@@ -94,7 +86,7 @@ function create(layer: TPCB_LayersOfImage, x, y, text, fontFamily, fontSize,
 
 **附注**
 - 全部接口都带官方 `beta preview` 标注，但仅提示"may change"，与"调用即失败/返回 true 无效果/挂起"存在显著差距；
-- 以上均在官方桥 v1.1.28 + 官方扩展 Run API Gateway + 网页版专业版（2026-08）上实测，可完整复现。
+- 以上均在官方桥 v1.1.28 + 官方扩展 Run API Gateway + 网页版专业版（2026-08）上实测。
 
 ---
 
@@ -129,5 +121,3 @@ await run(`return await eda.sch_Drc.check(true, false, true);`);
 // 6) 丝印文本（预计挂起）
 await run(`return await eda.pcb_PrimitiveString.create(3, 1500, 1500, 'JCL', 'Arial', 40, 2, 5, 0, false, 0, false, false);`);
 ```
-
-> 附：本仓库（dsh 插件 `@windypro-rourou/dsh-eda`）已将此 6 项固化进 `eda_capabilities` 与知识库（实测对照见 `docs/eda-conversation-skill.md` 附五缺陷表），供自动化规避。

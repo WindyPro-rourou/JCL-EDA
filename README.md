@@ -73,6 +73,8 @@ git clone https://github.com/WindyPro-rourou/JCL-EDA.git node_modules/@windypro-
 
 **生命周期**：插件加载时若检测到官方桥已安装，**自动启动并自动连接**（无需人工）；面板实时显示 装没装 / 端口 / 是否就绪。
 
+**界面适配（DSH 0.1.x / 0.2 桌面端）**：面板注册进 shell 的 **`shell.overlay` 槽位**（`position:absolute` + `z-index:30`，可拖拽调宽 120–760px 并记忆），入口是会话头部的 **header 工具位 pill**（0.2 桌面端左侧栏为槽位托管）；同时保留 0.1.x 侧边栏 DOM 入口与降级挂载。视觉优先复用宿主 UI 组件库 `@deepseek-ai/dsh-client-ui-primitives` + `--dsw-alias-*` 主题令牌——**不再使用遮挡式的 fixed 9999 覆盖层**。
+
 **限制（诚实说明）**：离线生成器支持 **9 种符号 + 6 个模板**（LED 点亮/分压/RC 延时/二极管续流/电池开关 LED/去耦/开关演示），更复杂符号（三极管/IC 等）待扩展；云端实时生成能力以官方 `eda.*` API 为准（**已知边界见 `docs/eda-conversation-skill.md` 附五缺陷速查表**：importChanges/setNetlist 不可靠、板框无 API、getNetlist('EasyEDA') 挂起、getAll 间歇失败等）。
 
 ## 如何运行 / 开发

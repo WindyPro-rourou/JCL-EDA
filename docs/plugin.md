@@ -2,24 +2,38 @@
 
 本仓库根即插件包：`git clone https://github.com/WindyPro-rourou/JCL-EDA.git` 开箱即用（详见根 `README.md`「安装」）。
 
-## 如何加载到 DSH Web GUI
+## 如何加载到 DSH Web GUI / 0.2 桌面端
 
 ```bash
-# 1) 安装到 DSH web profile（全部 GitHub 源：clone 后目录名 = 包名）
-cd ~/.dsh/profiles/web
+# 1) 安装到 profile（全部 GitHub 源：clone 后目录名 = 包名）
+#    0.1.x web profile:  ~/.dsh/profiles/web
+#    0.2 桌面端 profile:  <DSH home>/profiles/desktop（本机 F:\dsh-admited\data\dsh-home\profiles\desktop）
+cd <profile>
 git clone https://github.com/WindyPro-rourou/JCL-EDA.git         node_modules/@windypro-rourou/dsh-eda
 git clone https://github.com/WindyPro-rourou/dsh-logcat.git      node_modules/@windypro-rourou/dsh-logcat
 git clone https://github.com/WindyPro-rourou/dsh-code-studio.git node_modules/@windypro-rourou/dsh-code-studio
 
-# 2) 在 profile 的 cordis.patch.yml 追加（已有则跳过）：
+# 2) 0.1.x：在 cordis.patch.yml 追加 insert 行
 #   - insert:
 #       - id: eda
 #         name: '@windypro-rourou/dsh-eda'
 
-# 3) 重启 DSH Web GUI → 侧边栏出现「嘉立创 EDA」
+#    0.2 桌面端：把包装进 profile 依赖与 bundles（插件管理器写入同一处）
+#      package.json → dependencies: { "@windypro-rourou/dsh-eda": "0.1.4" }
+#      package.json → dsh.profile.bundles: [ ..., "@windypro-rourou/dsh-eda" ]
+#      然后 pnpm install（profile 目录）
+
+# 3) 重启 GUI → 会话头部出现「嘉立创 EDA」pill，点开即面板
 ```
 
-装完后**重启 GUI** 生效；插件自动启动官方桥并自愈连接。
+### 0.2 界面契约（本插件遵循）
+
+| 项 | 做法 |
+|---|---|
+| 面板容器 | `slots.register({ name: 'shell.overlay', id: 'eda', order: 90 })` → `position:absolute; z-index:30`（**不再 fixed 9999 遮挡**） |
+| 入口 | `slots.register({ name: 'conversation.session.header.utilities', id: 'eda-toggle' })`（0.2 左侧栏为槽位托管）；0.1.x 保留 `[data-pane="sidebar"]` DOM 入口 |
+| 主题 | 复用宿主组件库 `@deepseek-ai/dsh-client-ui-primitives`（缺失降级自绘）+ `--dsw-alias-*` 令牌 |
+| 尺寸 | 左边缘拖拽调宽 120–760px，`localStorage` 记忆 |
 
 ## 测试 / 自检（当前全绿）
 
