@@ -247,6 +247,10 @@ Promise&lt;string \| undefined&gt;
 
 PCB UUID, if it is `undefined` creation fails
 
+## Remarks
+
+不传 `boardName` 时 \*\*会自动创建一块 Board\*\*（此后直接调用 `createBoard()` 会得到 2 块板）， 如需游离 PCB 请显式管理 Board 归属
+
 ## Example
 
 ```javascript

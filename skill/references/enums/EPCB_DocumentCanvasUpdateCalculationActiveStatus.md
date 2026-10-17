@@ -1,6 +1,6 @@
 # EPCB\_DocumentCanvasUpdateCalculationActiveStatus enum
 
-Canvas update calculation function status
+画布更新计算功能状态
 
 ## Signature
 
@@ -33,6 +33,8 @@ ACTIVE
 
 </td><td>
 
+启用
+
 </td></tr>
 <tr><td>
 
@@ -43,6 +45,8 @@ INACTIVE
 `'inactive'`
 
 </td><td>
+
+停用
 
 </td></tr>
 </tbody></table>

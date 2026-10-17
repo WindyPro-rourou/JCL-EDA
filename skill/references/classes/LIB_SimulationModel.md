@@ -250,18 +250,8 @@ Create a simulation model
 function create(
 	libraryUuid: string,
 	model: { modelType: 'Ngspice' } & (
-		| {
-			modelFile: Blob;
-			modelName?: undefined | string;
-			modelCategory?: undefined | string;
-			modelPin?: undefined | string;
-		}
-		| {
-			modelData: string;
-			modelName?: undefined | string;
-			modelCategory?: undefined | string;
-			modelPin?: undefined | string;
-		}
+		| { modelFile: Blob; modelName?: string; modelCategory?: string; modelPin?: string }
+		| { modelData: string; modelName?: string; modelCategory?: string; modelPin?: string }
 	),
 	classification?: Array<string>,
 	description?: string,
@@ -302,7 +292,7 @@ model
 
 </td><td>
 
-{ modelType: 'Ngspice' } &amp; ({ modelFile: Blob; modelName?: undefined \| string; modelCategory?: undefined \| string; modelPin?: undefined \| string } \| { modelData: string; modelName?: undefined \| string; modelCategory?: undefined \| string; modelPin?: undefined \| string })
+{ modelType: 'Ngspice' } &amp; ({ modelFile: Blob; modelName?: string; modelCategory?: string; modelPin?: string } \| { modelData: string; modelName?: string; modelCategory?: string; modelPin?: string })
 
 </td><td>
 
@@ -384,7 +374,7 @@ Delete the simulation model
 ## Signature
 
 ```typescript
-function delete(simulationModelUuid: string, libraryUuid: string): Promise<boolean>;
+function delete(simulationModelUuid: string, libraryUuid: string): Promise<boolean | undefined>;
 ```
 
 ## Parameters
@@ -432,7 +422,7 @@ Library UUID, you can use [LIB\_LibrariesList](./LIB_LibrariesList.md) APIs in
 
 ## Returns
 
-Promise&lt;boolean&gt;
+Promise&lt;boolean \| undefined&gt;
 
 Whether the operation is successful
 
@@ -546,11 +536,7 @@ Modify the simulation model
 function modify(
 	simulationModelUuid: string,
 	libraryUuid: string,
-	modelProps?: {
-		modelName?: undefined | string;
-		modelCategory?: undefined | string;
-		modelPin?: undefined | string;
-	},
+	modelProps?: { modelName?: string; modelCategory?: string; modelPin?: string },
 	classification?: Array<string> | null,
 	description?: string | null,
 ): Promise<boolean>;
@@ -603,7 +589,7 @@ modelProps
 
 </td><td>
 
-\{ modelName?: undefined \| string; modelCategory?: undefined \| string; modelPin?: undefined \| string \}
+\{ modelName?: string; modelCategory?: string; modelPin?: string \}
 
 </td><td>
 

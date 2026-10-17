@@ -84,6 +84,28 @@ Whether it is the EasyEDA Pro edition
 </td></tr>
 <tr><td>
 
+[isEditorCurrentVersionGreaterThanOrEqual(version)](./SYS_Environment.md)
+
+</td><td>
+
+</td><td>
+
+判断传入版本是否高于或等于编辑器当前版本
+
+</td></tr>
+<tr><td>
+
+[isEditorCurrentVersionLessThanOrEqual(version)](./SYS_Environment.md)
+
+</td><td>
+
+</td><td>
+
+判断传入版本是否低于或等于编辑器当前版本
+
+</td></tr>
+<tr><td>
+
 [isHalfOfflineMode()](./SYS_Environment.md)
 
 </td><td>
@@ -250,17 +272,17 @@ Get user information
 
 ```typescript
 function getUserInfo(): {
-	username?: undefined | string;
-	nickname?: undefined | string;
-	avatar?: undefined | string;
-	uuid?: undefined | string;
-	customerCode?: undefined | string;
+	username?: string;
+	nickname?: string;
+	avatar?: string;
+	uuid?: string;
+	customerCode?: string;
 };
 ```
 
 ## Returns
 
-\{ username?: undefined \| string; nickname?: undefined \| string; avatar?: undefined \| string; uuid?: undefined \| string; customerCode?: undefined \| string \}
+\{ username?: string; nickname?: string; avatar?: string; uuid?: string; customerCode?: string \}
 
 User information
 
@@ -331,6 +353,122 @@ const isEasyEDAPro = eda.sys_Environment.isEasyEDAProEdition();
 
 // 2. 输出判断结果（国际版为 true，嘉立创 EDA 专业版为 false）
 console.log('是否 EasyEDA Pro 国际版：', isEasyEDAPro);
+```
+
+### iseditorcurrentversiongreaterthanorequal
+
+# SYS\_Environment.isEditorCurrentVersionGreaterThanOrEqual() method
+
+判断传入版本是否高于或等于编辑器当前版本
+
+## Signature
+
+```typescript
+function isEditorCurrentVersionGreaterThanOrEqual(version: string): boolean;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+version
+
+</td><td>
+
+string
+
+</td><td>
+
+传入的版本
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+boolean
+
+传入版本是否高于或等于编辑器当前版本
+
+## Example
+
+```javascript
+// 1. 判断传入版本是否高于或等于当前编辑器版本（同步返回布尔值）
+const isGe = eda.sys_Environment.isEditorCurrentVersionGreaterThanOrEqual('4.1.13');
+
+// 2. 输出判断结果
+console.log('传入版本是否高于或等于当前版本：', isGe);
+```
+
+### iseditorcurrentversionlessthanorequal
+
+# SYS\_Environment.isEditorCurrentVersionLessThanOrEqual() method
+
+判断传入版本是否低于或等于编辑器当前版本
+
+## Signature
+
+```typescript
+function isEditorCurrentVersionLessThanOrEqual(version: string): boolean;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+version
+
+</td><td>
+
+string
+
+</td><td>
+
+传入的版本
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+boolean
+
+传入版本是否低于或等于编辑器当前版本
+
+## Example
+
+```javascript
+// 1. 判断传入版本是否低于或等于当前编辑器版本（同步返回布尔值）
+const isLe = eda.sys_Environment.isEditorCurrentVersionLessThanOrEqual('4.1.13');
+
+// 2. 输出判断结果
+console.log('传入版本是否低于或等于当前版本：', isLe);
 ```
 
 ### ishalfofflinemode

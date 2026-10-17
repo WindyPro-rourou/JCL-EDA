@@ -57,7 +57,7 @@ function request(
 	url: string,
 	method?: 'GET' | 'POST' | 'HEAD' | 'PUT' | 'DELETE' | 'PATCH',
 	data?: string | Blob | FormData | URLSearchParams,
-	options?: { headers?: undefined | { [key: string]: any }; integrity?: undefined | string },
+	options?: { headers?: { [header: string]: any }; integrity?: string },
 	succeedCallFn?: (data: Response) => void | Promise<void>,
 ): Promise<Response>;
 ```
@@ -122,7 +122,7 @@ options
 
 </td><td>
 
-\{ headers?: undefined \| \{ \[key: string\]: any \}; integrity?: undefined \| string \}
+\{ headers?: \{ \[header: string\]: any \}; integrity?: string \}
 
 </td><td>
 

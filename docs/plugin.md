@@ -34,6 +34,9 @@ git clone https://github.com/WindyPro-rourou/dsh-code-studio.git node_modules/@w
 | 入口 | `slots.register({ name: 'conversation.session.header.utilities', id: 'eda-toggle' })`（0.2 左侧栏为槽位托管）；0.1.x 保留 `[data-pane="sidebar"]` DOM 入口 |
 | 主题 | 复用宿主组件库 `@deepseek-ai/dsh-client-ui-primitives`（缺失降级自绘）+ `--dsw-alias-*` 令牌 |
 | 尺寸 | 左边缘拖拽调宽 120–760px，`localStorage` 记忆 |
+| 版本更新 | 每小时查 npm `dist-tags.latest`；有新版时**系统提示追加独立提醒段 + 面板顶部「vX 可更新」pill**（点击复制升级命令）；`POST /api/dsh-eda/update/check` 可强制检查；`eda_status` 返回 `latestVersion/updateAvailable` |
+| 知识库 | 官方 easyeda-api-skill **1.1.56**（131 类）随包 vendored（`skill/`），`eda_skill_read` 可读；`~/.dsh/eda/bridge` 桥同步 1.1.56 |
+| 新能力 | PCB 板框用 `pcb_PrimitivePolyline` + `pcb_MathPolygon.createPolygon`（官方 1.1.56 Remarks）；自动布线 900s 硬上限 / force 弹窗；`SYS_ExternalApi` / `PCB_ImageTool` 等新类 |
 
 ## 测试 / 自检（当前全绿）
 

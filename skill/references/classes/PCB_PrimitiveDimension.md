@@ -696,57 +696,13 @@ Modify the dimension
 function modify(
 	primitiveId: string | IPCB_PrimitiveDimension,
 	property: {
-		dimensionType?:
-			| undefined
-			| EPCB_PrimitiveDimensionType.RADIUS
-			| EPCB_PrimitiveDimensionType.LENGTH
-			| EPCB_PrimitiveDimensionType.ANGLE;
-		coordinateSet?: undefined | any | any;
-		layer?:
-			| undefined
-			| EPCB_LayerId.TOP_SILKSCREEN
-			| EPCB_LayerId.BOTTOM_SILKSCREEN
-			| EPCB_LayerId.DOCUMENT
-			| EPCB_LayerId.MECHANICAL
-			| EPCB_LayerId.CUSTOM_1
-			| EPCB_LayerId.CUSTOM_2
-			| EPCB_LayerId.CUSTOM_3
-			| EPCB_LayerId.CUSTOM_4
-			| EPCB_LayerId.CUSTOM_5
-			| EPCB_LayerId.CUSTOM_6
-			| EPCB_LayerId.CUSTOM_7
-			| EPCB_LayerId.CUSTOM_8
-			| EPCB_LayerId.CUSTOM_9
-			| EPCB_LayerId.CUSTOM_10
-			| EPCB_LayerId.CUSTOM_11
-			| EPCB_LayerId.CUSTOM_12
-			| EPCB_LayerId.CUSTOM_13
-			| EPCB_LayerId.CUSTOM_14
-			| EPCB_LayerId.CUSTOM_15
-			| EPCB_LayerId.CUSTOM_16
-			| EPCB_LayerId.CUSTOM_17
-			| EPCB_LayerId.CUSTOM_18
-			| EPCB_LayerId.CUSTOM_19
-			| EPCB_LayerId.CUSTOM_20
-			| EPCB_LayerId.CUSTOM_21
-			| EPCB_LayerId.CUSTOM_22
-			| EPCB_LayerId.CUSTOM_23
-			| EPCB_LayerId.CUSTOM_24
-			| EPCB_LayerId.CUSTOM_25
-			| EPCB_LayerId.CUSTOM_26
-			| EPCB_LayerId.CUSTOM_27
-			| EPCB_LayerId.CUSTOM_28
-			| EPCB_LayerId.CUSTOM_29
-			| EPCB_LayerId.CUSTOM_30;
-		unit?:
-			| undefined
-			| ESYS_Unit.MILLIMETER
-			| ESYS_Unit.CENTIMETER
-			| ESYS_Unit.INCH
-			| ESYS_Unit.MIL;
-		lineWidth?: undefined | number;
-		precision?: undefined | number;
-		primitiveLock?: undefined | false | true;
+		dimensionType?: EPCB_PrimitiveDimensionType;
+		coordinateSet?: TPCB_PrimitiveDimensionCoordinateSet;
+		layer?: TPCB_LayersOfDimension;
+		unit?: ESYS_Unit.MILLIMETER | ESYS_Unit.CENTIMETER | ESYS_Unit.INCH | ESYS_Unit.MIL;
+		lineWidth?: number;
+		precision?: number;
+		primitiveLock?: boolean;
 	},
 ): Promise<IPCB_PrimitiveDimension | undefined>;
 ```
@@ -785,7 +741,7 @@ property
 
 </td><td>
 
-{ dimensionType?: undefined \| [EPCB\_PrimitiveDimensionType.RADIUS](../enums/EPCB_PrimitiveDimensionType.md) \| [EPCB\_PrimitiveDimensionType.LENGTH](../enums/EPCB_PrimitiveDimensionType.md) \| [EPCB\_PrimitiveDimensionType.ANGLE](../enums/EPCB_PrimitiveDimensionType.md)<!-- -->; coordinateSet?: undefined \| any \| any; layer?: undefined \| [EPCB\_LayerId.TOP\_SILKSCREEN](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.BOTTOM\_SILKSCREEN](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.DOCUMENT](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.MECHANICAL](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_1](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_2](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_3](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_4](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_5](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_6](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_7](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_8](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_9](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_10](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_11](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_12](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_13](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_14](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_15](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_16](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_17](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_18](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_19](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_20](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_21](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_22](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_23](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_24](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_25](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_26](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_27](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_28](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_29](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.CUSTOM\_30](../enums/EPCB_LayerId.md)<!-- -->; unit?: undefined \| [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.CENTIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MIL](../enums/ESYS_Unit.md)<!-- -->; lineWidth?: undefined \| number; precision?: undefined \| number; primitiveLock?: undefined \| false \| true }
+{ dimensionType?: [EPCB\_PrimitiveDimensionType](../enums/EPCB_PrimitiveDimensionType.md)<!-- -->; coordinateSet?: [TPCB\_PrimitiveDimensionCoordinateSet](../types/TPCB_PrimitiveDimensionCoordinateSet.md)<!-- -->; layer?: [TPCB\_LayersOfDimension](../types/TPCB_LayersOfDimension.md)<!-- -->; unit?: [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.CENTIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MIL](../enums/ESYS_Unit.md)<!-- -->; lineWidth?: number; precision?: number; primitiveLock?: boolean }
 
 </td><td>
 

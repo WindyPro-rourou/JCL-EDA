@@ -578,14 +578,14 @@ Modify Binary embedded object
 function modify(
 	primitiveId: string | ISCH_PrimitiveObject,
 	property: {
-		content?: undefined | string | File;
-		startX?: undefined | number;
-		startY?: undefined | number;
-		width?: undefined | number;
-		height?: undefined | number;
-		rotation?: undefined | number;
-		mirror?: undefined | false | true;
-		fileName?: undefined | string;
+		content?: File | string;
+		startX?: number;
+		startY?: number;
+		width?: number;
+		height?: number;
+		rotation?: number;
+		mirror?: boolean;
+		fileName?: string;
 	},
 ): Promise<ISCH_PrimitiveObject | undefined>;
 ```
@@ -624,7 +624,7 @@ property
 
 </td><td>
 
-\{ content?: undefined \| string \| File; startX?: undefined \| number; startY?: undefined \| number; width?: undefined \| number; height?: undefined \| number; rotation?: undefined \| number; mirror?: undefined \| false \| true; fileName?: undefined \| string \}
+\{ content?: File \| string; startX?: number; startY?: number; width?: number; height?: number; rotation?: number; mirror?: boolean; fileName?: string \}
 
 </td><td>
 

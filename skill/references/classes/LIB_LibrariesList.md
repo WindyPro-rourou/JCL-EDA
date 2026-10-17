@@ -84,7 +84,7 @@ Get the UUID of the system library
 </td></tr>
 <tr><td>
 
-[registerExtendLibrary(title, libraryFunctions)](./LIB_LibrariesList.md)
+[registerExtendLibrary(title, libraryFunctions, props)](./LIB_LibrariesList.md)
 
 </td><td>
 
@@ -232,12 +232,13 @@ Register an external library
 function registerExtendLibrary(
 	title: string,
 	libraryFunctions: {
-		device?: undefined | ILIB_ExtendLibraryDeviceFunctions;
-		symbol?: undefined | ILIB_ExtendLibrarySymbolFunctions;
-		footprint?: undefined | ILIB_ExtendLibraryFootprintFunctions;
-		cbb?: undefined | ILIB_ExtendLibraryCbbFunctions;
-		model3d?: undefined | ILIB_ExtendLibrary3DModelFunctions;
+		device?: ILIB_ExtendLibraryDeviceFunctions;
+		symbol?: ILIB_ExtendLibrarySymbolFunctions;
+		footprint?: ILIB_ExtendLibraryFootprintFunctions;
+		cbb?: ILIB_ExtendLibraryCbbFunctions;
+		model3d?: ILIB_ExtendLibrary3DModelFunctions;
 	},
+	props?: ILIB_RegisterExtendLibraryProps,
 ): Promise<string | undefined>;
 ```
 
@@ -275,9 +276,22 @@ libraryFunctions
 
 </td><td>
 
-{ device?: undefined \| [ILIB\_ExtendLibraryDeviceFunctions](../interfaces/ILIB_ExtendLibraryDeviceFunctions.md)<!-- -->; symbol?: undefined \| [ILIB\_ExtendLibrarySymbolFunctions](../interfaces/ILIB_ExtendLibrarySymbolFunctions.md)<!-- -->; footprint?: undefined \| [ILIB\_ExtendLibraryFootprintFunctions](../interfaces/ILIB_ExtendLibraryFootprintFunctions.md)<!-- -->; cbb?: undefined \| [ILIB\_ExtendLibraryCbbFunctions](../interfaces/ILIB_ExtendLibraryCbbFunctions.md)<!-- -->; model3d?: undefined \| [ILIB\_ExtendLibrary3DModelFunctions](../interfaces/ILIB_ExtendLibrary3DModelFunctions.md) }
+{ device?: [ILIB\_ExtendLibraryDeviceFunctions](../interfaces/ILIB_ExtendLibraryDeviceFunctions.md)<!-- -->; symbol?: [ILIB\_ExtendLibrarySymbolFunctions](../interfaces/ILIB_ExtendLibrarySymbolFunctions.md)<!-- -->; footprint?: [ILIB\_ExtendLibraryFootprintFunctions](../interfaces/ILIB_ExtendLibraryFootprintFunctions.md)<!-- -->; cbb?: [ILIB\_ExtendLibraryCbbFunctions](../interfaces/ILIB_ExtendLibraryCbbFunctions.md)<!-- -->; model3d?: [ILIB\_ExtendLibrary3DModelFunctions](../interfaces/ILIB_ExtendLibrary3DModelFunctions.md) }
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+props
+
+</td><td>
+
+[ILIB\_RegisterExtendLibraryProps](../interfaces/ILIB_RegisterExtendLibraryProps.md)
+
+</td><td>
+
+_(Optional)_ 附加配置，如 [saveAs](../interfaces/ILIB_RegisterExtendLibraryProps.md) 可分别控制器件、符号、封装等资源是否允许另存为（缺省均允许）
 
 </td></tr>
 </tbody></table>
@@ -293,6 +307,8 @@ Library UUID
 Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error`
 
 ## Example
+
+注册外部库并挂载符号类型资源：
 
 ```javascript
 // 1. 实现外部库的符号数据回调（真实场景中在此对接自己的数据源）
@@ -325,5 +341,21 @@ const libUuid = await eda.lib_LibrariesList.registerExtendLibrary('嘉立创示�
 });
 
 // 3. 输出注册结果，库面板中即可看到「嘉立创示例_外部库」
+console.log('libUuid:', libUuid);
+```
+注册外部库并分别控制各资源类型是否允许另存为（器件允许、符号与封装禁止，缺省的 cbb/model3d 视为允许）：
+
+```javascript
+const libUuid = await eda.lib_LibrariesList.registerExtendLibrary(
+	'嘉立创示例_外部库_另存为控制',
+	{ device: deviceFunctions, symbol: symbolFunctions, footprint: footprintFunctions },
+	{
+		saveAs: {
+			device: true,
+			symbol: false,
+			footprint: false,
+		},
+	}
+);
 console.log('libUuid:', libUuid);
 ```

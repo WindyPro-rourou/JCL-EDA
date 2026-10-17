@@ -368,15 +368,15 @@ function showInputDialog(
 		| 'week',
 	value?: string | number,
 	otherProperty?: {
-		max?: undefined | number;
-		maxlength?: undefined | number;
-		min?: undefined | number;
-		minlength?: undefined | number;
-		multiple?: undefined | false | true;
-		pattern?: undefined | RegExp;
-		placeholder?: undefined | string;
-		readonly?: undefined | false | true;
-		step?: undefined | number;
+		max?: number;
+		maxlength?: number;
+		min?: number;
+		minlength?: number;
+		multiple?: boolean;
+		pattern?: RegExp;
+		placeholder?: string;
+		readonly?: boolean;
+		step?: number;
 	},
 	callbackFn?: (value: any) => void,
 ): void;
@@ -468,7 +468,7 @@ otherProperty
 
 </td><td>
 
-\{ max?: undefined \| number; maxlength?: undefined \| number; min?: undefined \| number; minlength?: undefined \| number; multiple?: undefined \| false \| true; pattern?: undefined \| RegExp; placeholder?: undefined \| string; readonly?: undefined \| false \| true; step?: undefined \| number \}
+\{ max?: number; maxlength?: number; min?: number; minlength?: number; multiple?: boolean; pattern?: RegExp; placeholder?: string; readonly?: boolean; step?: number \}
 
 </td><td>
 

@@ -137,12 +137,14 @@ Document tree / Project management class
 class DMT_Project
 ```
 
-- **createproject**: `function createProject( 	projectFriendlyName: string, 	projectName?: string, 	teamUuid?: string, 	folderUuid?: string, 	description?: string, 	collaborationMode?: EDMT_ProjectCollaborationMode, ): Promise<string | undefined>;`
+- **createproject**: `function createProject( 	projectFriendlyName: string, 	projectName?: string, 	teamUuid?: string, 	folderUuid?: string, 	description?: string, 	collaborationMode?: EDMT_ProjectCollaborationMode, 	fileFormat?: EDMT_ProjectFileFormat, ): Promise<string | undefined>;`
 - **getallprojectsuuid**: `function getAllProjectsUuid( 	teamUuid?: string, 	folderUuid?: string, 	workspaceUuid?: string, ): Promise<Array<string>>;`
 - **getcurrentprojectinfo**: `function getCurrentProjectInfo(): Promise<IDMT_ProjectItem | undefined>;`
 - **getprojectinfo**: `function getProjectInfo(projectUuid: string): Promise<IDMT_BriefProjectItem | undefined>;`
+- **getreadystate**: `function getReadyState(projectUuid?: string): Promise<EDMT_ProjectReadyState>;`
 - **moveprojecttofolder**: `function moveProjectToFolder(projectUuid: string, folderUuid?: string): Promise<boolean>;`
 - **openproject**: `function openProject(projectUuid: string): Promise<boolean>;`
+- **waitforready**: `function waitForReady(projectUuid?: string, timeoutMs?: number): Promise<boolean>;`
 
 ---
 
@@ -169,7 +171,7 @@ class DMT_Schematic
 - **getschematicpageinfo**: `function getSchematicPageInfo( 	schematicPageUuid: string, ): Promise<IDMT_SchematicPageItem | undefined>;`
 - **modifyschematicname**: `function modifySchematicName(schematicUuid: string, schematicName: string): Promise<boolean>;`
 - **modifyschematicpagename**: `function modifySchematicPageName( 	schematicPageUuid: string, 	schematicPageName: string, ): Promise<boolean>;`
-- **modifyschematicpagetitleblock**: `function modifySchematicPageTitleBlock( 	showTitleBlock?: boolean, 	titleBlockData?: Record< 		string, 		{ showTitle?: undefined | false | true; showValue?: undefined | false | true; value?: any } 	>, ): Promise<boolean>;`
+- **modifyschematicpagetitleblock**: `function modifySchematicPageTitleBlock( 	showTitleBlock?: boolean, 	titleBlockData?: Record<string, { showTitle?: boolean; showValue?: boolean; value?: any }>, ): Promise<boolean>;`
 - **reorderschematicpages**: `function reorderSchematicPages( 	schematicUuid: string, 	schematicPageItemsArray: Array<IDMT_SchematicPageItem>, ): Promise<boolean>;`
 
 ---
@@ -246,6 +248,7 @@ eda: EDA;
 - **pcb_document**: `function pcb_Document: PCB_Document;`
 - **pcb_drc**: `function pcb_Drc: PCB_Drc;`
 - **pcb_event**: `function pcb_Event: PCB_Event;`
+- **pcb_imagetool**: `function pcb_ImageTool: PCB_ImageTool;`
 - **pcb_layer**: `function pcb_Layer: PCB_Layer;`
 - **pcb_manufacturedata**: `function pcb_ManufactureData: PCB_ManufactureData;`
 - **pcb_mathpolygon**: `function pcb_MathPolygon: PCB_MathPolygon;`
@@ -268,6 +271,7 @@ eda: EDA;
 - **pcb_primitivevia**: `function pcb_PrimitiveVia: PCB_PrimitiveVia;`
 - **pcb_raytracerengine**: `function pcb_RayTracerEngine: PCB_RayTracerEngine;`
 - **pcb_selectcontrol**: `function pcb_SelectControl: PCB_SelectControl;`
+- **pcb_tool**: `function pcb_Tool: PCB_Tool;`
 - **pnl_document**: `function pnl_Document: PNL_Document;`
 - **sch_document**: `function sch_Document: SCH_Document;`
 - **sch_drc**: `function sch_Drc: SCH_Drc;`
@@ -293,11 +297,13 @@ eda: EDA;
 - **sys_clienturl**: `function sys_ClientUrl: SYS_ClientUrl;`
 - **sys_dialog**: `function sys_Dialog: SYS_Dialog;`
 - **sys_environment**: `function sys_Environment: SYS_Environment;`
+- **sys_externalapi**: `function sys_ExternalApi: SYS_ExternalApi;`
 - **sys_filemanager**: `function sys_FileManager: SYS_FileManager;`
 - **sys_filesystem**: `function sys_FileSystem: SYS_FileSystem;`
 - **sys_fontmanager**: `function sys_FontManager: SYS_FontManager;`
 - **sys_formatconversion**: `function sys_FormatConversion: SYS_FormatConversion;`
 - **sys_headermenu**: `function sys_HeaderMenu: SYS_HeaderMenu;`
+- **sys_help**: `function sys_Help: SYS_Help;`
 - **sys_i18n**: `function sys_I18n: SYS_I18n;`
 - **sys_iframe**: `function sys_IFrame: SYS_IFrame;`
 - **sys_loadingandprogressbar**: `function sys_LoadingAndProgressBar: SYS_LoadingAndProgressBar;`
@@ -344,7 +350,7 @@ Single polygon
 class IPCB_Polygon
 ```
 
-- **discretize**: `function discretize(options?: IPCB_DiscretizeOptions): Promise<Array<IPCB_DiscretizedPoint>>;`
+- **discretize**: `function discretize(options?: IPCB_DiscretizeOptions): Promise<Array<IPCB_DiscretizedPoint> | null>;`
 - **getcenter**: `function getCenter(): Promise<{ x: number; y: number }>;`
 - **getsource**: `function getSource(): TPCB_PolygonSourceArray;`
 
@@ -454,13 +460,13 @@ class IPCB_PrimitiveComponent implements IPCB_Primitive
 - **done**: `function done(): Promise<IPCB_PrimitiveComponent>;`
 - **getallpins**: `function getAllPins(): Promise<Array<IPCB_PrimitiveComponentPad>>;`
 - **getstate_addintobom**: `function getState_AddIntoBom(): boolean;`
-- **getstate_component**: `function getState_Component(): 	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;`
+- **getstate_component**: `function getState_Component(): { libraryUuid: string; uuid: string; name?: string } | undefined;`
 - **getstate_designator**: `function getState_Designator(): string | undefined;`
-- **getstate_footprint**: `function getState_Footprint(): 	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;`
+- **getstate_footprint**: `function getState_Footprint(): { libraryUuid: string; uuid: string; name?: string } | undefined;`
 - **getstate_layer**: `function getState_Layer(): TPCB_LayersOfComponent;`
 - **getstate_manufacturer**: `function getState_Manufacturer(): string | undefined;`
 - **getstate_manufacturerid**: `function getState_ManufacturerId(): string | undefined;`
-- **getstate_model3d**: `function getState_Model3D(): 	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;`
+- **getstate_model3d**: `function getState_Model3D(): { libraryUuid: string; uuid: string; name?: string } | undefined;`
 - **getstate_name**: `function getState_Name(): string | undefined;`
 - **getstate_otherproperty**: `function getState_OtherProperty(): Record<string, string | number | boolean> | undefined;`
 - **getstate_pads**: `function getState_Pads(): 	Array<{ primitiveId: string; net: string; padNumber: string }> | undefined;`
@@ -1090,7 +1096,7 @@ class ISCH_PrimitiveCbbSymbolComponent extends ISCH_PrimitiveComponent
 
 - **done**: `function done(): Promise<ISCH_PrimitiveCbbSymbolComponent>;`
 - **getstate_cbb**: `function getState_Cbb(): { libraryUuid: string; uuid: string };`
-- **getstate_cbbsymbol**: `function getState_CbbSymbol(): { 	libraryUuid: string; 	cbbUuid: string; 	uuid?: undefined | string; 	name?: undefined | string; };`
+- **getstate_cbbsymbol**: `function getState_CbbSymbol(): { 	libraryUuid: string; 	cbbUuid: string; 	uuid?: string; 	name?: string; };`
 - **reset**: `function reset(): Promise<ISCH_PrimitiveCbbSymbolComponent>;`
 
 ---
@@ -1143,10 +1149,10 @@ class ISCH_PrimitiveComponent implements ISCH_Primitive
 - **getallpins**: `function getAllPins(): Promise<Array<ISCH_PrimitiveComponentPin> | undefined>;`
 - **getstate_addintobom**: `function getState_AddIntoBom(): boolean | undefined;`
 - **getstate_addintopcb**: `function getState_AddIntoPcb(): boolean | undefined;`
-- **getstate_component**: `function getState_Component(): 	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;`
+- **getstate_component**: `function getState_Component(): { libraryUuid: string; uuid: string; name?: string } | undefined;`
 - **getstate_componenttype**: `function getState_ComponentType(): ESCH_PrimitiveComponentType;`
 - **getstate_designator**: `function getState_Designator(): string | undefined;`
-- **getstate_footprint**: `function getState_Footprint(): 	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;`
+- **getstate_footprint**: `function getState_Footprint(): { libraryUuid: string; uuid: string; name?: string } | undefined;`
 - **getstate_manufacturer**: `function getState_Manufacturer(): string | undefined;`
 - **getstate_manufacturerid**: `function getState_ManufacturerId(): string | undefined;`
 - **getstate_mirror**: `function getState_Mirror(): boolean;`
@@ -1159,7 +1165,7 @@ class ISCH_PrimitiveComponent implements ISCH_Primitive
 - **getstate_subpartname**: `function getState_SubPartName(): string | undefined;`
 - **getstate_supplier**: `function getState_Supplier(): string | undefined;`
 - **getstate_supplierid**: `function getState_SupplierId(): string | undefined;`
-- **getstate_symbol**: `function getState_Symbol(): 	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;`
+- **getstate_symbol**: `function getState_Symbol(): { libraryUuid: string; uuid: string; name?: string } | undefined;`
 - **getstate_uniqueid**: `function getState_UniqueId(): string | undefined;`
 - **getstate_x**: `function getState_X(): number;`
 - **getstate_y**: `function getState_Y(): number;`
@@ -1438,7 +1444,7 @@ class LIB_3DModel
 
 - **copy**: `function copy( 	modelUuid: string, 	libraryUuid: string, 	targetLibraryUuid: string, 	targetClassification?: ILIB_ClassificationIndex | Array<string>, 	newModelName?: string, ): Promise<string | undefined>;`
 - **create**: `function create( 	libraryUuid: string, 	modelFile: Blob, 	classification?: ILIB_ClassificationIndex | Array<string>, 	unit?: 		| ESYS_Unit.MILLIMETER 		| ESYS_Unit.CENTIMETER 		| ESYS_Unit.METER 		| ESYS_Unit.MIL 		| ESYS_Unit.INCH, ): Promise<Array<string> | undefined>;`
-- **delete**: `function delete(modelUuid: string, libraryUuid: string): Promise<boolean>;`
+- **delete**: `function delete(modelUuid: string, libraryUuid: string): Promise<boolean | undefined>;`
 - **get**: `function get(modelUuid: string, libraryUuid?: string): Promise<ILIB_3DModelItem | undefined>;`
 - **modify**: `function modify( 	modelUuid: string, 	libraryUuid: string, 	modelName?: string, 	classification?: ILIB_ClassificationIndex | Array<string> | null, 	description?: string | null, ): Promise<boolean>;`
 - **search**: `function search( 	key: string, 	libraryUuid?: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	itemsOfPage?: number, 	page?: number, ): Promise<Array<ILIB_3DModelSearchItem>>;`
@@ -1455,7 +1461,7 @@ class LIB_Cbb
 
 - **copy**: `function copy( 	cbbUuid: string, 	libraryUuid: string, 	targetLibraryUuid: string, 	targetClassification?: ILIB_ClassificationIndex | Array<string>, 	newCbbName?: string, ): Promise<string | undefined>;`
 - **create**: `function create( 	libraryUuid: string, 	cbbName: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	description?: string, ): Promise<string | undefined>;`
-- **delete**: `function delete(cbbUuid: string, libraryUuid: string): Promise<boolean>;`
+- **delete**: `function delete(cbbUuid: string, libraryUuid: string): Promise<boolean | undefined>;`
 - **get**: `function get(cbbUuid: string, libraryUuid?: string): Promise<ILIB_CbbItem | undefined>;`
 - **modify**: `function modify( 	cbbUuid: string, 	libraryUuid: string, 	cbbName?: string, 	classification?: ILIB_ClassificationIndex | Array<string> | null, 	description?: string | null, ): Promise<boolean>;`
 - **openprojectineditor**: `function openProjectInEditor(cbbUuid: string, libraryUuid: string): Promise<boolean>;`
@@ -1476,10 +1482,10 @@ class LIB_Classification
 - **createsecondary**: `function createSecondary( 	libraryUuid: string, 	libraryType: ELIB_LibraryType, 	primaryClassificationUuid: string, 	secondaryClassificationName: string, ): Promise<ILIB_ClassificationIndex | undefined>;`
 - **deletebyindex**: `function deleteByIndex(classificationIndex: ILIB_ClassificationIndex): Promise<boolean>;`
 - **deletebyuuid**: `function deleteByUuid(libraryUuid: string, classificationUuid: string): Promise<boolean>;`
-- **getallclassificationtree**: `function getAllClassificationTree( 	libraryUuid: string, 	libraryType: ELIB_LibraryType, ): Promise< 	Array<{ name: string; uuid: string; children?: undefined | { name: string; uuid: string }[] }> >;`
+- **getallclassificationtree**: `function getAllClassificationTree( 	libraryUuid: string, 	libraryType: ELIB_LibraryType, ): Promise< 	Array<{ 		name: string; 		uuid: string; 		children?: Array<{ name: string; uuid: string }> | undefined; 	}> >;`
 - **getindexbyname**: `function getIndexByName( 	libraryUuid: string, 	libraryType: ELIB_LibraryType, 	primaryClassificationName: string, 	secondaryClassificationName?: string, ): Promise<ILIB_ClassificationIndex | undefined>;`
-- **getnamebyindex**: `function getNameByIndex( 	classificationIndex: ILIB_ClassificationIndex, ): Promise< 	| { primaryClassificationName: string; secondaryClassificationName?: undefined | string } 	| undefined >;`
-- **getnamebyuuid**: `function getNameByUuid( 	libraryUuid: string, 	libraryType: ELIB_LibraryType, 	primaryClassificationUuid: string, 	secondaryClassificationUuid?: string, ): Promise< 	| { primaryClassificationName: string; secondaryClassificationName?: undefined | string } 	| undefined >;`
+- **getnamebyindex**: `function getNameByIndex( 	classificationIndex: ILIB_ClassificationIndex, ): Promise< 	| { primaryClassificationName: string; secondaryClassificationName?: string | undefined } 	| undefined >;`
+- **getnamebyuuid**: `function getNameByUuid( 	libraryUuid: string, 	libraryType: ELIB_LibraryType, 	primaryClassificationUuid: string, 	secondaryClassificationUuid?: string, ): Promise< 	| { primaryClassificationName: string; secondaryClassificationName?: string | undefined } 	| undefined >;`
 
 ---
 
@@ -1493,9 +1499,9 @@ class LIB_Device
 
 - **copy**: `function copy( 	deviceUuid: string, 	libraryUuid: string, 	targetLibraryUuid: string, 	targetClassification?: ILIB_ClassificationIndex | Array<string>, 	newDeviceName?: string, ): Promise<string | undefined>;`
 - **create**: *(签名过长，请查看详细文档)*
-- **delete**: `function delete(deviceUuid: string, libraryUuid: string): Promise<boolean>;`
+- **delete**: `function delete(deviceUuid: string, libraryUuid: string): Promise<boolean | undefined>;`
 - **get**: `function get(deviceUuid: string, libraryUuid?: string): Promise<ILIB_DeviceItem | undefined>;`
-- **getbylcscids**: `function getByLcscIds<T extends boolean>( 	lcscIds: string, 	libraryUuid?: string, 	allowMultiMatch?: T, ): Promise<T extends true ? ILIB_DeviceSearchItem | undefined : Array<ILIB_DeviceSearchItem>>;`
+- **getbylcscids**: `function getByLcscIds<T extends boolean>( 	lcscIds: string, 	libraryUuid?: string, 	allowMultiMatch?: T, ): Promise<T extends true ? Array<ILIB_DeviceSearchItem> : ILIB_DeviceSearchItem | undefined>;`
 - **getbylcscids_1**: `function getByLcscIds( 	lcscIds: Array<string>, 	libraryUuid?: string, 	allowMultiMatch?: boolean, ): Promise<Array<ILIB_DeviceSearchItem>>;`
 - **modify**: *(签名过长，请查看详细文档)*
 - **search**: `function search( 	key: string, 	libraryUuid?: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	symbolType?: ELIB_SymbolType, 	itemsOfPage?: number, 	page?: number, ): Promise<Array<ILIB_DeviceSearchItem>>;`
@@ -1512,11 +1518,12 @@ class LIB_Footprint
 ```
 
 - **copy**: `function copy( 	footprintUuid: string, 	libraryUuid: string, 	targetLibraryUuid: string, 	targetClassification?: ILIB_ClassificationIndex | Array<string>, 	newFootprintName?: string, ): Promise<string | undefined>;`
-- **create**: `function create( 	libraryUuid: string, 	footprintName: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	description?: string, ): Promise<string | undefined>;`
-- **delete**: `function delete(footprintUuid: string, libraryUuid: string): Promise<boolean>;`
+- **create**: `function create( 	libraryUuid: string, 	footprintName: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	description?: string, 	otherProperty?: Record<string, boolean | number | string | undefined>, 	model3D?: { name: string; uuid: string; libraryUuid: string }, ): Promise<string | undefined>;`
+- **delete**: `function delete(footprintUuid: string, libraryUuid: string): Promise<boolean | undefined>;`
 - **get**: `function get(footprintUuid: string, libraryUuid?: string): Promise<ILIB_FootprintItem | undefined>;`
+- **getdocumentsource**: `function getDocumentSource( 	footprintUuid: string, 	libraryUuid?: string, ): Promise<string | undefined>;`
 - **getrenderimage**: `function getRenderImage(source: { 	footprintUuid: string; 	libraryUuid: string; }): Promise<Blob | undefined>;`
-- **modify**: `function modify( 	footprintUuid: string, 	libraryUuid: string, 	footprintName?: string, 	classification?: ILIB_ClassificationIndex | Array<string> | null, 	description?: string | null, ): Promise<boolean>;`
+- **modify**: `function modify( 	footprintUuid: string, 	libraryUuid: string, 	footprintName?: string, 	classification?: ILIB_ClassificationIndex | Array<string> | null, 	description?: string | null, 	otherProperty?: Record<string, boolean | number | string | undefined | null>, 	model3D?: { name: string; uuid: string; libraryUuid: string }, ): Promise<boolean>;`
 - **openineditor**: `function openInEditor( 	footprintUuid: string, 	libraryUuid: string, 	splitScreenId?: string, ): Promise<string | undefined>;`
 - **search**: `function search( 	key: string, 	libraryUuid?: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	itemsOfPage?: number, 	page?: number, ): Promise<Array<ILIB_FootprintSearchItem>>;`
 - **searchbyproperties**: `function searchByProperties( 	properties: ILIB_FootprintPropertiesForSearch, 	libraryUuid?: string, ): Promise<Array<ILIB_FootprintSearchItem>>;`
@@ -1537,7 +1544,7 @@ class LIB_LibrariesList
 - **getpersonallibraryuuid**: `function getPersonalLibraryUuid(): Promise<string | undefined>;`
 - **getprojectlibraryuuid**: `function getProjectLibraryUuid(): Promise<string | undefined>;`
 - **getsystemlibraryuuid**: `function getSystemLibraryUuid(): Promise<string | undefined>;`
-- **registerextendlibrary**: `function registerExtendLibrary( 	title: string, 	libraryFunctions: { 		device?: undefined | ILIB_ExtendLibraryDeviceFunctions; 		symbol?: undefined | ILIB_ExtendLibrarySymbolFunctions; 		footprint?: undefined | ILIB_ExtendLibraryFootprintFunctions; 		cbb?: undefined | ILIB_ExtendLibraryCbbFunctions; 		model3d?: undefined | ILIB_ExtendLibrary3DModelFunctions; 	}, ): Promise<string | undefined>;`
+- **registerextendlibrary**: `function registerExtendLibrary( 	title: string, 	libraryFunctions: { 		device?: ILIB_ExtendLibraryDeviceFunctions; 		symbol?: ILIB_ExtendLibrarySymbolFunctions; 		footprint?: ILIB_ExtendLibraryFootprintFunctions; 		cbb?: ILIB_ExtendLibraryCbbFunctions; 		model3d?: ILIB_ExtendLibrary3DModelFunctions; 	}, 	props?: ILIB_RegisterExtendLibraryProps, ): Promise<string | undefined>;`
 
 ---
 
@@ -1551,7 +1558,7 @@ class LIB_PanelLibrary
 
 - **copy**: `function copy( 	panelLibraryUuid: string, 	libraryUuid: string, 	targetLibraryUuid: string, 	targetClassification?: ILIB_ClassificationIndex | Array<string>, 	newPanelLibraryName?: string, ): Promise<string | undefined>;`
 - **create**: `function create( 	libraryUuid: string, 	panelLibraryName: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	description?: string, ): Promise<string | undefined>;`
-- **delete**: `function delete(panelLibraryUuid: string, libraryUuid: string): Promise<boolean>;`
+- **delete**: `function delete(panelLibraryUuid: string, libraryUuid: string): Promise<boolean | undefined>;`
 - **get**: `function get( 	panelLibraryUuid: string, 	libraryUuid?: string, ): Promise<ILIB_PanelLibraryItem | undefined>;`
 - **modify**: `function modify( 	panelLibraryUuid: string, 	libraryUuid: string, 	panelLibraryName?: string, 	classification?: ILIB_ClassificationIndex | Array<string> | null, 	description?: string | null, ): Promise<boolean>;`
 - **openineditor**: `function openInEditor( 	panelLibraryUuid: string, 	libraryUuid: string, 	splitScreenId?: string, ): Promise<string | undefined>;`
@@ -1580,10 +1587,10 @@ class LIB_SimulationModel
 ```
 
 - **copy**: `function copy( 	simulationModelUuid: string, 	libraryUuid: string, 	targetLibraryUuid: string, 	targetClassification?: Array<string>, 	newSimulationModelName?: string, ): Promise<string | undefined>;`
-- **create**: `function create( 	libraryUuid: string, 	model: { modelType: 'Ngspice' } & ( 		| { 			modelFile: Blob; 			modelName?: undefined | string; 			modelCategory?: undefined | string; 			modelPin?: undefined | string; 		} 		| { 			modelData: string; 			modelName?: undefined | string; 			modelCategory?: undefined | string; 			modelPin?: undefined | string; 		} 	), 	classification?: Array<string>, 	description?: string, ): Promise<string | undefined>;`
-- **delete**: `function delete(simulationModelUuid: string, libraryUuid: string): Promise<boolean>;`
+- **create**: `function create( 	libraryUuid: string, 	model: { modelType: 'Ngspice' } & ( 		| { modelFile: Blob; modelName?: string; modelCategory?: string; modelPin?: string } 		| { modelData: string; modelName?: string; modelCategory?: string; modelPin?: string } 	), 	classification?: Array<string>, 	description?: string, ): Promise<string | undefined>;`
+- **delete**: `function delete(simulationModelUuid: string, libraryUuid: string): Promise<boolean | undefined>;`
 - **get**: `function get( 	simulationModelUuid: string, 	libraryUuid?: string, ): Promise<ILIB_SimulationModelItem | undefined>;`
-- **modify**: `function modify( 	simulationModelUuid: string, 	libraryUuid: string, 	modelProps?: { 		modelName?: undefined | string; 		modelCategory?: undefined | string; 		modelPin?: undefined | string; 	}, 	classification?: Array<string> | null, 	description?: string | null, ): Promise<boolean>;`
+- **modify**: `function modify( 	simulationModelUuid: string, 	libraryUuid: string, 	modelProps?: { modelName?: string; modelCategory?: string; modelPin?: string }, 	classification?: Array<string> | null, 	description?: string | null, ): Promise<boolean>;`
 - **search**: `function search( 	key: string, 	libraryUuid?: string, 	classification?: Array<string>, 	simulationModelType?: ELIB_SimulationModelType, 	itemsOfPage?: number, 	page?: number, ): Promise<Array<ILIB_SimulationModelSearchItem>>;`
 
 ---
@@ -1597,11 +1604,12 @@ class LIB_Symbol
 ```
 
 - **copy**: `function copy( 	symbolUuid: string, 	libraryUuid: string, 	targetLibraryUuid: string, 	targetClassification?: ILIB_ClassificationIndex | Array<string>, 	newSymbolName?: string, ): Promise<string | undefined>;`
-- **create**: `function create( 	libraryUuid: string, 	symbolName: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	symbolType?: ELIB_SymbolType, 	description?: string, ): Promise<string | undefined>;`
-- **delete**: `function delete(symbolUuid: string, libraryUuid: string): Promise<boolean>;`
+- **create**: `function create( 	libraryUuid: string, 	symbolName: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	symbolType?: ELIB_SymbolType, 	description?: string, 	otherProperty?: Record<string, boolean | number | string | undefined>, ): Promise<string | undefined>;`
+- **delete**: `function delete(symbolUuid: string, libraryUuid: string): Promise<boolean | undefined>;`
 - **get**: `function get(symbolUuid: string, libraryUuid?: string): Promise<ILIB_SymbolItem | undefined>;`
-- **getrenderimage**: `function getRenderImage(source: { 	symbolUuid: string; 	libraryUuid: string; 	subPartName?: undefined | string; }): Promise<Blob | undefined>;`
-- **modify**: `function modify( 	symbolUuid: string, 	libraryUuid: string, 	symbolName?: string, 	classification?: ILIB_ClassificationIndex | Array<string> | null, 	description?: string | null, ): Promise<boolean>;`
+- **getdocumentsource**: `function getDocumentSource(symbolUuid: string, libraryUuid?: string): Promise<string | undefined>;`
+- **getrenderimage**: `function getRenderImage(source: { 	symbolUuid: string; 	libraryUuid: string; 	subPartName?: string; }): Promise<Blob | undefined>;`
+- **modify**: `function modify( 	symbolUuid: string, 	libraryUuid: string, 	symbolName?: string, 	classification?: ILIB_ClassificationIndex | Array<string> | null, 	description?: string | null, 	otherProperty?: Record<string, boolean | number | string | undefined | null>, ): Promise<boolean>;`
 - **openineditor**: `function openInEditor( 	symbolUuid: string, 	libraryUuid: string, 	splitScreenId?: string, ): Promise<string | undefined>;`
 - **search**: `function search( 	key: string, 	libraryUuid?: string, 	classification?: ILIB_ClassificationIndex | Array<string>, 	symbolType?: ELIB_SymbolType, 	itemsOfPage?: number, 	page?: number, ): Promise<Array<ILIB_SymbolSearchItem>>;`
 - **searchbyproperties**: `function searchByProperties( 	properties: ILIB_SymbolPropertiesForSearch, 	libraryUuid?: string, ): Promise<Array<ILIB_SymbolSearchItem>>;`
@@ -1711,14 +1719,30 @@ class PCB_Event
 ```
 
 - **addcrossprobeselecteventlistener**: `function addCrossProbeSelectEventListener( 	id: string, 	callFn: (props: any) => void | Promise<void>, ): void;`
-- **addmouseeventlistener**: `function addMouseEventListener( 	id: string, 	eventType: 'all' | EPCB_MouseEventType, 	callFn: ( 		eventType: EPCB_MouseEventType, 		props: [ 			{ 				primitiveId: string; 				primitiveType: EPCB_PrimitiveType; 				net?: undefined | string; 				designator?: undefined | string; 				parentComponentPrimitiveId?: undefined | string; 				parentComponentDesignator?: undefined | string; 			}, 		], 	) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
+- **addimageeventlistener**: `function addImageEventListener( 	id: string, 	callFn: (message: { file?: File; source: 'toolbar' | 'paste' }) => void | Promise<void>, ): boolean;`
+- **addmouseeventlistener**: `function addMouseEventListener( 	id: string, 	eventType: 'all' | EPCB_MouseEventType, 	callFn: ( 		eventType: EPCB_MouseEventType, 		props: [ 			{ 				primitiveId: string; 				primitiveType: EPCB_PrimitiveType; 				net?: string; 				designator?: string; 				parentComponentPrimitiveId?: string; 				parentComponentDesignator?: string; 			}, 		], 	) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
 - **addneteventlistener**: `function addNetEventListener( 	id: string, 	eventType: 'all' | EPCB_NetEventType, 	callFn: (eventType: EPCB_NetEventType, props: [{ net: string }]) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
-- **addprimitiveeventlistener**: `function addPrimitiveEventListener( 	id: string, 	eventType: 'all' | EPCB_PrimitiveEventType, 	callFn: ( 		eventType: EPCB_PrimitiveEventType, 		props: [ 			{ 				primitiveId: string; 				primitiveType: EPCB_PrimitiveType; 				net?: undefined | string; 				designator?: undefined | string; 				parentComponentPrimitiveId?: undefined | string; 				parentComponentDesignator?: undefined | string; 			}, 		], 	) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
+- **addprimitiveeventlistener**: `function addPrimitiveEventListener( 	id: string, 	eventType: 'all' | EPCB_PrimitiveEventType, 	callFn: ( 		eventType: EPCB_PrimitiveEventType, 		props: [ 			{ 				primitiveId: string; 				primitiveType: EPCB_PrimitiveType; 				net?: string; 				designator?: string; 				parentComponentPrimitiveId?: string; 				parentComponentDesignator?: string; 			}, 		], 	) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
 - **addraytracerengine3dviewcamerachangeeventlistener**: `function addRayTracerEngine3DViewCameraChangeEventListener( 	id: string, 	callFn: (props: { 		position: { x: number; y: number; z: number }; 		rotation: { x: number; y: number; z: number }; 		focalLength: number; 	}) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
 - **addraytracerengine3dviewclickmaterialeventlistener**: `function addRayTracerEngine3DViewClickMaterialEventListener( 	id: string, 	callFn: (props: { materialId: number; material: any }) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
 - **addrealtimedrcresulteventlistener**: `function addRealTimeDrcResultEventListener( 	id: string, 	eventType: 'all', 	callFn: (eventType: undefined, props: [{ drcResult: any }]) => void | Promise<void>, ): void;`
 - **iseventlisteneralreadyexist**: `function isEventListenerAlreadyExist(id: string): boolean;`
 - **removeeventlistener**: `function removeEventListener(id: string): boolean;`
+
+---
+
+## PCB_ImageTool
+
+PCB 图片工具类
+
+```typescript
+class PCB_ImageTool
+```
+
+- **processimage**: `function processImage( 	file: File, 	options?: { maxBytes?: number; acceptableBytes?: number }, ): Promise<{ 	file: File; 	dataURL: string; 	width: number; 	height: number; 	actualFormat: string; 	msg: string; }>;`
+- **runinsertimagecommand**: `function runInsertImageCommand(): Promise<boolean>;`
+- **startplacetruecolorpicture**: `function startPlaceTrueColorPicture(options: { 	imageBlob: Blob; 	width: number; 	height: number; 	unit?: 'mm' | 'mil'; 	fileName: string; }): Promise<boolean>;`
+- **startplacevectorimage**: `function startPlaceVectorImage(options: { 	path: string; 	width: number; 	height: number; 	unit?: 'mm' | 'mil'; }): Promise<boolean>;`
 
 ---
 
@@ -1740,7 +1764,7 @@ class PCB_Layer
 - **getdefaultphysicalstackingconfigurationname**: `function getDefaultPhysicalStackingConfigurationName( 	physicalProps?: IPCB_SubstratePhysicalProperties, ): Promise<string | undefined>;`
 - **getphysicalstackingconfiguration**: `function getPhysicalStackingConfiguration( 	configurationName: string, 	physicalProps?: IPCB_SubstratePhysicalProperties, ): Promise<IPCB_PhysicalStackingConfiguration | undefined>;`
 - **locklayer**: `function lockLayer( 	layer?: TPCB_LayersInTheSelectable | Array<TPCB_LayersInTheSelectable>, ): Promise<boolean>;`
-- **modifylayer**: `function modifyLayer( 	layer: TPCB_LayersInTheSelectable, 	property: { 		name?: undefined | string; 		type?: undefined | EPCB_LayerType.SIGNAL | EPCB_LayerType.INTERNAL_ELECTRICAL; 		color?: undefined | string; 		transparency?: undefined | number; 	}, ): Promise<boolean>;`
+- **modifylayer**: `function modifyLayer( 	layer: TPCB_LayersInTheSelectable, 	property: { 		name?: string; 		type?: TPCB_LayerTypesOfInnerLayer; 		color?: string; 		transparency?: number; 	}, ): Promise<boolean>;`
 - **overwritecurrentphysicalstackingconfiguration**: `function overwriteCurrentPhysicalStackingConfiguration( 	physicalStackingConfiguration: IPCB_PhysicalStackingConfiguration, ): Promise<boolean>;`
 - **removelayer**: `function removeLayer(layer: TPCB_LayersOfCustom): Promise<boolean>;`
 - **renamephysicalstackingconfiguration**: `function renamePhysicalStackingConfiguration( 	originalConfigurationName: string, 	configurationName: string, 	physicalProps?: IPCB_SubstratePhysicalProperties, ): Promise<boolean>;`
@@ -1773,7 +1797,7 @@ class PCB_ManufactureData
 - **getautolayoutjsonfile**: `function getAutoLayoutJsonFile(fileName?: string): Promise<File | undefined>;`
 - **getautoroutejsonfile**: `function getAutoRouteJsonFile(fileName?: string): Promise<File | undefined>;`
 - **getautoroutejsonfileforjrouter**: `function getAutoRouteJsonFileForJRouter(fileName?: string): Promise<File | undefined>;`
-- **getbomfile**: `function getBomFile( 	fileName?: string, 	fileType?: 'xlsx' | 'csv', 	template?: string, 	filterOptions?: Array<{ property: string; includeValue: string | false | true }>, 	statistics?: Array<string>, 	property?: Array<string>, 	columns?: Array<IPCB_BomPropertiesTableColumns>, ): Promise<File | undefined>;`
+- **getbomfile**: `function getBomFile( 	fileName?: string, 	fileType?: 'xlsx' | 'csv', 	template?: string, 	filterOptions?: Array<{ property: string; includeValue: boolean | string }>, 	statistics?: Array<string>, 	property?: Array<string>, 	columns?: Array<IPCB_BomPropertiesTableColumns>, ): Promise<File | undefined>;`
 - **getbomtemplatefile**: `function getBomTemplateFile(template: string): Promise<File | undefined>;`
 - **getbomtemplates**: `function getBomTemplates(): Promise<Array<string>>;`
 - **getdsnfile**: `function getDsnFile(fileName?: string): Promise<File | undefined>;`
@@ -1785,7 +1809,7 @@ class PCB_ManufactureData
 - **getipcd356afile**: `function getIpcD356AFile(fileName?: string): Promise<File | undefined>;`
 - **getmanufacturedata**: `function getManufactureData(): Promise<File | undefined>;`
 - **getnetlistfile**: `function getNetlistFile( 	fileName?: string, 	netlistType?: ESYS_NetlistType, ): Promise<File | undefined>;`
-- **getopendatabasedoubleplusfile**: `function getOpenDatabaseDoublePlusFile( 	fileName?: string, 	unit?: ESYS_Unit.INCH | ESYS_Unit.MILLIMETER, 	otherData?: { 		metallizedDrilledHoles?: undefined | false | true; 		nonMetallizedDrilledHoles?: undefined | false | true; 		drillTable?: undefined | false | true; 		flyingProbeTestFile?: undefined | false | true; 	}, 	layers?: Array<{ layerId: EPCB_LayerId; mirror: boolean }>, 	objects?: Array<{ objectName: string }>, ): Promise<File | undefined>;`
+- **getopendatabasedoubleplusfile**: `function getOpenDatabaseDoublePlusFile( 	fileName?: string, 	unit?: ESYS_Unit.INCH | ESYS_Unit.MILLIMETER, 	otherData?: { 		metallizedDrilledHoles?: boolean; 		nonMetallizedDrilledHoles?: boolean; 		drillTable?: boolean; 		flyingProbeTestFile?: boolean; 	}, 	layers?: Array<{ layerId: EPCB_LayerId; mirror: boolean }>, 	objects?: Array<{ objectName: string }>, ): Promise<File | undefined>;`
 - **getpadsfile**: `function getPadsFile(fileName?: string): Promise<File | undefined>;`
 - **getpcbinfofile**: `function getPcbInfoFile(fileName?: string): Promise<File | undefined>;`
 - **getpdffile**: *(签名过长，请查看详细文档)*
@@ -1813,8 +1837,10 @@ class PCB_MathPolygon
 - **convertimagetocomplexpolygon**: `function convertImageToComplexPolygon( 	imageBlob: Blob, 	imageWidth: number, 	imageHeight: number, 	tolerance?: number, 	simplification?: number, 	smoothing?: number, 	despeckling?: number, 	whiteAsBackgroundColor?: boolean, 	inversion?: boolean, ): Promise<IPCB_ComplexPolygon | undefined>;`
 - **createcomplexpolygon**: `function createComplexPolygon( 	complexPolygon: 		| TPCB_PolygonSourceArray 		| Array<TPCB_PolygonSourceArray> 		| IPCB_Polygon 		| Array<IPCB_Polygon>, ): IPCB_ComplexPolygon | undefined;`
 - **createpolygon**: `function createPolygon(polygon: TPCB_PolygonSourceArray): IPCB_Polygon | undefined;`
-- **discretize**: `function discretize( 	polygon: IPCB_Polygon | TPCB_PolygonSourceArray, 	options?: IPCB_DiscretizeOptions, ): Promise<Array<IPCB_DiscretizedPoint>>;`
+- **discretize**: `function discretize( 	polygon: IPCB_Polygon | TPCB_PolygonSourceArray, 	options?: IPCB_DiscretizeOptions, ): Promise<Array<IPCB_DiscretizedPoint> | null>;`
+- **disposetrace**: `function disposeTrace(): Promise<void>;`
 - **splitpolygon**: `function splitPolygon(...complexPolygons: Array<IPCB_ComplexPolygon>): Array<IPCB_Polygon>;`
+- **traceimage**: `function traceImage(options: { 	imageBlob?: Blob; 	imageWidth?: number; 	imageHeight?: number; 	quality?: 'low' | 'high'; 	tolerance?: number; 	simplify?: number; 	smoothness?: number; 	despeckle?: number; 	whiteAsTransparent?: boolean; 	antiphase?: boolean; }): Promise< 	| { path: string; sourcePreviewUrl: string; previewUrl: string; width: number; height: number } 	| undefined >;`
 
 ---
 
@@ -1872,7 +1898,7 @@ class PCB_PrimitiveArc implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveArc>>;`
 - **getall**: `function getAll( 	net?: string, 	layer?: TPCB_LayersOfLine, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveArc>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	net?: string, 	layer?: TPCB_LayersOfLine, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveArc, 	property: { 		net?: string; 		layer?: TPCB_LayersOfLine; 		startX?: number; 		startY?: number; 		endX?: number; 		endY?: number; 		arcAngle?: number; 		lineWidth?: number; 		interactiveMode?: EPCB_PrimitiveArcInteractiveMode; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveArc | undefined>;`
 
 ---
 
@@ -1889,7 +1915,7 @@ class PCB_PrimitiveAttribute implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveAttribute>>;`
 - **getall**: `function getAll( 	parentPrimitiveId?: string, 	layer?: TPCB_LayersOfImage, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveAttribute>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	parentPrimitiveId?: string, 	layer?: TPCB_LayersOfImage, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveAttribute, 	property: { 		layer?: TPCB_LayersOfImage; 		x?: number; 		y?: number; 		key?: string; 		value?: string; 		keyVisible?: boolean; 		valueVisible?: boolean; 		fontFamily?: string; 		fontSize?: number; 		lineWidth?: number; 		alignMode?: EPCB_PrimitiveStringAlignMode; 		rotation?: number; 		reverse?: boolean; 		expansion?: number; 		mirror?: boolean; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveAttribute | undefined>;`
 
 ---
 
@@ -1929,7 +1955,7 @@ class PCB_PrimitiveDimension implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveDimension>>;`
 - **getall**: `function getAll( 	layer?: TPCB_LayersOfDimension, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveDimension>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	layer?: TPCB_LayersOfDimension, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveDimension, 	property: { 		dimensionType?: EPCB_PrimitiveDimensionType; 		coordinateSet?: TPCB_PrimitiveDimensionCoordinateSet; 		layer?: TPCB_LayersOfDimension; 		unit?: ESYS_Unit.MILLIMETER | ESYS_Unit.CENTIMETER | ESYS_Unit.INCH | ESYS_Unit.MIL; 		lineWidth?: number; 		precision?: number; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveDimension | undefined>;`
 
 ---
 
@@ -1947,7 +1973,7 @@ class PCB_PrimitiveFill implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveFill>>;`
 - **getall**: `function getAll( 	layer?: TPCB_LayersOfFill, 	net?: string, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveFill>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	layer?: TPCB_LayersOfFill, 	net?: string, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveFill, 	property: { 		layer?: TPCB_LayersOfFill; 		complexPolygon?: IPCB_Polygon; 		net?: string; 		fillMode?: EPCB_PrimitiveFillMode; 		lineWidth?: number; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveFill | undefined>;`
 
 ---
 
@@ -1965,7 +1991,7 @@ class PCB_PrimitiveImage implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveImage>>;`
 - **getall**: `function getAll( 	layer?: TPCB_LayersOfImage, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveImage>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	layer?: TPCB_LayersOfImage, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveImage, 	property: { 		x?: number; 		y?: number; 		layer?: TPCB_LayersOfImage; 		width?: number; 		height?: number; 		rotation?: number; 		horizonMirror?: boolean; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveImage | undefined>;`
 
 ---
 
@@ -1983,7 +2009,7 @@ class PCB_PrimitiveLine implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveLine>>;`
 - **getall**: `function getAll( 	net?: string, 	layer?: TPCB_LayersOfLine, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveLine>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	net?: string, 	layer?: TPCB_LayersOfLine, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveLine, 	property: { 		net?: string; 		layer?: TPCB_LayersOfLine; 		startX?: number; 		startY?: number; 		endX?: number; 		endY?: number; 		lineWidth?: number; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveLine | undefined>;`
 
 ---
 
@@ -2001,7 +2027,7 @@ class PCB_PrimitiveObject implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveObject>>;`
 - **getall**: `function getAll( 	layer?: TPCB_LayersOfObject, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveObject>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	layer?: TPCB_LayersOfObject, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveObject, 	property: { 		layer?: TPCB_LayersOfObject; 		topLeftX?: number; 		topLeftY?: number; 		binaryData?: string; 		width?: number; 		height?: number; 		rotation?: number; 		mirror?: boolean; 		fileName?: string; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveObject | undefined>;`
 
 ---
 
@@ -2037,7 +2063,7 @@ class PCB_PrimitivePolyline implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitivePolyline>>;`
 - **getall**: `function getAll( 	net?: string, 	layer?: TPCB_LayersOfLine, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitivePolyline>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	net?: string, 	layer?: TPCB_LayersOfLine, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitivePolyline, 	property: { 		net?: string; 		layer?: TPCB_LayersOfLine; 		polygon?: IPCB_Polygon; 		lineWidth?: number; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitivePolyline | undefined>;`
 
 ---
 
@@ -2055,7 +2081,7 @@ class PCB_PrimitivePour implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitivePour>>;`
 - **getall**: `function getAll( 	net?: string, 	layer?: TPCB_LayersOfCopper, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitivePour>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	net?: string, 	layer?: TPCB_LayersOfCopper, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitivePour, 	property: { 		net?: string; 		layer?: TPCB_LayersOfCopper; 		complexPolygon?: IPCB_Polygon; 		pourFillMethod?: EPCB_PrimitivePourFillMethod; 		preserveSilos?: boolean; 		pourName?: string; 		pourPriority?: number; 		lineWidth?: number; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitivePour | undefined>;`
 
 ---
 
@@ -2089,7 +2115,7 @@ class PCB_PrimitiveRegion implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveRegion>>;`
 - **getall**: `function getAll( 	layer?: TPCB_LayersOfRegion, 	ruleType?: Array<EPCB_PrimitiveRegionRuleType>, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveRegion>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	layer?: TPCB_LayersOfRegion, 	ruleType?: Array<EPCB_PrimitiveRegionRuleType>, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveRegion, 	property: { 		layer?: TPCB_LayersOfRegion; 		complexPolygon?: IPCB_Polygon; 		ruleType?: Array<EPCB_PrimitiveRegionRuleType>; 		regionName?: string; 		lineWidth?: number; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveRegion | undefined>;`
 
 ---
 
@@ -2107,7 +2133,7 @@ class PCB_PrimitiveString implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveString>>;`
 - **getall**: `function getAll( 	layer?: TPCB_LayersOfImage, 	primitiveLock?: boolean, ): Promise<Array<IPCB_PrimitiveString>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId( 	layer?: TPCB_LayersOfImage, 	primitiveLock?: boolean, ): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveString, 	property: { 		layer?: TPCB_LayersOfImage; 		x?: number; 		y?: number; 		text?: string; 		fontFamily?: string; 		fontSize?: number; 		lineWidth?: number; 		alignMode?: EPCB_PrimitiveStringAlignMode; 		rotation?: number; 		reverse?: boolean; 		expansion?: number; 		mirror?: boolean; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveString | undefined>;`
 
 ---
 
@@ -2125,7 +2151,7 @@ class PCB_PrimitiveVia implements IPCB_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<IPCB_PrimitiveVia>>;`
 - **getall**: `function getAll(net?: string, primitiveLock?: boolean): Promise<Array<IPCB_PrimitiveVia>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(net?: string, primitiveLock?: boolean): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | IPCB_PrimitiveVia, 	property: { 		net?: string; 		x?: number; 		y?: number; 		holeDiameter?: number; 		diameter?: number; 		viaType?: EPCB_PrimitiveViaType; 		designRuleBlindViaName?: string | null; 		solderMaskExpansion?: IPCB_PrimitiveSolderMaskAndPasteMaskExpansion | null; 		primitiveLock?: boolean; 	}, ): Promise<IPCB_PrimitiveVia | undefined>;`
 
 ---
 
@@ -2137,11 +2163,17 @@ PCB &amp; footprint / ray tracer engine class
 class PCB_RayTracerEngine
 ```
 
+- **addsceneelement**: `function addSceneElement(file: Blob): Promise<IPCB_RayTracerSceneElement>;`
 - **dispose**: `function dispose(): Promise<void>;`
+- **exportimage**: `function exportImage(): Promise<Blob>;`
 - **getlightconfigurations**: `function getLightConfigurations(lightName: string): Promise<any>;`
-- **getrenderconfigurations**: `function getRenderConfigurations(): Promise<any>;`
-- **init**: `function init(): Promise<void>;`
-- **setrenderconfigurations**: `function setRenderConfigurations(configurations: any): Promise<void>;`
+- **getrenderconfigurations**: `function getRenderConfigurations(): Promise<IPCB_RayTracerRenderConfigurations>;`
+- **getsceneelements**: `function getSceneElements(): Promise<IPCB_RayTracerSceneElement[]>;`
+- **init**: `function init(resourceProvider?: (path: string) => Promise<Blob>): Promise<void>;`
+- **pauserender**: `function pauseRender(): Promise<void>;`
+- **removesceneelement**: `function removeSceneElement(id: string): Promise<void>;`
+- **setrenderconfigurations**: `function setRenderConfigurations(configurations: IPCB_RayTracerRenderConfigurations): Promise<void>;`
+- **setsceneelementtransform**: `function setSceneElementTransform( 	id: string, 	transform: IPCB_RayTracerSceneElementTransform, ): Promise<void>;`
 
 ---
 
@@ -2160,6 +2192,17 @@ class PCB_SelectControl
 - **getallselectedprimitives_primitiveid**: `function getAllSelectedPrimitives_PrimitiveId(): Promise<Array<string>>;`
 - **getcurrentmouseposition**: `function getCurrentMousePosition(): Promise<{ x: number; y: number } | undefined>;`
 - **getselectedprimitives**: `function getSelectedPrimitives(): Promise<Array<object>>;`
+
+---
+
+## PCB_Tool
+
+PCB / 设计工具类
+
+```typescript
+class PCB_Tool
+```
+
 
 ---
 
@@ -2183,8 +2226,8 @@ Schematic &amp; symbol / document operation class
 class SCH_Document
 ```
 
-- **autolayout**: *(签名过长，请查看详细文档)*
-- **autorouting**: *(签名过长，请查看详细文档)*
+- **autolayout**: `function autoLayout(props?: { 	uuids?: Array<string>; 	netlist?: { 		component: Record< 			string, 			{ 				pinInfoMap: Record< 					string, 					{ name: string; number: string; net: string; props: { 'Pin Number': string } } 				>; 			} 		>; 	}; 	designatorDeviceTypeMap?: Record< 		string, 		| 'resistor' 		| 'capacitor' 		| 'inductive' 		| 'diode' 		| 'triode' 		| 'oscillator' 		| 'chip' 		| 'otherDevice' 	>; }): Promise<any>;`
+- **autorouting**: `function autoRouting(props?: { 	uuids?: Array<string>; 	netlist?: { 		component: Record< 			string, 			{ 				pinInfoMap: Record< 					string, 					{ name: string; number: string; net: string; props: { 'Pin Number': string } } 				>; 			} 		>; 	}; 	designatorDeviceTypeMap?: Record< 		string, 		| 'resistor' 		| 'capacitor' 		| 'inductive' 		| 'diode' 		| 'triode' 		| 'oscillator' 		| 'chip' 		| 'otherDevice' 	>; }): Promise<any>;`
 - **getcurrentfilterconfiguration**: `function getCurrentFilterConfiguration(): Promise<Record<string, boolean> | undefined>;`
 - **getprimitiveatpoint**: `function getPrimitiveAtPoint(x: number, y: number): Promise<ISCH_Primitive | undefined>;`
 - **getprimitivesinregion**: `function getPrimitivesInRegion( 	left: number, 	right: number, 	top: number, 	bottom: number, ): Promise<Array<ISCH_Primitive>>;`
@@ -2217,7 +2260,7 @@ class SCH_Event
 ```
 
 - **addmouseeventlistener**: `function addMouseEventListener( 	id: string, 	eventType: 'all' | ESCH_MouseEventType, 	callFn: (eventType: ESCH_MouseEventType) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
-- **addprimitiveeventlistener**: `function addPrimitiveEventListener( 	id: string, 	eventType: 'all' | ESCH_PrimitiveEventType, 	callFn: ( 		eventType: ESCH_PrimitiveEventType, 		props: { primitiveIds: string[] }, 	) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
+- **addprimitiveeventlistener**: `function addPrimitiveEventListener( 	id: string, 	eventType: 'all' | ESCH_PrimitiveEventType, 	callFn: ( 		eventType: ESCH_PrimitiveEventType, 		props: { primitiveIds: Array<string> }, 	) => void | Promise<void>, 	onlyOnce?: boolean, ): void;`
 - **addsimulationenginepulleventlistener**: `function addSimulationEnginePullEventListener( 	id: string, 	eventType: 'all', 	callFn: ( 		eventType: 			ESCH_DynamicSimulationEnginePullEventType | ESCH_SpiceSimulationEnginePullEventType, 		props: Record<string, any>, 	) => void | Promise<void>, ): void;`
 - **iseventlisteneralreadyexist**: `function isEventListenerAlreadyExist(id: string): boolean;`
 - **removeeventlistener**: `function removeEventListener(id: string): boolean;`
@@ -2234,7 +2277,7 @@ class SCH_ManufactureData
 
 - **deletebomtemplate**: `function deleteBomTemplate(template: string): Promise<boolean>;`
 - **getassemblyvariantsconfigs**: `function getAssemblyVariantsConfigs(): Promise<Array<{ text: string; value: string }>>;`
-- **getbomfile**: `function getBomFile( 	fileName?: string, 	fileType?: 'xlsx' | 'csv', 	template?: string, 	filterOptions?: Array<{ property: string; includeValue: string | false | true }>, 	statistics?: Array<string>, 	property?: Array<string>, 	columns?: Array<IPCB_BomPropertiesTableColumns>, 	assemblyVariantsConfig?: { text: string; value: string }, ): Promise<File | undefined>;`
+- **getbomfile**: `function getBomFile( 	fileName?: string, 	fileType?: 'xlsx' | 'csv', 	template?: string, 	filterOptions?: Array<{ property: string; includeValue: boolean | string }>, 	statistics?: Array<string>, 	property?: Array<string>, 	columns?: Array<IPCB_BomPropertiesTableColumns>, 	assemblyVariantsConfig?: { text: string; value: string }, ): Promise<File | undefined>;`
 - **getbomtemplatefile**: `function getBomTemplateFile(template: string): Promise<File | undefined>;`
 - **getbomtemplates**: `function getBomTemplates(): Promise<Array<string>>;`
 - **getexportdocumentfile**: *(签名过长，请查看详细文档)*
@@ -2305,7 +2348,7 @@ class SCH_PrimitiveArc implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitiveArc>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitiveArc>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveArc, 	property: { 		startX?: number; 		startY?: number; 		referenceX?: number; 		referenceY?: number; 		endX?: number; 		endY?: number; 		color?: string | null; 		fillColor?: string | null; 		lineWidth?: number | null; 		lineType?: ESCH_PrimitiveLineType | null; 	}, ): Promise<ISCH_PrimitiveArc | undefined>;`
 
 ---
 
@@ -2340,7 +2383,7 @@ class SCH_PrimitiveBus implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitiveBus>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitiveBus>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveBus, 	property: { 		busName?: undefined | string; 		line?: undefined | number[] | number[][]; 		color?: undefined | null | string; 		lineWidth?: undefined | null | number; 		lineType?: 			| undefined 			| null 			| ESCH_PrimitiveLineType.SOLID 			| ESCH_PrimitiveLineType.DASHED 			| ESCH_PrimitiveLineType.DOTTED 			| ESCH_PrimitiveLineType.DOT_DASHED; 	}, ): Promise<ISCH_PrimitiveBus | undefined>;`
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveBus, 	property: { 		busName?: string; 		line?: Array<number> | Array<Array<number>>; 		color?: string | null; 		lineWidth?: number | null; 		lineType?: ESCH_PrimitiveLineType | null; 	}, ): Promise<ISCH_PrimitiveBus | undefined>;`
 
 ---
 
@@ -2358,7 +2401,7 @@ class SCH_PrimitiveCircle implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitiveCircle>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitiveCircle>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveCircle, 	property: { 		centerX?: number; 		centerY?: number; 		radius?: number; 		color?: string | null; 		fillColor?: string | null; 		lineWidth?: number | null; 		lineType?: ESCH_PrimitiveLineType | null; 		fillStyle?: ESCH_PrimitiveFillStyle | null; 	}, ): Promise<ISCH_PrimitiveCircle | undefined>;`
 
 ---
 
@@ -2370,8 +2413,8 @@ Schematic &amp; symbol / device primitive class
 class SCH_PrimitiveComponent implements ISCH_PrimitiveAPI
 ```
 
-- **create**: `function create( 	component: 		| { libraryType?: undefined | ELIB_LibraryType.DEVICE; libraryUuid: string; uuid: string } 		| ILIB_DeviceItem 		| ILIB_DeviceSearchItem 		| { libraryType: ELIB_LibraryType.SYMBOL; libraryUuid: string; uuid: string } 		| ILIB_SymbolItem 		| ILIB_SymbolSearchItem, 	x: number, 	y: number, 	subPartName?: string, 	rotation?: number, 	mirror?: boolean, 	addIntoBom?: boolean, 	addIntoPcb?: boolean, ): Promise<ISCH_PrimitiveComponent | undefined>;`
-- **createcbbsymbol**: `function createCbbSymbol( 	cbbSymbol: { libraryUuid: string; cbbUuid: string; uuid?: undefined | string }, 	x: number, 	y: number, 	rotation?: number, 	mirror?: boolean, ): Promise<ISCH_PrimitiveCbbSymbolComponent | undefined>;`
+- **create**: `function create( 	component: 		| { libraryType?: ELIB_LibraryType.DEVICE; libraryUuid: string; uuid: string } 		| ILIB_DeviceItem 		| ILIB_DeviceSearchItem 		| { libraryType: ELIB_LibraryType.SYMBOL; libraryUuid: string; uuid: string } 		| ILIB_SymbolItem 		| ILIB_SymbolSearchItem, 	x: number, 	y: number, 	subPartName?: string, 	rotation?: number, 	mirror?: boolean, 	addIntoBom?: boolean, 	addIntoPcb?: boolean, ): Promise<ISCH_PrimitiveComponent | undefined>;`
+- **createcbbsymbol**: `function createCbbSymbol( 	cbbSymbol: { libraryUuid: string; cbbUuid: string; uuid?: string }, 	x: number, 	y: number, 	rotation?: number, 	mirror?: boolean, ): Promise<ISCH_PrimitiveCbbSymbolComponent | undefined>;`
 - **createnetflag**: `function createNetFlag( 	identification: 'Power' | 'Ground' | 'AnalogGround' | 'ProtectGround', 	net: string, 	x: number, 	y: number, 	rotation?: number, 	mirror?: boolean, ): Promise<ISCH_PrimitiveComponent | undefined>;`
 - **createnetport**: `function createNetPort( 	direction: 'IN' | 'OUT' | 'BI', 	net: string, 	x: number, 	y: number, 	rotation?: number, 	mirror?: boolean, ): Promise<ISCH_PrimitiveComponent | undefined>;`
 - **createshortcircuitflag**: `function createShortCircuitFlag( 	x: number, 	y: number, 	rotation?: number, 	mirror?: boolean, ): Promise<ISCH_PrimitiveComponent | undefined>;`
@@ -2383,7 +2426,7 @@ class SCH_PrimitiveComponent implements ISCH_PrimitiveAPI
 - **getallprimitiveid**: `function getAllPrimitiveId( 	componentType?: ESCH_PrimitiveComponentType, 	allSchematicPages?: boolean, ): Promise<Array<string>>;`
 - **getallpropertynames**: `function getAllPropertyNames(): Promise<Array<string>>;`
 - **modify**: *(签名过长，请查看详细文档)*
-- **placecbbschematicpage**: `function placeCbbSchematicPage( 	cbbSchematicPage: { libraryUuid: string; cbbUuid: string; uuid: string }, 	x: number, 	y: number, 	props?: { reimportWhenNameRepeated?: undefined | false | true }, ): Promise<boolean>;`
+- **placecbbschematicpage**: `function placeCbbSchematicPage( 	cbbSchematicPage: { libraryUuid: string; cbbUuid: string; uuid: string }, 	x: number, 	y: number, 	props?: { reimportWhenNameRepeated?: boolean }, ): Promise<boolean>;`
 - **placecomponentwithmouse**: `function placeComponentWithMouse( 	component: { libraryUuid: string; uuid: string } | ILIB_DeviceItem | ILIB_DeviceSearchItem, 	subPartName?: string, ): Promise<boolean>;`
 - **placesymbolwithmouse**: `function placeSymbolWithMouse( 	symbol: { libraryUuid: string; uuid: string } | ILIB_SymbolItem | ILIB_SymbolSearchItem, 	subPartName?: string, 	properties?: Record<string, boolean | number | string | undefined>, ): Promise<boolean>;`
 - **setnetflagcomponentuuid_analogground**: `function setNetFlagComponentUuid_AnalogGround( 	component: { libraryUuid: string; uuid: string } | ILIB_DeviceItem | ILIB_DeviceSearchItem, ): Promise<boolean>;`
@@ -2410,7 +2453,7 @@ class SCH_PrimitiveObject implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitiveObject>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitiveObject>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveObject, 	property: { 		content?: undefined | string | File; 		startX?: undefined | number; 		startY?: undefined | number; 		width?: undefined | number; 		height?: undefined | number; 		rotation?: undefined | number; 		mirror?: undefined | false | true; 		fileName?: undefined | string; 	}, ): Promise<ISCH_PrimitiveObject | undefined>;`
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveObject, 	property: { 		content?: File | string; 		startX?: number; 		startY?: number; 		width?: number; 		height?: number; 		rotation?: number; 		mirror?: boolean; 		fileName?: string; 	}, ): Promise<ISCH_PrimitiveObject | undefined>;`
 
 ---
 
@@ -2428,7 +2471,7 @@ class SCH_PrimitivePin implements ISCH_PrimitiveAPI
 - **get_1**: `function get( 	primitiveIds: Array<string>, ): Promise<Array<ISCH_PrimitivePin | ISCH_PrimitiveComponentPin>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitivePin>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitivePin | ISCH_PrimitiveComponentPin, 	property: { 		x?: number; 		y?: number; 		pinNumber?: string; 		pinName?: string; 		rotation?: number; 		pinLength?: number; 		pinColor?: string | null; 		pinShape?: ESCH_PrimitivePinShape; 		pinType?: ESCH_PrimitivePinType; 		noConnected?: boolean; 		otherProperty?: Record<string, string | number | boolean>; 	}, ): Promise<ISCH_PrimitivePin | ISCH_PrimitiveComponentPin | undefined>;`
 
 ---
 
@@ -2446,7 +2489,7 @@ class SCH_PrimitivePolygon implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitivePolygon>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitivePolygon>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitivePolygon, 	property: { 		line?: undefined | number[]; 		color?: undefined | null | string; 		fillColor?: undefined | null | string; 		lineWidth?: undefined | null | number; 		lineType?: 			| undefined 			| null 			| ESCH_PrimitiveLineType.SOLID 			| ESCH_PrimitiveLineType.DASHED 			| ESCH_PrimitiveLineType.DOTTED 			| ESCH_PrimitiveLineType.DOT_DASHED; 	}, ): Promise<ISCH_PrimitivePolygon | undefined>;`
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitivePolygon, 	property: { 		line?: Array<number>; 		color?: string | null; 		fillColor?: string | null; 		lineWidth?: number | null; 		lineType?: ESCH_PrimitiveLineType | null; 	}, ): Promise<ISCH_PrimitivePolygon | undefined>;`
 
 ---
 
@@ -2464,7 +2507,7 @@ class SCH_PrimitiveRectangle implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitiveRectangle>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitiveRectangle>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveRectangle, 	property: { 		topLeftX?: number; 		topLeftY?: number; 		width?: number; 		height?: number; 		cornerRadius?: number; 		rotation?: number; 		color?: string | null; 		fillColor?: string | null; 		lineWidth?: number | null; 		lineType?: ESCH_PrimitiveLineType | null; 		fillStyle?: ESCH_PrimitiveFillStyle | null; 	}, ): Promise<ISCH_PrimitiveRectangle | undefined>;`
 
 ---
 
@@ -2482,7 +2525,7 @@ class SCH_PrimitiveText implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitiveText>>;`
 - **getall**: `function getAll(): Promise<Array<ISCH_PrimitiveText>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(): Promise<Array<string>>;`
-- **modify**: *(签名过长，请查看详细文档)*
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveText, 	property: { 		x?: number; 		y?: number; 		content?: string; 		rotation?: number; 		textColor?: string | null; 		fontName?: string | null; 		fontSize?: number | null; 		bold?: boolean; 		italic?: boolean; 		underLine?: boolean; 		alignMode?: ESCH_PrimitiveTextAlignMode; 	}, ): Promise<ISCH_PrimitiveText | undefined>;`
 
 ---
 
@@ -2500,7 +2543,7 @@ class SCH_PrimitiveWire implements ISCH_PrimitiveAPI
 - **get_1**: `function get(primitiveIds: Array<string>): Promise<Array<ISCH_PrimitiveWire>>;`
 - **getall**: `function getAll(net?: string | Array<string>): Promise<Array<ISCH_PrimitiveWire>>;`
 - **getallprimitiveid**: `function getAllPrimitiveId(net?: string | Array<string>): Promise<Array<string>>;`
-- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveWire, 	property: { 		line?: undefined | number[] | number[][]; 		net?: undefined | string; 		color?: undefined | null | string; 		lineWidth?: undefined | null | number; 		lineType?: 			| undefined 			| null 			| ESCH_PrimitiveLineType.SOLID 			| ESCH_PrimitiveLineType.DASHED 			| ESCH_PrimitiveLineType.DOTTED 			| ESCH_PrimitiveLineType.DOT_DASHED; 	}, ): Promise<ISCH_PrimitiveWire | undefined>;`
+- **modify**: `function modify( 	primitiveId: string | ISCH_PrimitiveWire, 	property: { 		line?: Array<number> | Array<Array<number>>; 		net?: string; 		color?: string | null; 		lineWidth?: number | null; 		lineType?: ESCH_PrimitiveLineType | null; 	}, ): Promise<ISCH_PrimitiveWire | undefined>;`
 
 ---
 
@@ -2555,7 +2598,7 @@ System / external request class
 class SYS_ClientUrl
 ```
 
-- **request**: `function request( 	url: string, 	method?: 'GET' | 'POST' | 'HEAD' | 'PUT' | 'DELETE' | 'PATCH', 	data?: string | Blob | FormData | URLSearchParams, 	options?: { headers?: undefined | { [key: string]: any }; integrity?: undefined | string }, 	succeedCallFn?: (data: Response) => void | Promise<void>, ): Promise<Response>;`
+- **request**: `function request( 	url: string, 	method?: 'GET' | 'POST' | 'HEAD' | 'PUT' | 'DELETE' | 'PATCH', 	data?: string | Blob | FormData | URLSearchParams, 	options?: { headers?: { [header: string]: any }; integrity?: string }, 	succeedCallFn?: (data: Response) => void | Promise<void>, ): Promise<Response>;`
 
 ---
 
@@ -2586,15 +2629,30 @@ class SYS_Environment
 
 - **geteditorcomplieddate**: `function getEditorCompliedDate(): string;`
 - **geteditorcurrentversion**: `function getEditorCurrentVersion(onlySemantic?: boolean): string;`
-- **getuserinfo**: `function getUserInfo(): { 	username?: undefined | string; 	nickname?: undefined | string; 	avatar?: undefined | string; 	uuid?: undefined | string; 	customerCode?: undefined | string; };`
+- **getuserinfo**: `function getUserInfo(): { 	username?: string; 	nickname?: string; 	avatar?: string; 	uuid?: string; 	customerCode?: string; };`
 - **isclient**: `function isClient(): boolean;`
 - **iseasyedaproedition**: `function isEasyEDAProEdition(): boolean;`
+- **iseditorcurrentversiongreaterthanorequal**: `function isEditorCurrentVersionGreaterThanOrEqual(version: string): boolean;`
+- **iseditorcurrentversionlessthanorequal**: `function isEditorCurrentVersionLessThanOrEqual(version: string): boolean;`
 - **ishalfofflinemode**: `function isHalfOfflineMode(): boolean;`
 - **isjlcedaproedition**: `function isJLCEDAProEdition(): boolean;`
 - **isofflinemode**: `function isOfflineMode(): boolean;`
 - **isonlinemode**: `function isOnlineMode(): boolean;`
 - **isproprivateedition**: `function isProPrivateEdition(): boolean;`
 - **isweb**: `function isWeb(): boolean;`
+
+---
+
+## SYS_ExternalApi
+
+外部接口注入管理类
+
+```typescript
+class SYS_ExternalApi
+```
+
+- **register**: `function register( 	namespace: string, 	apiName: string, 	callFn: (...args: any[]) => any | Promise<any>, 	help?: ISYS_ExternalApiHelp, ): void;`
+- **unregister**: `function unregister(namespace: string, apiName: string): boolean;`
 
 ---
 
@@ -2608,7 +2666,7 @@ class SYS_FileManager
 
 - **extractlibinfo**: `function extractLibInfo(data: File | Array<File>): Promise<any>;`
 - **extractprojectinfo**: `function extractProjectInfo(data: File): Promise<any>;`
-- **getcbbfilebycbbuuid**: `function getCbbFileByCbbUuid( 	cbbUuid: string, 	libraryUuid?: string, 	props?: { 		fileName?: undefined | string; 		password?: undefined | string; 		fileType?: undefined | 'epro' | 'epro2'; 		templateSchematicUuid?: undefined | string; 		templatePcbUuid?: undefined | string; 	}, ): Promise<File | undefined>;`
+- **getcbbfilebycbbuuid**: `function getCbbFileByCbbUuid( 	cbbUuid: string, 	libraryUuid?: string, 	props?: { 		fileName?: string; 		password?: string; 		fileType?: 'epro' | 'epro2'; 		templateSchematicUuid?: string; 		templatePcbUuid?: string; 	}, ): Promise<File | undefined>;`
 - **getdevicefilebydeviceuuid**: `function getDeviceFileByDeviceUuid( 	deviceUuid: string | Array<string>, 	libraryUuid?: string, 	fileType?: 'elibz' | 'elibz2', ): Promise<File | undefined>;`
 - **getdocumentfile**: `function getDocumentFile( 	fileName?: string, 	password?: string, 	fileType?: 'epro' | 'epro2', ): Promise<File | undefined>;`
 - **getdocumentfootprintsources**: `function getDocumentFootprintSources(): Promise< 	Array<{ footprintUuid: string; documentSource: string }> >;`
@@ -2645,11 +2703,14 @@ class SYS_FileSystem
 - **listfilesoffilesystem**: `function listFilesOfFileSystem( 	folderPath: string, 	recursive?: boolean, ): Promise<Array<ISYS_FileSystemFileList>>;`
 - **openreadfiledialog**: `function openReadFileDialog( 	filenameExtensions?: string | Array<string>, 	multiFiles?: true, ): Promise<Array<File> | undefined>;`
 - **openreadfiledialog_1**: `function openReadFileDialog( 	filenameExtensions?: string | Array<string>, 	multiFiles?: false, ): Promise<File | undefined>;`
+- **openreadfilepathdialog**: `function openReadFilePathDialog( 	filenameExtensions?: string | Array<string>, 	multiFiles?: true, ): Promise<Array<string>>;`
+- **openreadfilepathdialog_1**: `function openReadFilePathDialog( 	filenameExtensions?: string | Array<string>, 	multiFiles?: false, ): Promise<string | undefined>;`
 - **openreadfolderdialog**: `function openReadFolderDialog(): Promise<Array<{ relativePath: string; file: File }>>;`
+- **openreadfolderpathdialog**: `function openReadFolderPathDialog(): Promise<string | undefined>;`
 - **readfilefromfilesystem**: `function readFileFromFileSystem(uri: string): Promise<File | undefined>;`
 - **revokeobjecturl**: `function revokeObjectURL(url: string): void;`
 - **savefile**: `function saveFile(fileData: File | Blob, fileName?: string): Promise<void>;`
-- **savefiletofilesystem**: `function saveFileToFileSystem( 	uri: string, 	fileData: File | Blob, 	fileName?: string, 	force?: boolean, ): Promise<boolean>;`
+- **savefiletofilesystem**: `function saveFileToFileSystem( 	uri: string, 	fileData: File | Blob, 	fileName?: string, ): Promise<boolean>;`
 
 ---
 
@@ -2691,10 +2752,22 @@ class SYS_HeaderMenu
 ```
 
 - **insertheadermenus**: `function insertHeaderMenus(headerMenus: ISYS_HeaderMenus): Promise<void>;`
-- **insertsystemheadermenuitem**: `function insertSystemHeaderMenuItem( 	env: ESYS_HeaderMenuEnvironment, 	id: Array<string>, 	props: { 		title: string; 		registerFn?: undefined | string; 		menuItems?: 			undefined | (null | ISYS_HeaderMenuSub2MenuItem | ISYS_HeaderMenuSub1MenuItem)[]; 		insertDividerBefore?: undefined | false | true; 		insertDividerAfter?: undefined | false | true; 		insertBefore?: undefined | string; 		crossDividerWhenInsert?: undefined | false | true; 	}, ): Promise<string | undefined>;`
+- **insertsystemheadermenuitem**: `function insertSystemHeaderMenuItem( 	env: ESYS_HeaderMenuEnvironment, 	id: Array<string>, 	props: { 		title: string; 		registerFn?: string; 		icon?: string; 		shortcutKey?: TSYS_ShortcutKeys; 		menuItems?: Array<ISYS_HeaderMenuSub1MenuItem | ISYS_HeaderMenuSub2MenuItem | null>; 		insertDividerBefore?: boolean; 		insertDividerAfter?: boolean; 		insertBefore?: string; 		crossDividerWhenInsert?: boolean; 	}, ): Promise<string | undefined>;`
 - **removeheadermenus**: `function removeHeaderMenus(): void;`
-- **removesystemheadermenuitem**: `function removeSystemHeaderMenuItem( 	id: Array<string>, 	props?: { 		removeTheBeforeDivider?: undefined | false | true; 		removeTheAfterDivider?: undefined | false | true; 	}, ): Promise<boolean>;`
+- **removesystemheadermenuitem**: `function removeSystemHeaderMenuItem( 	id: Array<string>, 	props?: { 		removeTheBeforeDivider?: boolean; 		removeTheAfterDivider?: boolean; 	}, ): Promise<boolean>;`
 - **replaceheadermenus**: `function replaceHeaderMenus(headerMenus: ISYS_HeaderMenus): Promise<void>;`
+
+---
+
+## SYS_Help
+
+Help 渐进式披露类
+
+```typescript
+class SYS_Help
+```
+
+- **help**: `function help( 	namespace?: string, 	className?: string, 	methodName?: string, ): Promise<ISYS_HelpData | Record<string, any> | ISYS_HelpClassSummary | ISYS_HelpMethodDetail>;`
 
 ---
 
@@ -2709,8 +2782,8 @@ class SYS_I18n
 - **addlanguagechangedeventlistener**: `function addLanguageChangedEventListener( 	id: string, 	callFn: (newLanguage: string, lastLanguage: string) => void | Promise<void>, 	onlyOnce: boolean, ): void;`
 - **getallsupportedlanguages**: `function getAllSupportedLanguages(): Array<string>;`
 - **getcurrentlanguage**: `function getCurrentLanguage(): Promise<string>;`
-- **importmultilingual**: `function importMultilingual(language: string, source: ISYS_LanguageKeyValuePairs): boolean;`
-- **importmultilinguallanguage**: `function importMultilingualLanguage( 	namespace: string, 	language: string, 	source: ISYS_LanguageKeyValuePairs, ): boolean;`
+- **importmultilingual**: `function importMultilingual(language: string, source: TSYS_LanguageKeyValuePairs): boolean;`
+- **importmultilinguallanguage**: `function importMultilingualLanguage( 	namespace: string, 	language: string, 	source: TSYS_LanguageKeyValuePairs, ): boolean;`
 - **importmultilingualnamespace**: `function importMultilingualNamespace( 	namespace: string, 	source: ISYS_MultilingualLanguagesData, ): boolean;`
 - **iseventlisteneralreadyexist**: `function isEventListenerAlreadyExist(id: string): boolean;`
 - **islanguagesupported**: `function isLanguageSupported(language: string): boolean;`
@@ -2730,7 +2803,7 @@ class SYS_IFrame
 - **closeiframe**: `function closeIFrame(id?: string): Promise<boolean>;`
 - **hideiframe**: `function hideIFrame(id?: string): Promise<boolean>;`
 - **isiframealreadyexist**: `function isIFrameAlreadyExist(id: string): Promise<boolean>;`
-- **openiframe**: *(签名过长，请查看详细文档)*
+- **openiframe**: `function openIFrame( 	htmlFileName: string, 	width?: number, 	height?: number, 	id?: string, 	props?: { 		maximizeButton?: boolean; 		minimizeButton?: boolean; 		minimizeStyle?: 'collapsed' | 'constricted'; 		buttonCallbackFn?: (button: 'close' | 'minimize' | 'maximize') => void | Promise<void>; 		onBeforeCloseCallFn?: () => boolean | undefined | Promise<boolean | undefined>; 		grayscaleMask?: boolean; 		title?: string; 		x?: number; 		y?: number; 	}, ): Promise<boolean>;`
 - **showiframe**: `function showIFrame(id?: string): Promise<boolean>;`
 
 ---
@@ -2761,7 +2834,7 @@ class SYS_Log
 - **add**: `function add(message: string, type?: ESYS_LogType): void;`
 - **clear**: `function clear(): void;`
 - **export**: `function export(types?: ESYS_LogType | Array<ESYS_LogType>): void;`
-- **find**: `function find( 	message: 		| string 		| Array< 			| string 			| { 				text: string; 				attr?: 					| undefined 					| { 						id?: undefined | string; 						path?: undefined | string; 						sheet?: undefined | string; 						pcbid?: undefined | string; 						type?: undefined | string; 					}; 			} 		>, 	types?: ESYS_LogType | Array<ESYS_LogType>, ): Promise<Array<ISYS_LogLine>>;`
+- **find**: `function find( 	message: 		| string 		| Array< 			| string 			| { 				text: string; 				attr?: { 					id?: string; 					path?: string; 					sheet?: string; 					pcbid?: string; 					type?: string; 				}; 			} 		>, 	types?: ESYS_LogType | Array<ESYS_LogType>, ): Promise<Array<ISYS_LogLine>>;`
 - **sort**: `function sort(types?: ESYS_LogType | Array<ESYS_LogType>): Promise<Array<ISYS_LogLine>>;`
 
 ---
@@ -2892,6 +2965,7 @@ System / settings class
 class SYS_Setting
 ```
 
+- **getjlccolorsilkenabled**: `function getJLCColorSilkEnabled(): Promise<boolean>;`
 - **restoredefault**: `function restoreDefault(): Promise<boolean>;`
 
 ---
@@ -2906,7 +2980,7 @@ class SYS_ShortcutKey
 
 - **get**: `function get(id: string): ISYS_ShortcutKeyDataWithUserDefinedShortcutKey | undefined;`
 - **getall**: `function getAll(): Record<string, ISYS_ShortcutKeyDataWithUserDefinedShortcutKey>;`
-- **getshortcutkeys**: `function getShortcutKeys( 	includeSystem?: boolean, ): Promise< 	Array<{ 		shortcutKey: TSYS_ShortcutKeys; 		title: string; 		documentType: ESYS_ShortcutKeyEffectiveEditorRange[]; 		scene: ESYS_ShortcutKeyEffectiveEditorScene[]; 	}> >;`
+- **getshortcutkeys**: `function getShortcutKeys( 	includeSystem?: boolean, ): Promise< 	Array<{ 		shortcutKey: TSYS_ShortcutKeys; 		title: string; 		documentType: Array<ESYS_ShortcutKeyEffectiveEditorRange>; 		scene: Array<ESYS_ShortcutKeyEffectiveEditorScene>; 	}> >;`
 - **register**: `function register(id: string, props: ISYS_ShortcutKeyDataWithCallFn): boolean;`
 - **registershortcutkey**: `function registerShortcutKey( 	shortcutKey: TSYS_ShortcutKeys, 	title: string, 	callbackFn: (shortcutKey: TSYS_ShortcutKeys) => void | Promise<void>, 	documentType?: Array<ESYS_ShortcutKeyEffectiveEditorRange>, 	scene?: Array<ESYS_ShortcutKeyEffectiveEditorScene>, ): Promise<boolean>;`
 - **unregister**: `function unregister(id: string): boolean;`
@@ -2966,8 +3040,9 @@ System / tool class
 class SYS_Tool
 ```
 
-- **netlistcomparison**: `function netlistComparison( 	netlist1: string | { projectUuid: string; documentUuid: string } | File, 	netlist2: string | { projectUuid: string; documentUuid: string } | File, ): Promise< 	Array<{ 		type: 'Net' | 'Component'; 		object: string; 		netlist1Name: string[]; 		netlist2Name: string[]; 	}> >;`
-- **pcbcomparison**: `function pcbComparison( 	pcb1: string | { projectUuid: string; pcbUuid: string } | File, 	pcb2: string | { projectUuid: string; pcbUuid: string } | File, 	options?: { 		valUnit?: 			| undefined 			| ESYS_Unit.MILLIMETER 			| ESYS_Unit.CENTIMETER 			| ESYS_Unit.INCH 			| ESYS_Unit.MIL; 		deviation?: undefined | number; 		comparisonSize?: undefined | number; 	}, ): Promise<ISYS_PcbComparisonResponse>;`
+- **netlistcomparison**: `function netlistComparison( 	netlist1: string | { projectUuid: string; documentUuid: string } | File, 	netlist2: string | { projectUuid: string; documentUuid: string } | File, ): Promise< 	Array<{ 		type: 'Net' | 'Component'; 		object: string; 		netlist1Name: Array<string>; 		netlist2Name: Array<string>; 	}> >;`
+- **pcbcomparison**: `function pcbComparison( 	pcb1: string | { projectUuid: string; pcbUuid: string } | File, 	pcb2: string | { projectUuid: string; pcbUuid: string } | File, 	options?: { 		valUnit?: ESYS_Unit.MIL | ESYS_Unit.MILLIMETER | ESYS_Unit.INCH | ESYS_Unit.CENTIMETER; 		deviation?: number; 		comparisonSize?: number; 	}, ): Promise<ISYS_ComparisonResponse>;`
+- **schematiccomparison**: `function schematicComparison( 	schematicUuid1: string, 	schematicUuid2: string, ): Promise<ISYS_ComparisonResponse>;`
 
 ---
 
@@ -3011,7 +3086,7 @@ System / window class
 class SYS_Window
 ```
 
-- **addeventlistener**: `function addEventListener( 	type: ESYS_WindowEventType, 	listener: (ev: any) => any, 	options?: { 		capture?: undefined | false | true; 		once?: undefined | false | true; 		passive?: undefined | false | true; 		signal?: undefined | AbortSignal; 	}, ): ISYS_WindowEventListenerRemovableObject | undefined;`
+- **addeventlistener**: `function addEventListener( 	type: ESYS_WindowEventType, 	listener: (ev: any) => any, 	options?: { capture?: boolean; once?: boolean; passive?: boolean; signal?: AbortSignal }, ): ISYS_WindowEventListenerRemovableObject | undefined;`
 - **getcurrenttheme**: `function getCurrentTheme(): Promise<ESYS_Theme>;`
 - **geturlanchor**: `function getUrlAnchor(): string;`
 - **geturlparam**: `function getUrlParam(key: string): string | null;`

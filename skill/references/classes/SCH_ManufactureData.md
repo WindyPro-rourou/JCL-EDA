@@ -284,7 +284,7 @@ function getBomFile(
 	fileName?: string,
 	fileType?: 'xlsx' | 'csv',
 	template?: string,
-	filterOptions?: Array<{ property: string; includeValue: string | false | true }>,
+	filterOptions?: Array<{ property: string; includeValue: boolean | string }>,
 	statistics?: Array<string>,
 	property?: Array<string>,
 	columns?: Array<IPCB_BomPropertiesTableColumns>,
@@ -352,7 +352,7 @@ filterOptions
 
 </td><td>
 
-Array&lt;{ property: string; includeValue: string \| false \| true }&gt;
+Array&lt;{ property: string; includeValue: boolean \| string }&gt;
 
 </td><td>
 
@@ -553,18 +553,18 @@ function getExportDocumentFile(
 	fileName?: string,
 	fileType?: ESCH_ExportDocumentFileType,
 	typeSpecificParams?: {
-		theme?: undefined | 'Default' | 'White on Black' | 'Black on White';
-		lineWidth?: undefined | 'Default' | 'Always 1px' | 'Follow the Zoom Change';
-		displayAttributesAsMenu?: undefined | false | true;
+		theme?: 'Default' | 'White on Black' | 'Black on White';
+		lineWidth?: 'Default' | 'Always 1px' | 'Follow the Zoom Change';
+		displayAttributesAsMenu?: boolean;
 		size?:
-			| undefined
+			| 'Original Size'
 			| string
-			| { width: number; height: number; unit: ESYS_Unit.MILLIMETER | ESYS_Unit.INCH };
+			| { width: number; height: number; unit: ESYS_Unit.INCH | ESYS_Unit.MILLIMETER };
 	},
 	object?: 'All Schematic' | 'Current Schematic' | 'Current Schematic Page' | string,
 	objectSpecificParams?: {
-		range?: undefined | 'All' | any;
-		outputMethod?: undefined | 'Merged sheet' | 'Separated sheet';
+		range?: 'All' | [number, number];
+		outputMethod?: 'Merged sheet' | 'Separated sheet';
 	},
 ): Promise<File | undefined>;
 ```
@@ -616,7 +616,7 @@ typeSpecificParams
 
 </td><td>
 
-{ theme?: undefined \| 'Default' \| 'White on Black' \| 'Black on White'; lineWidth?: undefined \| 'Default' \| 'Always 1px' \| 'Follow the Zoom Change'; displayAttributesAsMenu?: undefined \| false \| true; size?: undefined \| string \| { width: number; height: number; unit: [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) } }
+{ theme?: 'Default' \| 'White on Black' \| 'Black on White'; lineWidth?: 'Default' \| 'Always 1px' \| 'Follow the Zoom Change'; displayAttributesAsMenu?: boolean; size?: 'Original Size' \| string \| { width: number; height: number; unit: [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md) } }
 
 </td><td>
 
@@ -642,7 +642,7 @@ objectSpecificParams
 
 </td><td>
 
-{ range?: undefined \| 'All' \| any; outputMethod?: undefined \| 'Merged sheet' \| 'Separated sheet' }
+{ range?: 'All' \| \[number, number\]; outputMethod?: 'Merged sheet' \| 'Separated sheet' }
 
 </td><td>
 
@@ -840,6 +840,8 @@ PNG 文件数据（或压缩包）
 
 ADD since EDA v3.2.183 支持按长宽分辨率导出高清图片（最大 4096）； 支持只传入 `width` 或 `height` 中的任意一个，另一侧将按原始比例自动拉伸输出； `width` 与 `height` 均不传时，按当前一倍分辨率输出
 
+注意：多图页时返回的文件与 [getSvgFile](./SCH_ManufactureData.md) 同名（`schematic.zip`<!-- -->）， 保存时须自行改名以免互相覆盖
+
 / EDA v4.1.23
 
 ### getsimulationnetlistfile
@@ -976,6 +978,8 @@ SVG 文件数据（或压缩包）
 ## Remarks
 
 ADD since EDA v3.2.183 多图页时会导出为压缩包（zip）
+
+注意：返回的文件与 [getPngFile](./SCH_ManufactureData.md) 同名（`schematic.zip`<!-- -->）， 保存时须自行改名以免互相覆盖
 
 / EDA v4.1.23
 

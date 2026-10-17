@@ -620,13 +620,12 @@ Get the property state: associate library device
 ## Signature
 
 ```typescript
-function getState_Component():
-	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;
+function getState_Component(): { libraryUuid: string; uuid: string; name?: string } | undefined;
 ```
 
 ## Returns
 
-{ libraryUuid: string; uuid: string; name?: undefined \| string } \| undefined
+{ libraryUuid: string; uuid: string; name?: string } \| undefined
 
 Associate library device
 
@@ -691,13 +690,12 @@ Get the property state: associate library footprint
 ## Signature
 
 ```typescript
-function getState_Footprint():
-	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;
+function getState_Footprint(): { libraryUuid: string; uuid: string; name?: string } | undefined;
 ```
 
 ## Returns
 
-{ libraryUuid: string; uuid: string; name?: undefined \| string } \| undefined
+{ libraryUuid: string; uuid: string; name?: string } \| undefined
 
 Associate library footprint
 
@@ -830,13 +828,12 @@ Get the property state: associate library 3D model
 ## Signature
 
 ```typescript
-function getState_Model3D():
-	{ libraryUuid: string; uuid: string; name?: undefined | string } | undefined;
+function getState_Model3D(): { libraryUuid: string; uuid: string; name?: string } | undefined;
 ```
 
 ## Returns
 
-{ libraryUuid: string; uuid: string; name?: undefined \| string } \| undefined
+{ libraryUuid: string; uuid: string; name?: string } \| undefined
 
 Associate library 3D model
 

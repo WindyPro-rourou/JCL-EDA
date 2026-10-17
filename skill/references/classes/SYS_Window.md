@@ -177,12 +177,7 @@ Add an event listener
 function addEventListener(
 	type: ESYS_WindowEventType,
 	listener: (ev: any) => any,
-	options?: {
-		capture?: undefined | false | true;
-		once?: undefined | false | true;
-		passive?: undefined | false | true;
-		signal?: undefined | AbortSignal;
-	},
+	options?: { capture?: boolean; once?: boolean; passive?: boolean; signal?: AbortSignal },
 ): ISYS_WindowEventListenerRemovableObject | undefined;
 ```
 
@@ -233,7 +228,7 @@ options
 
 </td><td>
 
-\{ capture?: undefined \| false \| true; once?: undefined \| false \| true; passive?: undefined \| false \| true; signal?: undefined \| AbortSignal \}
+\{ capture?: boolean; once?: boolean; passive?: boolean; signal?: AbortSignal \}
 
 </td><td>
 
@@ -248,21 +243,25 @@ _(Optional)_ Optional parameters
 
 Event listener method, used to remove the event listener. If it is `undefined`<!-- -->, it means creating the event listener failed
 
+## Remarks
+
+监听直接挂载到原生 window 上，返回的可移除对象可传给 [SYS\_Window.removeEventListener()](./SYS_Window.md) 移除； 同一扩展重复注册相同 type 的监听会被替换（非累积），卸载扩展时注册的原生监听会被自动清理。
+
 ## Example
 
 ```javascript
-// 1. 注册 focus 监听（真实场景由用户切换窗口焦点触发，这里用合成事件模拟）
+// 示例 1：注册 focus 监听（真实场景由用户切换窗口焦点触发，这里用合成事件模拟）
 const removable = eda.sys_Window.addEventListener('focus', () => {
 	console.log('窗口获得焦点');
 });
 
-// 2. 检查返回的可移除对象，其中的 type 字段记录了监听的事件类型
+// 检查返回的可移除对象，其中的 type 字段记录了监听的事件类型
 console.log('监听注册成功：', removable !== undefined, '，事件类型：', removable.type);
 
-// 3. 模拟一次获得焦点事件，回调同步触发
+// 模拟一次获得焦点事件，回调同步触发
 window.dispatchEvent(new Event('focus'));
 
-// 4. 注销监听，恢复原状
+// 注销监听，恢复原状
 eda.sys_Window.removeEventListener(removable);
 console.log('监听已注销');
 ```

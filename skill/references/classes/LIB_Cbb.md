@@ -369,7 +369,7 @@ Delete Reuse block
 ## Signature
 
 ```typescript
-function delete(cbbUuid: string, libraryUuid: string): Promise<boolean>;
+function delete(cbbUuid: string, libraryUuid: string): Promise<boolean | undefined>;
 ```
 
 ## Parameters
@@ -417,7 +417,7 @@ Library UUID, you can use [LIB\_LibrariesList](./LIB_LibrariesList.md) APIs in
 
 ## Returns
 
-Promise&lt;boolean&gt;
+Promise&lt;boolean \| undefined&gt;
 
 Whether the operation is successful
 

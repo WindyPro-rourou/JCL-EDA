@@ -1229,8 +1229,8 @@ Tab ID, if it is `undefined`<!-- -->, then open document failed
 const results = await eda.lib_Symbol.search('0603');
 console.log('symbol:', results[0].name);
 
-// 2. 打开该符号的编辑画布，返回标签页 ID（'2' = ELIB_LibraryType.SYMBOL）
-const tabId = await eda.dmt_EditorControl.openLibraryDocument(results[0].libraryUuid, '2', results[0].uuid);
+// 2. 打开该符号的编辑画布，返回标签页 ID
+const tabId = await eda.dmt_EditorControl.openLibraryDocument(results[0].libraryUuid, ELIB_LibraryType.SYMBOL, results[0].uuid);
 console.log('tabId:', tabId);
 
 // 3. 看完关闭标签页

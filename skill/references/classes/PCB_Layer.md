@@ -400,7 +400,7 @@ physicalProps
 
 </td><td>
 
-_(Optional)_ Physical properties. If not passed in, the current PCB properties are used by default
+_(Optional)_ 物理属性，如若不传入则默认为当前 PCB 属性
 
 </td></tr>
 </tbody></table>
@@ -434,6 +434,10 @@ function getAllLayers(): Promise<Array<IPCB_LayerItem>>;
 Promise&lt;Array&lt;[IPCB\_LayerItem](../interfaces/IPCB_LayerItem.md)<!-- -->&gt;&gt;
 
 Detailed properties of all layers
+
+## Remarks
+
+返回结果 \*\*包含停用的内层\*\*（如 16 铜层下可能返回 34 个 `SIGNAL`<!-- -->，其中多个 `layerStatus=0`<!-- -->）； 筛选可用层的条件为 `type === 'SIGNAL' && layerStatus === 1`<!-- -->（或 `layerStatus !== EPCB_LayerStatus.NOT_USED`<!-- -->）
 
 ## Example
 
@@ -495,7 +499,7 @@ physicalProps
 
 </td><td>
 
-_(Optional)_ Physical properties. If not passed in, the current PCB properties are used by default
+_(Optional)_ 物理属性，如若不传入则默认为当前 PCB 属性
 
 </td></tr>
 </tbody></table>
@@ -625,7 +629,7 @@ physicalProps
 
 </td><td>
 
-_(Optional)_ Physical properties. If not passed in, the current PCB properties are used by default
+_(Optional)_ 物理属性，如若不传入则默认为当前 PCB 属性
 
 </td></tr>
 </tbody></table>
@@ -695,7 +699,7 @@ physicalProps
 
 </td><td>
 
-_(Optional)_ Physical properties. If not passed in, the current PCB properties are used by default
+_(Optional)_ 物理属性，如若不传入则默认为当前 PCB 属性
 
 </td></tr>
 </tbody></table>
@@ -794,10 +798,10 @@ Modify Layer properties
 function modifyLayer(
 	layer: TPCB_LayersInTheSelectable,
 	property: {
-		name?: undefined | string;
-		type?: undefined | EPCB_LayerType.SIGNAL | EPCB_LayerType.INTERNAL_ELECTRICAL;
-		color?: undefined | string;
-		transparency?: undefined | number;
+		name?: string;
+		type?: TPCB_LayerTypesOfInnerLayer;
+		color?: string;
+		transparency?: number;
 	},
 ): Promise<boolean>;
 ```
@@ -836,7 +840,7 @@ property
 
 </td><td>
 
-{ name?: undefined \| string; type?: undefined \| [EPCB\_LayerType.SIGNAL](../enums/EPCB_LayerType.md) \| [EPCB\_LayerType.INTERNAL\_ELECTRICAL](../enums/EPCB_LayerType.md)<!-- -->; color?: undefined \| string; transparency?: undefined \| number }
+{ name?: string; type?: [TPCB\_LayerTypesOfInnerLayer](../types/TPCB_LayerTypesOfInnerLayer.md)<!-- -->; color?: string; transparency?: number }
 
 </td><td>
 
@@ -933,7 +937,7 @@ Overwrite whether it is successful
 
 It will overwrite the current physical stacking configuration of the PCB. Please note the risk of data loss
 
-If the passed-in physical stacking configuration does not match the physical properties of the current PCB, `false` will be returned directly without modification ADD since EDA v4.2
+如果传入的物理叠层配置不符合当前 PCB 的物理属性，将会直接返回 `false` 且不进行修改 ADD since EDA v4.2
 
 ### removelayer
 
@@ -1075,7 +1079,7 @@ physicalProps
 
 </td><td>
 
-_(Optional)_ Physical properties. If not passed in, the current PCB properties are used by default
+_(Optional)_ 物理属性，如若不传入则默认为当前 PCB 属性
 
 </td></tr>
 </tbody></table>
@@ -1160,7 +1164,7 @@ physicalProps
 
 </td><td>
 
-_(Optional)_ Physical properties. If not passed in, the current PCB properties are used by default
+_(Optional)_ 物理属性，如若不传入则默认为当前 PCB 属性
 
 </td></tr>
 <tr><td>
@@ -1304,7 +1308,7 @@ physicalProps
 
 </td><td>
 
-_(Optional)_ Physical properties. If not passed in, the current PCB properties are used by default
+_(Optional)_ 物理属性，如若不传入则默认为当前 PCB 属性
 
 </td></tr>
 </tbody></table>

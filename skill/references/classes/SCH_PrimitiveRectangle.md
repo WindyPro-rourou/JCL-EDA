@@ -613,33 +613,17 @@ Modify Rectangle
 function modify(
 	primitiveId: string | ISCH_PrimitiveRectangle,
 	property: {
-		topLeftX?: undefined | number;
-		topLeftY?: undefined | number;
-		width?: undefined | number;
-		height?: undefined | number;
-		cornerRadius?: undefined | number;
-		rotation?: undefined | number;
-		color?: undefined | null | string;
-		fillColor?: undefined | null | string;
-		lineWidth?: undefined | null | number;
-		lineType?:
-			| undefined
-			| null
-			| ESCH_PrimitiveLineType.SOLID
-			| ESCH_PrimitiveLineType.DASHED
-			| ESCH_PrimitiveLineType.DOTTED
-			| ESCH_PrimitiveLineType.DOT_DASHED;
-		fillStyle?:
-			| undefined
-			| null
-			| ESCH_PrimitiveFillStyle.NONE
-			| ESCH_PrimitiveFillStyle.SOLID
-			| ESCH_PrimitiveFillStyle.GRID
-			| ESCH_PrimitiveFillStyle.HORIZONTAL_LINE
-			| ESCH_PrimitiveFillStyle.VERTICAL_LINE
-			| ESCH_PrimitiveFillStyle.RHOMBIC_GRID
-			| ESCH_PrimitiveFillStyle.LEFT_SLASH_LINE
-			| ESCH_PrimitiveFillStyle.RIGHT_SLASH_LINE;
+		topLeftX?: number;
+		topLeftY?: number;
+		width?: number;
+		height?: number;
+		cornerRadius?: number;
+		rotation?: number;
+		color?: string | null;
+		fillColor?: string | null;
+		lineWidth?: number | null;
+		lineType?: ESCH_PrimitiveLineType | null;
+		fillStyle?: ESCH_PrimitiveFillStyle | null;
 	},
 ): Promise<ISCH_PrimitiveRectangle | undefined>;
 ```
@@ -678,7 +662,7 @@ property
 
 </td><td>
 
-{ topLeftX?: undefined \| number; topLeftY?: undefined \| number; width?: undefined \| number; height?: undefined \| number; cornerRadius?: undefined \| number; rotation?: undefined \| number; color?: undefined \| null \| string; fillColor?: undefined \| null \| string; lineWidth?: undefined \| null \| number; lineType?: undefined \| null \| [ESCH\_PrimitiveLineType.SOLID](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DASHED](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DOTTED](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DOT\_DASHED](../enums/ESCH_PrimitiveLineType.md)<!-- -->; fillStyle?: undefined \| null \| [ESCH\_PrimitiveFillStyle.NONE](../enums/ESCH_PrimitiveFillStyle.md) \| [ESCH\_PrimitiveFillStyle.SOLID](../enums/ESCH_PrimitiveFillStyle.md) \| [ESCH\_PrimitiveFillStyle.GRID](../enums/ESCH_PrimitiveFillStyle.md) \| [ESCH\_PrimitiveFillStyle.HORIZONTAL\_LINE](../enums/ESCH_PrimitiveFillStyle.md) \| [ESCH\_PrimitiveFillStyle.VERTICAL\_LINE](../enums/ESCH_PrimitiveFillStyle.md) \| [ESCH\_PrimitiveFillStyle.RHOMBIC\_GRID](../enums/ESCH_PrimitiveFillStyle.md) \| [ESCH\_PrimitiveFillStyle.LEFT\_SLASH\_LINE](../enums/ESCH_PrimitiveFillStyle.md) \| [ESCH\_PrimitiveFillStyle.RIGHT\_SLASH\_LINE](../enums/ESCH_PrimitiveFillStyle.md) }
+{ topLeftX?: number; topLeftY?: number; width?: number; height?: number; cornerRadius?: number; rotation?: number; color?: string \| null; fillColor?: string \| null; lineWidth?: number \| null; lineType?: [ESCH\_PrimitiveLineType](../enums/ESCH_PrimitiveLineType.md) \| null; fillStyle?: [ESCH\_PrimitiveFillStyle](../enums/ESCH_PrimitiveFillStyle.md) \| null }
 
 </td><td>
 

@@ -36,7 +36,7 @@ Description
 </td></tr>
 <tr><td>
 
-[create(libraryUuid, symbolName, classification, symbolType, description)](./LIB_Symbol.md)
+[create(libraryUuid, symbolName, classification, symbolType, description, otherProperty)](./LIB_Symbol.md)
 
 </td><td>
 
@@ -69,6 +69,17 @@ Description
 </td></tr>
 <tr><td>
 
+[getDocumentSource(symbolUuid, libraryUuid)](./LIB_Symbol.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 获取符号的文档源码
+
+</td></tr>
+<tr><td>
+
 [getRenderImage(source)](./LIB_Symbol.md)
 
 </td><td>
@@ -80,7 +91,7 @@ Description
 </td></tr>
 <tr><td>
 
-[modify(symbolUuid, libraryUuid, symbolName, classification, description)](./LIB_Symbol.md)
+[modify(symbolUuid, libraryUuid, symbolName, classification, description, otherProperty)](./LIB_Symbol.md)
 
 </td><td>
 
@@ -290,6 +301,7 @@ function create(
 	classification?: ILIB_ClassificationIndex | Array<string>,
 	symbolType?: ELIB_SymbolType,
 	description?: string,
+	otherProperty?: Record<string, boolean | number | string | undefined>,
 ): Promise<string | undefined>;
 ```
 
@@ -373,6 +385,19 @@ string
 _(Optional)_ Description
 
 </td></tr>
+<tr><td>
+
+otherProperty
+
+</td><td>
+
+Record&lt;string, boolean \| number \| string \| undefined&gt;
+
+</td><td>
+
+_(Optional)_ 其它属性
+
+</td></tr>
 </tbody></table>
 
 ## Returns
@@ -387,9 +412,9 @@ Symbol UUID
 // 1. 获取个人库 UUID
 const libraryUuid = await eda.lib_LibrariesList.getPersonalLibraryUuid();
 
-// 2. 创建符号（分类传 [] = 不分类；符号类型 '1' = 原理图符号，见 ELIB_SymbolType）
+// 2. 创建符号（分类传 [] = 不分类；符号类型见 ELIB_SymbolType）
 const symbolName = `嘉立创示例_新符号_${Date.now()}`;
-const symbolUuid = await eda.lib_Symbol.create(libraryUuid, symbolName, [], '1', '示例符号描述');
+const symbolUuid = await eda.lib_Symbol.create(libraryUuid, symbolName, [], ELIB_SymbolType.COMPONENT, '示例符号描述');
 
 // 创建类保留现场（新符号留在个人库中供观察）
 
@@ -408,7 +433,7 @@ Delete Symbol
 ## Signature
 
 ```typescript
-function delete(symbolUuid: string, libraryUuid: string): Promise<boolean>;
+function delete(symbolUuid: string, libraryUuid: string): Promise<boolean | undefined>;
 ```
 
 ## Parameters
@@ -456,7 +481,7 @@ Library UUID, you can use [LIB\_LibrariesList](./LIB_LibrariesList.md) APIs in
 
 ## Returns
 
-Promise&lt;boolean&gt;
+Promise&lt;boolean \| undefined&gt;
 
 Whether the operation is successful
 
@@ -537,6 +562,109 @@ Promise&lt;[ILIB\_SymbolItem](../interfaces/ILIB_SymbolItem.md) \| undefined&gt;
 
 Symbol property
 
+### getdocumentsource
+
+# LIB\_Symbol.getDocumentSource() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+获取符号的文档源码
+
+## Signature
+
+```typescript
+function getDocumentSource(symbolUuid: string, libraryUuid?: string): Promise<string | undefined>;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+symbolUuid
+
+</td><td>
+
+string
+
+</td><td>
+
+符号 UUID
+
+</td></tr>
+<tr><td>
+
+libraryUuid
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ 库 UUID，默认为系统库，可以使用 [LIB\_LibrariesList](./LIB_LibrariesList.md) 内的接口获取
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+Promise&lt;string \| undefined&gt;
+
+符号的 3.0 文档源码（esym JSON 字符串），获取失败返回 `undefined`
+
+## Remarks
+
+与 [LIB\_Symbol.updateDocumentSource()](./LIB_Symbol.md) 对称的读取接口；返回 \*\*3.0 格式\*\*（esym）的符号源数据， 可直接用于组装原理图源数据（如 AI 生成 eprj3 工程）。
+
+支持工程库 / 非工程库（系统库 / 个人库 / 扩展库）： - 工程库：从当前打开的工程 worker 读取（含未保存内容）； - 非工程库：从 lib.worker 读取（含未保存内容），worker 无缓存时回退网络获取， 自动处理 `history_uuid`<!-- -->（历史版本）、`dataStrId`<!-- -->（远程存储）与 2.0 → 3.0 格式转换。
+
+获取失败（如库条目不存在）将返回 `undefined`
+
+## Example
+
+```javascript
+// 1. 获取个人库 UUID 并新建符号作为读取对象（第四参数为符号类型，见 ELIB_SymbolType）
+const libraryUuid = await eda.lib_LibrariesList.getPersonalLibraryUuid();
+const symbolUuid = await eda.lib_Symbol.create(
+	libraryUuid,
+	`嘉立创示例_读取源码_${Date.now()}`,
+	[],
+	ELIB_SymbolType.COMPONENT
+);
+
+// 2. 读取该符号的文档源码（第二参数为符号所属库）
+const pending = eda.lib_Symbol.getDocumentSource(symbolUuid, libraryUuid);
+
+// 3. 等待 3 秒观察结果状态（当前版本 Promise 不 settle，用超时保护避免卡住）
+const settled = await Promise.race([
+	Promise.resolve(pending).then(
+		source => `fulfilled，源码长度 ${source ? source.length : '空'}`,
+		() => 'rejected'
+	),
+	new Promise(resolve => setTimeout(() => resolve('pending（3 秒内未返回）'), 3000)),
+]);
+
+// 4. 清理测试符号（查询类需要清理）
+await eda.lib_Symbol.delete(symbolUuid, libraryUuid);
+
+console.log('symbolUuid:', symbolUuid);
+console.log('returns:', typeof pending.then === 'function' ? 'Promise' : typeof pending);
+console.log('settled:', settled);
+```
+
 ### getrenderimage
 
 # LIB\_Symbol.getRenderImage() method
@@ -551,7 +679,7 @@ Get the symbol render image
 function getRenderImage(source: {
 	symbolUuid: string;
 	libraryUuid: string;
-	subPartName?: undefined | string;
+	subPartName?: string;
 }): Promise<Blob | undefined>;
 ```
 
@@ -576,7 +704,7 @@ source
 
 </td><td>
 
-\{ symbolUuid: string; libraryUuid: string; subPartName?: undefined \| string \}
+\{ symbolUuid: string; libraryUuid: string; subPartName?: string \}
 
 </td><td>
 
@@ -624,6 +752,7 @@ function modify(
 	symbolName?: string,
 	classification?: ILIB_ClassificationIndex | Array<string> | null,
 	description?: string | null,
+	otherProperty?: Record<string, boolean | number | string | undefined | null>,
 ): Promise<boolean>;
 ```
 
@@ -707,6 +836,19 @@ string \| null
 _(Optional)_ Description
 
 </td></tr>
+<tr><td>
+
+otherProperty
+
+</td><td>
+
+Record&lt;string, boolean \| number \| string \| undefined \| null&gt;
+
+</td><td>
+
+_(Optional)_ 其它属性，如希望清除某些属性，则将其的值设置为 `null`
+
+</td></tr>
 </tbody></table>
 
 ## Returns
@@ -728,7 +870,7 @@ const symbolUuid = await eda.lib_Symbol.create(
 	libraryUuid,
 	`嘉立创示例_符号修改前_${Date.now()}`,
 	[],
-	'1',
+	ELIB_SymbolType.COMPONENT,
 	'修改前的描述'
 );
 
@@ -1057,6 +1199,10 @@ _(Optional)_ Library UUID, default is system library, you can use [LIB\_Librarie
 Promise&lt;Array&lt;[ILIB\_SymbolSearchItem](../interfaces/ILIB_SymbolSearchItem.md)<!-- -->&gt;&gt;
 
 List of searched symbol properties
+
+## Remarks
+
+该接口暂时不支持工程库的精确搜索
 
 ## Example
 

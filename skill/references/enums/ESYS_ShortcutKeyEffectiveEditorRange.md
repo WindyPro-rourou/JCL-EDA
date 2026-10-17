@@ -1,6 +1,6 @@
 # ESYS\_ShortcutKeyEffectiveEditorRange enum
 
-Effective page range of the shortcut key
+快捷键生效页面范围
 
 ## Signature
 
@@ -33,6 +33,8 @@ ASSEMBLY\_VARIANT
 
 </td><td>
 
+装配变量
+
 </td></tr>
 <tr><td>
 
@@ -43,6 +45,8 @@ BLANK
 `0`
 
 </td><td>
+
+空白页
 
 </td></tr>
 <tr><td>
@@ -55,6 +59,8 @@ FOOTPRINT
 
 </td><td>
 
+封装
+
 </td></tr>
 <tr><td>
 
@@ -65,6 +71,8 @@ HOME
 `1`
 
 </td><td>
+
+开始页
 
 </td></tr>
 <tr><td>
@@ -77,6 +85,8 @@ PANEL
 
 </td><td>
 
+面板
+
 </td></tr>
 <tr><td>
 
@@ -87,6 +97,8 @@ PANEL\_3D\_PREVIEW
 `9`
 
 </td><td>
+
+面板 3D 预览
 
 </td></tr>
 <tr><td>
@@ -99,6 +111,8 @@ PANEL\_LIBRARY
 
 </td><td>
 
+面板库
+
 </td></tr>
 <tr><td>
 
@@ -109,6 +123,8 @@ PCB
 `4`
 
 </td><td>
+
+PCB
 
 </td></tr>
 <tr><td>
@@ -121,6 +137,8 @@ PCB\_2D\_PREVIEW
 
 </td><td>
 
+PCB 2D 预览
+
 </td></tr>
 <tr><td>
 
@@ -131,6 +149,8 @@ PCB\_3D\_PREVIEW
 `7`
 
 </td><td>
+
+PCB 3D 预览
 
 </td></tr>
 <tr><td>
@@ -143,6 +163,8 @@ SCHEMATIC\_PAGE
 
 </td><td>
 
+原理图图页
+
 </td></tr>
 <tr><td>
 
@@ -153,6 +175,8 @@ SIMULATION\_SCHEMATIC\_PAGE\_NGSPICE
 `12`
 
 </td><td>
+
+仿真原理图图页：Ngspice
 
 </td></tr>
 <tr><td>
@@ -165,6 +189,8 @@ SIMULATION\_SCHEMATIC\_PAGE\_SIMULIDE
 
 </td><td>
 
+仿真原理图图页：SimulIDE
+
 </td></tr>
 <tr><td>
 
@@ -176,6 +202,8 @@ SIMULATION\_WAVEFORM
 
 </td><td>
 
+仿真波形分析
+
 </td></tr>
 <tr><td>
 
@@ -186,6 +214,8 @@ SYMBOL
 `3`
 
 </td><td>
+
+符号
 
 </td></tr>
 </tbody></table>

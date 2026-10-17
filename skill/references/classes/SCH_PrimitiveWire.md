@@ -215,6 +215,10 @@ Promise&lt;[ISCH\_PrimitiveWire](./ISCH_PrimitiveWire.md) \| undefined&gt;
 
 Wire primitive object
 
+## Remarks
+
+WIRE 组即连通性模型：同网络折线若写成多个 WIRE 组，即使端点相同也不会连通； 编辑器 `create()` 会自动把同网络折线合并为一个 WIRE primitive group，跨组连通需确保段与段首尾相接
+
 ## Example
 
 ```javascript
@@ -605,17 +609,11 @@ Modify Wire
 function modify(
 	primitiveId: string | ISCH_PrimitiveWire,
 	property: {
-		line?: undefined | number[] | number[][];
-		net?: undefined | string;
-		color?: undefined | null | string;
-		lineWidth?: undefined | null | number;
-		lineType?:
-			| undefined
-			| null
-			| ESCH_PrimitiveLineType.SOLID
-			| ESCH_PrimitiveLineType.DASHED
-			| ESCH_PrimitiveLineType.DOTTED
-			| ESCH_PrimitiveLineType.DOT_DASHED;
+		line?: Array<number> | Array<Array<number>>;
+		net?: string;
+		color?: string | null;
+		lineWidth?: number | null;
+		lineType?: ESCH_PrimitiveLineType | null;
 	},
 ): Promise<ISCH_PrimitiveWire | undefined>;
 ```
@@ -654,7 +652,7 @@ property
 
 </td><td>
 
-{ line?: undefined \| number\[\] \| number\[\]\[\]; net?: undefined \| string; color?: undefined \| null \| string; lineWidth?: undefined \| null \| number; lineType?: undefined \| null \| [ESCH\_PrimitiveLineType.SOLID](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DASHED](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DOTTED](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DOT\_DASHED](../enums/ESCH_PrimitiveLineType.md) }
+{ line?: Array&lt;number&gt; \| Array&lt;Array&lt;number&gt;&gt;; net?: string; color?: string \| null; lineWidth?: number \| null; lineType?: [ESCH\_PrimitiveLineType](../enums/ESCH_PrimitiveLineType.md) \| null }
 
 </td><td>
 

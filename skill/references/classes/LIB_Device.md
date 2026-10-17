@@ -273,23 +273,13 @@ function create(
 	deviceName: string,
 	classification?: ILIB_ClassificationIndex | Array<string>,
 	association?: {
-		symbolType?:
-			| undefined
-			| ELIB_SymbolType.COMPONENT
-			| ELIB_SymbolType.NET_FLAG
-			| ELIB_SymbolType.NET_PORT
-			| ELIB_SymbolType.DRAWING
-			| ELIB_SymbolType.NON_ELECTRICAL
-			| ELIB_SymbolType.SHORT_CIRCUIT_FLAG
-			| ELIB_SymbolType.OFF_PAGE_CONNECTOR
-			| ELIB_SymbolType.DIFFERENTIAL_PAIRS_FLAG
-			| ELIB_SymbolType.CBB_SYMBOL;
-		symbolUuid?: undefined | string;
-		symbol?: undefined | { uuid: string; libraryUuid: string };
-		footprintUuid?: undefined | string;
-		footprint?: undefined | { uuid: string; libraryUuid: string };
-		model3D?: undefined | { uuid: string; libraryUuid: string };
-		imageData?: undefined | File | Blob;
+		symbolType?: ELIB_SymbolType;
+		symbolUuid?: string;
+		symbol?: { uuid: string; libraryUuid: string };
+		footprintUuid?: string;
+		footprint?: { uuid: string; libraryUuid: string };
+		model3D?: { uuid: string; libraryUuid: string };
+		imageData?: File | Blob;
 	},
 	description?: string,
 	property?: ILIB_DeviceExtendPropertyItem,
@@ -356,7 +346,7 @@ association
 
 </td><td>
 
-{ symbolType?: undefined \| [ELIB\_SymbolType.COMPONENT](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.NET\_FLAG](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.NET\_PORT](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.DRAWING](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.NON\_ELECTRICAL](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.SHORT\_CIRCUIT\_FLAG](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.OFF\_PAGE\_CONNECTOR](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.DIFFERENTIAL\_PAIRS\_FLAG](../enums/ELIB_SymbolType.md) \| [ELIB\_SymbolType.CBB\_SYMBOL](../enums/ELIB_SymbolType.md)<!-- -->; symbolUuid?: undefined \| string; symbol?: undefined \| { uuid: string; libraryUuid: string }; footprintUuid?: undefined \| string; footprint?: undefined \| { uuid: string; libraryUuid: string }; model3D?: undefined \| { uuid: string; libraryUuid: string }; imageData?: undefined \| File \| Blob }
+{ symbolType?: [ELIB\_SymbolType](../enums/ELIB_SymbolType.md)<!-- -->; symbolUuid?: string; symbol?: { uuid: string; libraryUuid: string }; footprintUuid?: string; footprint?: { uuid: string; libraryUuid: string }; model3D?: { uuid: string; libraryUuid: string }; imageData?: File \| Blob }
 
 </td><td>
 
@@ -431,7 +421,7 @@ Delete Device
 ## Signature
 
 ```typescript
-function delete(deviceUuid: string, libraryUuid: string): Promise<boolean>;
+function delete(deviceUuid: string, libraryUuid: string): Promise<boolean | undefined>;
 ```
 
 ## Parameters
@@ -479,7 +469,7 @@ Library UUID, you can use [LIB\_LibrariesList](./LIB_LibrariesList.md) APIs in
 
 ## Returns
 
-Promise&lt;boolean&gt;
+Promise&lt;boolean \| undefined&gt;
 
 Whether the operation is successful
 
@@ -580,7 +570,7 @@ function getByLcscIds<T extends boolean>(
 	lcscIds: string,
 	libraryUuid?: string,
 	allowMultiMatch?: T,
-): Promise<T extends true ? ILIB_DeviceSearchItem | undefined : Array<ILIB_DeviceSearchItem>>;
+): Promise<T extends true ? Array<ILIB_DeviceSearchItem> : ILIB_DeviceSearchItem | undefined>;
 ```
 
 ## Parameters
@@ -641,7 +631,7 @@ _(Optional)_ Whether a single LCSC C number is allowed to match multiple results
 
 ## Returns
 
-Promise&lt;T extends true ? [ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem.md) \| undefined : Array&lt;[ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem.md)<!-- -->&gt;&gt;
+Promise&lt;T extends true ? Array&lt;[ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem.md)<!-- -->&gt; : [ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem.md) \| undefined&gt;
 
 Searched device properties
 
@@ -652,6 +642,8 @@ By default, if multiple devices with the same C number are matched in the same l
 If you want to return multiple results, set `allowMultiMatch` to `true`<!-- -->;
 
 This API is temporarily unavailable in the private deployment environment
+
+私有化部署环境暂无法使用本接口
 
 ### getbylcscids_1
 
@@ -741,6 +733,8 @@ If you want to return multiple results, set `allowMultiMatch` to `true`<!-- -->;
 
 This API is temporarily unavailable in the private deployment environment
 
+私有化部署环境暂无法使用本接口
+
 ## Example
 
 ```javascript
@@ -774,26 +768,25 @@ function modify(
 	deviceName?: string,
 	classification?: ILIB_ClassificationIndex | Array<string> | null,
 	association?: {
-		symbolUuid?: undefined | string;
-		symbol?: undefined | { uuid: string; libraryUuid: string };
-		footprintUuid?: undefined | null | string;
-		footprint?: undefined | null | { uuid: string; libraryUuid: string };
-		model3D?: undefined | null | { uuid: string; libraryUuid: string };
-		imageData?: undefined | null | File | Blob;
+		symbolUuid?: string;
+		symbol?: { uuid: string; libraryUuid: string };
+		footprintUuid?: string | null;
+		footprint?: { uuid: string; libraryUuid: string } | null;
+		model3D?: { uuid: string; libraryUuid: string } | null;
+		imageData?: File | Blob | null;
 	},
 	description?: string | null,
 	property?: {
-		name?: undefined | null | string;
-		designator?: undefined | string;
-		addIntoBom?: undefined | false | true;
-		addIntoPcb?: undefined | false | true;
-		net?: undefined | string;
-		manufacturer?: undefined | null | string;
-		manufacturerId?: undefined | null | string;
-		supplier?: undefined | null | string;
-		supplierId?: undefined | null | string;
-		otherProperty?:
-			undefined | Record<string, undefined | null | string | number | false | true>;
+		name?: string | null;
+		designator?: string;
+		addIntoBom?: boolean;
+		addIntoPcb?: boolean;
+		net?: string;
+		manufacturer?: string | null;
+		manufacturerId?: string | null;
+		supplier?: string | null;
+		supplierId?: string | null;
+		otherProperty?: Record<string, boolean | number | string | undefined | null>;
 	},
 ): Promise<boolean>;
 ```
@@ -871,7 +864,7 @@ association
 
 </td><td>
 
-\{ symbolUuid?: undefined \| string; symbol?: undefined \| \{ uuid: string; libraryUuid: string \}; footprintUuid?: undefined \| null \| string; footprint?: undefined \| null \| \{ uuid: string; libraryUuid: string \}; model3D?: undefined \| null \| \{ uuid: string; libraryUuid: string \}; imageData?: undefined \| null \| File \| Blob \}
+\{ symbolUuid?: string; symbol?: \{ uuid: string; libraryUuid: string \}; footprintUuid?: string \| null; footprint?: \{ uuid: string; libraryUuid: string \} \| null; model3D?: \{ uuid: string; libraryUuid: string \} \| null; imageData?: File \| Blob \| null \}
 
 </td><td>
 
@@ -897,7 +890,7 @@ property
 
 </td><td>
 
-{ name?: undefined \| null \| string; designator?: undefined \| string; addIntoBom?: undefined \| false \| true; addIntoPcb?: undefined \| false \| true; net?: undefined \| string; manufacturer?: undefined \| null \| string; manufacturerId?: undefined \| null \| string; supplier?: undefined \| null \| string; supplierId?: undefined \| null \| string; otherProperty?: undefined \| Record&lt;string, undefined \| null \| string \| number \| false \| true&gt; }
+{ name?: string \| null; designator?: string; addIntoBom?: boolean; addIntoPcb?: boolean; net?: string; manufacturer?: string \| null; manufacturerId?: string \| null; supplier?: string \| null; supplierId?: string \| null; otherProperty?: Record&lt;string, boolean \| number \| string \| undefined \| null&gt; }
 
 </td><td>
 
@@ -1065,6 +1058,10 @@ Promise&lt;Array&lt;[ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem
 
 List of searched device properties
 
+## Remarks
+
+本接口为 \*\*模糊搜索\*\*，可能返回社区伪编号（如 `C99xxxxxxx`<!-- -->）或近似结果（如 `C14604` 命中近似型号）； 需要按属性精确检索请用 [searchByProperties](./LIB_Device.md)<!-- -->（如 `{ supplierId: 'C1523' }`<!-- -->）
+
 ## Example
 
 ```javascript
@@ -1199,6 +1196,10 @@ _(Optional)_ Page count
 Promise&lt;Array&lt;[ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem.md)<!-- -->&gt;&gt;
 
 List of searched device properties
+
+## Remarks
+
+该接口暂时不支持工程库的精确搜索； 需精确检索时传 `{ supplierId, partNumber, partCode, … }` 等属性，与 [search](./LIB_Device.md) 的模糊搜索互补
 
 ## Example
 

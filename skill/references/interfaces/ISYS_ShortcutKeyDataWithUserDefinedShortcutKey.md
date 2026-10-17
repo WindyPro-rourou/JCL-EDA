@@ -1,6 +1,6 @@
 # ISYS\_ShortcutKeyDataWithUserDefinedShortcutKey interface
 
-Shortcut key data with userDefinedShortcutKey
+包含 userDefinedShortcutKey 的快捷键数据
 
 ## Signature
 
@@ -40,7 +40,7 @@ Description
 
 </td><td>
 
-_(Optional)_ User-defined shortcut key
+_(Optional)_ 用户定义快捷键
 
 </td></tr>
 </tbody></table>
@@ -53,7 +53,7 @@ _(Optional)_ User-defined shortcut key
 
 # ISYS\_ShortcutKeyDataWithUserDefinedShortcutKey.userDefinedShortcutKey property
 
-User-defined shortcut key
+用户定义快捷键
 
 ## Signature
 

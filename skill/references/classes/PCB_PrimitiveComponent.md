@@ -823,20 +823,20 @@ Modify Device
 function modify(
 	primitiveId: string | IPCB_PrimitiveComponent,
 	property: {
-		layer?: undefined | EPCB_LayerId.TOP | EPCB_LayerId.BOTTOM;
-		x?: undefined | number;
-		y?: undefined | number;
-		rotation?: undefined | number;
-		primitiveLock?: undefined | false | true;
-		addIntoBom?: undefined | false | true;
-		designator?: undefined | null | string;
-		name?: undefined | null | string;
-		uniqueId?: undefined | null | string;
-		manufacturer?: undefined | null | string;
-		manufacturerId?: undefined | null | string;
-		supplier?: undefined | null | string;
-		supplierId?: undefined | null | string;
-		otherProperty?: undefined | Record<string, any>;
+		layer?: TPCB_LayersOfComponent;
+		x?: number;
+		y?: number;
+		rotation?: number;
+		primitiveLock?: boolean;
+		addIntoBom?: boolean;
+		designator?: string | null;
+		name?: string | null;
+		uniqueId?: string | null;
+		manufacturer?: string | null;
+		manufacturerId?: string | null;
+		supplier?: string | null;
+		supplierId?: string | null;
+		otherProperty?: Record<string, any>;
 	},
 ): Promise<IPCB_PrimitiveComponent | undefined>;
 ```
@@ -875,7 +875,7 @@ property
 
 </td><td>
 
-{ layer?: undefined \| [EPCB\_LayerId.TOP](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.BOTTOM](../enums/EPCB_LayerId.md)<!-- -->; x?: undefined \| number; y?: undefined \| number; rotation?: undefined \| number; primitiveLock?: undefined \| false \| true; addIntoBom?: undefined \| false \| true; designator?: undefined \| null \| string; name?: undefined \| null \| string; uniqueId?: undefined \| null \| string; manufacturer?: undefined \| null \| string; manufacturerId?: undefined \| null \| string; supplier?: undefined \| null \| string; supplierId?: undefined \| null \| string; otherProperty?: undefined \| Record&lt;string, any&gt; }
+{ layer?: [TPCB\_LayersOfComponent](../types/TPCB_LayersOfComponent.md)<!-- -->; x?: number; y?: number; rotation?: number; primitiveLock?: boolean; addIntoBom?: boolean; designator?: string \| null; name?: string \| null; uniqueId?: string \| null; manufacturer?: string \| null; manufacturerId?: string \| null; supplier?: string \| null; supplierId?: string \| null; otherProperty?: Record&lt;string, any&gt; }
 
 </td><td>
 

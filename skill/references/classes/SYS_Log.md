@@ -268,15 +268,13 @@ function find(
 			| string
 			| {
 				text: string;
-				attr?:
-					| undefined
-					| {
-						id?: undefined | string;
-						path?: undefined | string;
-						sheet?: undefined | string;
-						pcbid?: undefined | string;
-						type?: undefined | string;
-					};
+				attr?: {
+					id?: string;
+					path?: string;
+					sheet?: string;
+					pcbid?: string;
+					type?: string;
+				};
 			}
 		>,
 	types?: ESYS_LogType | Array<ESYS_LogType>,
@@ -304,7 +302,7 @@ message
 
 </td><td>
 
-string \| Array&lt;string \| { text: string; attr?: undefined \| { id?: undefined \| string; path?: undefined \| string; sheet?: undefined \| string; pcbid?: undefined \| string; type?: undefined \| string } }&gt;
+string \| Array&lt;string \| { text: string; attr?: { id?: string; path?: string; sheet?: string; pcbid?: string; type?: string } }&gt;
 
 </td><td>
 

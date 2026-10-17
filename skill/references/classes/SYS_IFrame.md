@@ -142,6 +142,8 @@ Close the iframe window with the specified ID
 
 Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error`
 
+控制其它扩展打开的内联框架窗口时，`id` 需传入完整 ID 格式：`<其它扩展UUID>.<窗口ID>`<!-- -->（点分隔，窗口 ID 为打开时传入的 `id` 参数）
+
 ## Example
 
 ```javascript
@@ -218,6 +220,8 @@ Whether the operation is successful
 This API is result-oriented: If the specified iframe window is not found, the API returns `false`<!-- -->; if the iframe window was already hidden before the operation, the API returns `true`
 
 Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error`
+
+控制其它扩展打开的内联框架窗口时，`id` 需传入完整 ID 格式：`<其它扩展UUID>.<窗口ID>`<!-- -->（点分隔，窗口 ID 为打开时传入的 `id` 参数）
 
 ## Example
 
@@ -297,7 +301,9 @@ Whether Exists
 
 ## Remarks
 
-Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error` ADD since EDA v4.2
+Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error`
+
+控制其它扩展打开的内联框架窗口时，`id` 需传入完整 ID 格式：`<其它扩展UUID>.<窗口ID>`<!-- -->（点分隔，窗口 ID 为打开时传入的 `id` 参数） ADD since EDA v4.2
 
 ### openiframe
 
@@ -316,17 +322,15 @@ function openIFrame(
 	height?: number,
 	id?: string,
 	props?: {
-		maximizeButton?: undefined | false | true;
-		minimizeButton?: undefined | false | true;
-		minimizeStyle?: undefined | 'collapsed' | 'constricted';
-		buttonCallbackFn?:
-			undefined | ((button: 'close' | 'minimize' | 'maximize') => void | Promise<void>);
-		onBeforeCloseCallFn?:
-			undefined | (() => boolean | undefined | Promise<boolean | undefined>);
-		grayscaleMask?: undefined | false | true;
-		title?: undefined | string;
-		x?: undefined | number;
-		y?: undefined | number;
+		maximizeButton?: boolean;
+		minimizeButton?: boolean;
+		minimizeStyle?: 'collapsed' | 'constricted';
+		buttonCallbackFn?: (button: 'close' | 'minimize' | 'maximize') => void | Promise<void>;
+		onBeforeCloseCallFn?: () => boolean | undefined | Promise<boolean | undefined>;
+		grayscaleMask?: boolean;
+		title?: string;
+		x?: number;
+		y?: number;
 	},
 ): Promise<boolean>;
 ```
@@ -404,7 +408,7 @@ props
 
 </td><td>
 
-{ maximizeButton?: undefined \| false \| true; minimizeButton?: undefined \| false \| true; minimizeStyle?: undefined \| 'collapsed' \| 'constricted'; buttonCallbackFn?: undefined \| ((button: 'close' \| 'minimize' \| 'maximize') =&gt; void \| Promise&lt;void&gt;); onBeforeCloseCallFn?: undefined \| (() =&gt; boolean \| undefined \| Promise&lt;boolean \| undefined&gt;); grayscaleMask?: undefined \| false \| true; title?: undefined \| string; x?: undefined \| number; y?: undefined \| number }
+{ maximizeButton?: boolean; minimizeButton?: boolean; minimizeStyle?: 'collapsed' \| 'constricted'; buttonCallbackFn?: (button: 'close' \| 'minimize' \| 'maximize') =&gt; void \| Promise&lt;void&gt;; onBeforeCloseCallFn?: () =&gt; boolean \| undefined \| Promise&lt;boolean \| undefined&gt;; grayscaleMask?: boolean; title?: string; x?: number; y?: number; }
 
 </td><td>
 
@@ -503,6 +507,8 @@ Whether the operation is successful
 This API is result-oriented: If the specified iframe window is not found, the API returns `false`<!-- -->; if the iframe window was already in the shown state before the operation, the API returns `true`
 
 Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error`
+
+控制其它扩展打开的内联框架窗口时，`id` 需传入完整 ID 格式：`<其它扩展UUID>.<窗口ID>`<!-- -->（点分隔，窗口 ID 为打开时传入的 `id` 参数）
 
 ## Example
 

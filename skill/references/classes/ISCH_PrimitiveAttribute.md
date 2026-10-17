@@ -488,7 +488,7 @@ const designator = attrs.find(a => a.getState_Key() === 'Designator');
 const fontSizeBefore = designator.getState_FontSize();
 const rotationBefore = designator.getState_Rotation();
 
-// 4. 批量修改两个属性，一次 done() 提交
+// 4. 批量修改两个属性，一次 done() 提交（字号 50，单位 0.01inch，即 0.5inch）
 const asyncAttr = designator.toAsync();
 asyncAttr.setState_FontSize(50);
 asyncAttr.setState_Rotation(90);
@@ -732,7 +732,7 @@ const attrIds = await eda.sch_PrimitiveAttribute.getAllPrimitiveId(compId);
 const attrs = await eda.sch_PrimitiveAttribute.get(attrIds);
 const designator = attrs.find(a => a.getState_Key() === 'Designator');
 
-// 3. 读取编号文本的字号，单位 mm（null 表示跟随默认字号）
+// 3. 读取编号文本的字号，单位与画布单位相同（0.01inch，100 = 1inch；null 表示跟随默认字号）
 const fontSize = designator.getState_FontSize();
 
 // 4. 清理测试器件（属性图元随器件一起删除）
@@ -1751,7 +1751,7 @@ const attrIds = await eda.sch_PrimitiveAttribute.getAllPrimitiveId(comp.getState
 const attrs = await eda.sch_PrimitiveAttribute.get(attrIds);
 const designator = attrs.find(a => a.getState_Key() === 'Designator');
 
-// 3. 切换异步模式设置字号并提交（传入 50，读回 0.5mm）
+// 3. 切换异步模式设置字号并提交（传入 50，单位 0.01inch，即 0.5inch）
 const asyncAttr = designator.toAsync();
 asyncAttr.setState_FontSize(50);
 await asyncAttr.done();
@@ -2484,7 +2484,7 @@ const designator = attrs.find(a => a.getState_Key() === 'Designator');
 // 3. 转换为异步句柄并确认其异步状态
 const asyncAttr = designator.toAsync();
 
-// 4. 通过异步句柄修改字号并提交（传入 50，读回 0.5mm）
+// 4. 通过异步句柄修改字号并提交（传入 50，单位 0.01inch，即 0.5inch）
 asyncAttr.setState_FontSize(50);
 await asyncAttr.done();
 

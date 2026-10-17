@@ -171,13 +171,14 @@ function insertSystemHeaderMenuItem(
 	id: Array<string>,
 	props: {
 		title: string;
-		registerFn?: undefined | string;
-		menuItems?:
-			undefined | (null | ISYS_HeaderMenuSub2MenuItem | ISYS_HeaderMenuSub1MenuItem)[];
-		insertDividerBefore?: undefined | false | true;
-		insertDividerAfter?: undefined | false | true;
-		insertBefore?: undefined | string;
-		crossDividerWhenInsert?: undefined | false | true;
+		registerFn?: string;
+		icon?: string;
+		shortcutKey?: TSYS_ShortcutKeys;
+		menuItems?: Array<ISYS_HeaderMenuSub1MenuItem | ISYS_HeaderMenuSub2MenuItem | null>;
+		insertDividerBefore?: boolean;
+		insertDividerAfter?: boolean;
+		insertBefore?: string;
+		crossDividerWhenInsert?: boolean;
 	},
 ): Promise<string | undefined>;
 ```
@@ -229,7 +230,7 @@ props
 
 </td><td>
 
-{ title: string; registerFn?: undefined \| string; menuItems?: undefined \| (null \| [ISYS\_HeaderMenuSub2MenuItem](../interfaces/ISYS_HeaderMenuSub2MenuItem.md) \| [ISYS\_HeaderMenuSub1MenuItem](../interfaces/ISYS_HeaderMenuSub1MenuItem.md)<!-- -->)\[\]; insertDividerBefore?: undefined \| false \| true; insertDividerAfter?: undefined \| false \| true; insertBefore?: undefined \| string; crossDividerWhenInsert?: undefined \| false \| true }
+{ title: string; registerFn?: string; icon?: string; shortcutKey?: [TSYS\_ShortcutKeys](../types/TSYS_ShortcutKeys.md)<!-- -->; menuItems?: Array&lt;[ISYS\_HeaderMenuSub1MenuItem](../interfaces/ISYS_HeaderMenuSub1MenuItem.md) \| [ISYS\_HeaderMenuSub2MenuItem](../interfaces/ISYS_HeaderMenuSub2MenuItem.md) \| null&gt;; insertDividerBefore?: boolean; insertDividerAfter?: boolean; insertBefore?: string; crossDividerWhenInsert?: boolean; }
 
 </td><td>
 
@@ -323,8 +324,8 @@ Remove a system header menu item
 function removeSystemHeaderMenuItem(
 	id: Array<string>,
 	props?: {
-		removeTheBeforeDivider?: undefined | false | true;
-		removeTheAfterDivider?: undefined | false | true;
+		removeTheBeforeDivider?: boolean;
+		removeTheAfterDivider?: boolean;
 	},
 ): Promise<boolean>;
 ```
@@ -363,7 +364,7 @@ props
 
 </td><td>
 
-\{ removeTheBeforeDivider?: undefined \| false \| true; removeTheAfterDivider?: undefined \| false \| true \}
+\{ removeTheBeforeDivider?: boolean; removeTheAfterDivider?: boolean; \}
 
 </td><td>
 

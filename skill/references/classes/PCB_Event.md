@@ -40,6 +40,17 @@ Description
 </td></tr>
 <tr><td>
 
+[addImageEventListener(id, callFn)](./PCB_Event.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 新增插入图片事件监听
+
+</td></tr>
+<tr><td>
+
 [addMouseEventListener(id, eventType, callFn, onlyOnce)](./PCB_Event.md)
 
 </td><td>
@@ -219,6 +230,80 @@ const removed = eda.pcb_Event.removeEventListener(listenerId);
 console.log('removed:', removed);
 ```
 
+### addimageeventlistener
+
+# PCB\_Event.addImageEventListener() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+> Warning: This API is now obsolete.
+>
+> 临时接口（插入图片 PCB 迁移打通流程用）：统一事件机制落地后替换，请尽快迁移，勿在新功能中继续依赖
+
+新增插入图片事件监听
+
+## Signature
+
+```typescript
+function addImageEventListener(
+	id: string,
+	callFn: (message: { file?: File; source: 'toolbar' | 'paste' }) => void | Promise<void>,
+): boolean;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+id
+
+</td><td>
+
+string
+
+</td><td>
+
+事件 ID，用于防止重复注册（内部自动加扩展 uuid 前缀）
+
+</td></tr>
+<tr><td>
+
+callFn
+
+</td><td>
+
+(message: { file?: File; source: 'toolbar' \| 'paste' }) =&gt; void \| Promise&lt;void&gt;
+
+</td><td>
+
+事件触发时的回调，接收 pro-ui 触发的放置图片请求
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+boolean
+
+是否注册成功
+
+## Remarks
+
+ADD since EDA v5
+
 ### addmouseeventlistener
 
 # PCB\_Event.addMouseEventListener() method
@@ -239,10 +324,10 @@ function addMouseEventListener(
 			{
 				primitiveId: string;
 				primitiveType: EPCB_PrimitiveType;
-				net?: undefined | string;
-				designator?: undefined | string;
-				parentComponentPrimitiveId?: undefined | string;
-				parentComponentDesignator?: undefined | string;
+				net?: string;
+				designator?: string;
+				parentComponentPrimitiveId?: string;
+				parentComponentDesignator?: string;
 			},
 		],
 	) => void | Promise<void>,
@@ -297,7 +382,7 @@ callFn
 
 </td><td>
 
-(eventType: [EPCB\_MouseEventType](../enums/EPCB_MouseEventType.md)<!-- -->, props: \[{ primitiveId: string; primitiveType: [EPCB\_PrimitiveType](../enums/EPCB_PrimitiveType.md)<!-- -->; net?: undefined \| string; designator?: undefined \| string; parentComponentPrimitiveId?: undefined \| string; parentComponentDesignator?: undefined \| string }\]) =&gt; void \| Promise&lt;void&gt;
+(eventType: [EPCB\_MouseEventType](../enums/EPCB_MouseEventType.md)<!-- -->, props: \[{ primitiveId: string; primitiveType: [EPCB\_PrimitiveType](../enums/EPCB_PrimitiveType.md)<!-- -->; net?: string; designator?: string; parentComponentPrimitiveId?: string; parentComponentDesignator?: string }\]) =&gt; void \| Promise&lt;void&gt;
 
 </td><td>
 
@@ -501,10 +586,10 @@ function addPrimitiveEventListener(
 			{
 				primitiveId: string;
 				primitiveType: EPCB_PrimitiveType;
-				net?: undefined | string;
-				designator?: undefined | string;
-				parentComponentPrimitiveId?: undefined | string;
-				parentComponentDesignator?: undefined | string;
+				net?: string;
+				designator?: string;
+				parentComponentPrimitiveId?: string;
+				parentComponentDesignator?: string;
 			},
 		],
 	) => void | Promise<void>,
@@ -559,7 +644,7 @@ callFn
 
 </td><td>
 
-(eventType: [EPCB\_PrimitiveEventType](../enums/EPCB_PrimitiveEventType.md)<!-- -->, props: \[{ primitiveId: string; primitiveType: [EPCB\_PrimitiveType](../enums/EPCB_PrimitiveType.md)<!-- -->; net?: undefined \| string; designator?: undefined \| string; parentComponentPrimitiveId?: undefined \| string; parentComponentDesignator?: undefined \| string }\]) =&gt; void \| Promise&lt;void&gt;
+(eventType: [EPCB\_PrimitiveEventType](../enums/EPCB_PrimitiveEventType.md)<!-- -->, props: \[{ primitiveId: string; primitiveType: [EPCB\_PrimitiveType](../enums/EPCB_PrimitiveType.md)<!-- -->; net?: string; designator?: string; parentComponentPrimitiveId?: string; parentComponentDesignator?: string }\]) =&gt; void \| Promise&lt;void&gt;
 
 </td><td>
 

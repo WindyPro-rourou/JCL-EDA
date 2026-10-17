@@ -673,19 +673,15 @@ Modify Via
 function modify(
 	primitiveId: string | IPCB_PrimitiveVia,
 	property: {
-		net?: undefined | string;
-		x?: undefined | number;
-		y?: undefined | number;
-		holeDiameter?: undefined | number;
-		diameter?: undefined | number;
-		viaType?:
-			| undefined
-			| EPCB_PrimitiveViaType.VIA
-			| EPCB_PrimitiveViaType.BLIND
-			| EPCB_PrimitiveViaType.SUTURE;
-		designRuleBlindViaName?: undefined | null | string;
-		solderMaskExpansion?: undefined | null | IPCB_PrimitiveSolderMaskAndPasteMaskExpansion;
-		primitiveLock?: undefined | false | true;
+		net?: string;
+		x?: number;
+		y?: number;
+		holeDiameter?: number;
+		diameter?: number;
+		viaType?: EPCB_PrimitiveViaType;
+		designRuleBlindViaName?: string | null;
+		solderMaskExpansion?: IPCB_PrimitiveSolderMaskAndPasteMaskExpansion | null;
+		primitiveLock?: boolean;
 	},
 ): Promise<IPCB_PrimitiveVia | undefined>;
 ```
@@ -724,7 +720,7 @@ property
 
 </td><td>
 
-{ net?: undefined \| string; x?: undefined \| number; y?: undefined \| number; holeDiameter?: undefined \| number; diameter?: undefined \| number; viaType?: undefined \| [EPCB\_PrimitiveViaType.VIA](../enums/EPCB_PrimitiveViaType.md) \| [EPCB\_PrimitiveViaType.BLIND](../enums/EPCB_PrimitiveViaType.md) \| [EPCB\_PrimitiveViaType.SUTURE](../enums/EPCB_PrimitiveViaType.md)<!-- -->; designRuleBlindViaName?: undefined \| null \| string; solderMaskExpansion?: undefined \| null \| [IPCB\_PrimitiveSolderMaskAndPasteMaskExpansion](../interfaces/IPCB_PrimitiveSolderMaskAndPasteMaskExpansion.md)<!-- -->; primitiveLock?: undefined \| false \| true }
+{ net?: string; x?: number; y?: number; holeDiameter?: number; diameter?: number; viaType?: [EPCB\_PrimitiveViaType](../enums/EPCB_PrimitiveViaType.md)<!-- -->; designRuleBlindViaName?: string \| null; solderMaskExpansion?: [IPCB\_PrimitiveSolderMaskAndPasteMaskExpansion](../interfaces/IPCB_PrimitiveSolderMaskAndPasteMaskExpansion.md) \| null; primitiveLock?: boolean }
 
 </td><td>
 

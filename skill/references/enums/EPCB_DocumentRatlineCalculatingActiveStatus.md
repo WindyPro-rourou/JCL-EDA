@@ -37,6 +37,8 @@ ACTIVE
 
 </td><td>
 
+启用
+
 </td></tr>
 <tr><td>
 
@@ -47,6 +49,8 @@ INACTIVE
 `'inactive'`
 
 </td><td>
+
+停用
 
 </td></tr>
 </tbody></table>

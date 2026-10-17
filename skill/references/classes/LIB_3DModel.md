@@ -333,6 +333,8 @@ UUIDs of all created 3D models
 
 The passed-in `modelFile` can be an archive of multiple model files. EDA will automatically extract the multiple models
 
+在客户端离线模式下，3D 模型库是本地的一个目录，本接口会将数据组织后导入到指定的库目录中
+
 ## Example
 
 ```javascript
@@ -373,7 +375,7 @@ Delete 3D model
 ## Signature
 
 ```typescript
-function delete(modelUuid: string, libraryUuid: string): Promise<boolean>;
+function delete(modelUuid: string, libraryUuid: string): Promise<boolean | undefined>;
 ```
 
 ## Parameters
@@ -421,7 +423,7 @@ Library UUID, you can use [LIB\_LibrariesList](./LIB_LibrariesList.md) APIs in
 
 ## Returns
 
-Promise&lt;boolean&gt;
+Promise&lt;boolean \| undefined&gt;
 
 Whether the operation is successful
 

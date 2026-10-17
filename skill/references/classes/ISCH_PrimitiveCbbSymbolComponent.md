@@ -178,14 +178,14 @@ Get the property state: associate reuse block symbol
 function getState_CbbSymbol(): {
 	libraryUuid: string;
 	cbbUuid: string;
-	uuid?: undefined | string;
-	name?: undefined | string;
+	uuid?: string;
+	name?: string;
 };
 ```
 
 ## Returns
 
-\{ libraryUuid: string; cbbUuid: string; uuid?: undefined \| string; name?: undefined \| string \}
+\{ libraryUuid: string; cbbUuid: string; uuid?: string; name?: string \}
 
 Associate reuse block symbol
 

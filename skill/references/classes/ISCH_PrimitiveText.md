@@ -549,7 +549,7 @@ Font size
 ## Example
 
 ```javascript
-// 1. 创建一个字号 20 的测试文本（第 7 参是字体大小）
+// 1. 创建一个字号 20 的测试文本（第 7 参是字体大小，单位 0.01inch，即 0.2inch）
 const text = await eda.sch_PrimitiveText.create(400, 300, '嘉立创示例_大标题', 0, null, null, 20);
 
 // 2. 读取字体大小
@@ -1252,7 +1252,7 @@ const y = 2000 + Math.floor(Math.random() * 8000);
 // 2. 创建一个默认字号的测试文本（SCH 坐标单位 10mil）
 const text = await eda.sch_PrimitiveText.create(x, y, '嘉立创示例_标题');
 
-// 3. 切换异步模式，把字号增大到 20
+// 3. 切换异步模式，把字号增大到 20（单位 0.01inch，即 0.2inch）
 const asyncText = text.toAsync();
 asyncText.setState_FontSize(20);
 await asyncText.done();

@@ -482,32 +482,21 @@ Modify Property
 function modify(
 	primitiveId: string | ISCH_PrimitiveAttribute,
 	property: {
-		x?: undefined | null | number;
-		y?: undefined | null | number;
-		rotation?: undefined | null | number;
-		color?: undefined | null | string;
-		fontName?: undefined | null | string;
-		fontSize?: undefined | null | number;
-		bold?: undefined | null | false | true;
-		italic?: undefined | null | false | true;
-		underLine?: undefined | null | false | true;
-		alignMode?:
-			| undefined
-			| null
-			| ESCH_PrimitiveTextAlignMode.LEFT_TOP
-			| ESCH_PrimitiveTextAlignMode.LEFT_MIDDLE
-			| ESCH_PrimitiveTextAlignMode.LEFT_BOTTOM
-			| ESCH_PrimitiveTextAlignMode.CENTER_TOP
-			| ESCH_PrimitiveTextAlignMode.CENTER
-			| ESCH_PrimitiveTextAlignMode.CENTER_BOTTOM
-			| ESCH_PrimitiveTextAlignMode.RIGHT_TOP
-			| ESCH_PrimitiveTextAlignMode.RIGHT_MIDDLE
-			| ESCH_PrimitiveTextAlignMode.RIGHT_BOTTOM;
-		fillColor?: undefined | null | string;
-		key?: undefined | string;
-		value?: undefined | string;
-		keyVisible?: undefined | null | false | true;
-		valueVisible?: undefined | null | false | true;
+		x?: number | null;
+		y?: number | null;
+		rotation?: number | null;
+		color?: string | null;
+		fontName?: string | null;
+		fontSize?: number | null;
+		bold?: boolean | null;
+		italic?: boolean | null;
+		underLine?: boolean | null;
+		alignMode?: ESCH_PrimitiveTextAlignMode | null;
+		fillColor?: string | null;
+		key?: string;
+		value?: string;
+		keyVisible?: boolean | null;
+		valueVisible?: boolean | null;
 	},
 ): Promise<ISCH_PrimitiveAttribute | undefined>;
 ```
@@ -546,7 +535,7 @@ property
 
 </td><td>
 
-{ x?: undefined \| null \| number; y?: undefined \| null \| number; rotation?: undefined \| null \| number; color?: undefined \| null \| string; fontName?: undefined \| null \| string; fontSize?: undefined \| null \| number; bold?: undefined \| null \| false \| true; italic?: undefined \| null \| false \| true; underLine?: undefined \| null \| false \| true; alignMode?: undefined \| null \| [ESCH\_PrimitiveTextAlignMode.LEFT\_TOP](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.LEFT\_MIDDLE](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.LEFT\_BOTTOM](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.CENTER\_TOP](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.CENTER](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.CENTER\_BOTTOM](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.RIGHT\_TOP](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.RIGHT\_MIDDLE](../enums/ESCH_PrimitiveTextAlignMode.md) \| [ESCH\_PrimitiveTextAlignMode.RIGHT\_BOTTOM](../enums/ESCH_PrimitiveTextAlignMode.md)<!-- -->; fillColor?: undefined \| null \| string; key?: undefined \| string; value?: undefined \| string; keyVisible?: undefined \| null \| false \| true; valueVisible?: undefined \| null \| false \| true }
+{ x?: number \| null; y?: number \| null; rotation?: number \| null; color?: string \| null; fontName?: string \| null; fontSize?: number \| null; bold?: boolean \| null; italic?: boolean \| null; underLine?: boolean \| null; alignMode?: [ESCH\_PrimitiveTextAlignMode](../enums/ESCH_PrimitiveTextAlignMode.md) \| null; fillColor?: string \| null; key?: string; value?: string; keyVisible?: boolean \| null; valueVisible?: boolean \| null }
 
 </td><td>
 

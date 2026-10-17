@@ -33,6 +33,8 @@ CANVAS\_NOT\_SELECT
 
 </td><td>
 
+画布未选中
+
 </td></tr>
 <tr><td>
 
@@ -43,6 +45,8 @@ CANVAS\_SELECTED
 `2`
 
 </td><td>
+
+画布选中
 
 </td></tr>
 <tr><td>
@@ -55,6 +59,8 @@ DRAWING
 
 </td><td>
 
+画布绘制
+
 </td></tr>
 <tr><td>
 
@@ -65,6 +71,8 @@ EDITOR
 `1`
 
 </td><td>
+
+非画布
 
 </td></tr>
 <tr><td>
@@ -77,6 +85,8 @@ LOCAL
 
 </td><td>
 
+局部快捷键
+
 </td></tr>
 <tr><td>
 
@@ -87,6 +97,8 @@ PLACING
 `5`
 
 </td><td>
+
+画布放置
 
 </td></tr>
 </tbody></table>

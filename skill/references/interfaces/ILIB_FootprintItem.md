@@ -91,6 +91,23 @@ UUID of the library it belongs to
 </td></tr>
 <tr><td>
 
+[model3D?](./ILIB_FootprintItem.md)
+
+</td><td>
+
+</td><td>
+
+\{ name: string; uuid: string; libraryUuid: string \}
+
+</td><td>
+
+_(Optional)_ 关联 3D 模型
+
+ADD since v4.1.22
+
+</td></tr>
+<tr><td>
+
 [name](./ILIB_FootprintItem.md)
 
 </td><td>
@@ -102,6 +119,21 @@ string
 </td><td>
 
 Footprint name
+
+</td></tr>
+<tr><td>
+
+[otherProperty?](./ILIB_FootprintItem.md)
+
+</td><td>
+
+</td><td>
+
+Record&lt;string, boolean \| number \| string \| undefined&gt;
+
+</td><td>
+
+_(Optional)_ 其它属性
 
 </td></tr>
 <tr><td>
@@ -173,6 +205,20 @@ UUID of the library it belongs to
 libraryUuid: string;
 ```
 
+### model3d
+
+# ILIB\_FootprintItem.model3D property
+
+关联 3D 模型
+
+ADD since v4.1.22
+
+## Signature
+
+```typescript
+model3D?: { name: string; uuid: string; libraryUuid: string };
+```
+
 ### name
 
 # ILIB\_FootprintItem.name property
@@ -183,6 +229,18 @@ Footprint name
 
 ```typescript
 name: string;
+```
+
+### otherproperty
+
+# ILIB\_FootprintItem.otherProperty property
+
+其它属性
+
+## Signature
+
+```typescript
+otherProperty?: Record<string, boolean | number | string | undefined>;
 ```
 
 ### uuid

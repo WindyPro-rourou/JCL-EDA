@@ -25,6 +25,17 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[getJLCColorSilkEnabled()](./SYS_Setting.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 获取是否启用嘉立创彩色丝印工艺
+
+</td></tr>
+<tr><td>
+
 [restoreDefault()](./SYS_Setting.md)
 
 </td><td>
@@ -39,6 +50,44 @@ Description
 ---
 
 ## 方法详情
+
+### getjlccolorsilkenabled
+
+# SYS\_Setting.getJLCColorSilkEnabled() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+> Warning: This API is now obsolete.
+>
+> 临时接口（插入图片 PCB 迁移打通流程用）：等统一设置接口落地后删除替换，请尽快迁移，勿在新功能中继续依赖
+
+获取是否启用嘉立创彩色丝印工艺
+
+## Signature
+
+```typescript
+function getJLCColorSilkEnabled(): Promise<boolean>;
+```
+
+## Returns
+
+Promise&lt;boolean&gt;
+
+是否启用；读取失败返回 `false`
+
+## Remarks
+
+ADD since EDA v5
+
+## Example
+
+```javascript
+// 决定 UI 是否显示「放置原图（真彩）」勾选项
+const enabled = await eda.sys_Setting.getJLCColorSilkEnabled();
+if (enabled) {
+	console.log('彩色丝印工艺已启用');
+}
+```
 
 ### restoredefault
 

@@ -45,6 +45,17 @@ Description
 **_(BETA)_** PCB comparison
 
 </td></tr>
+<tr><td>
+
+[schematicComparison(schematicUuid1, schematicUuid2)](./SYS_Tool.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** Schematic comparison
+
+</td></tr>
 </tbody></table>
 
 ---
@@ -69,8 +80,8 @@ function netlistComparison(
 	Array<{
 		type: 'Net' | 'Component';
 		object: string;
-		netlist1Name: string[];
-		netlist2Name: string[];
+		netlist1Name: Array<string>;
+		netlist2Name: Array<string>;
 	}>
 >;
 ```
@@ -120,7 +131,7 @@ Netlist 2, which can be: 1. The UUID of a schematic or PCB in the current projec
 
 ## Returns
 
-Promise&lt;Array&lt;{ type: 'Net' \| 'Component'; object: string; netlist1Name: string\[\]; netlist2Name: string\[\] }&gt;&gt;
+Promise&lt;Array&lt;{ type: 'Net' \| 'Component'; object: string; netlist1Name: Array&lt;string&gt;; netlist2Name: Array&lt;string&gt; }&gt;&gt;
 
 Netlist comparison result
 
@@ -162,16 +173,11 @@ function pcbComparison(
 	pcb1: string | { projectUuid: string; pcbUuid: string } | File,
 	pcb2: string | { projectUuid: string; pcbUuid: string } | File,
 	options?: {
-		valUnit?:
-			| undefined
-			| ESYS_Unit.MILLIMETER
-			| ESYS_Unit.CENTIMETER
-			| ESYS_Unit.INCH
-			| ESYS_Unit.MIL;
-		deviation?: undefined | number;
-		comparisonSize?: undefined | number;
+		valUnit?: ESYS_Unit.MIL | ESYS_Unit.MILLIMETER | ESYS_Unit.INCH | ESYS_Unit.CENTIMETER;
+		deviation?: number;
+		comparisonSize?: number;
 	},
-): Promise<ISYS_PcbComparisonResponse>;
+): Promise<ISYS_ComparisonResponse>;
 ```
 
 ## Parameters
@@ -221,21 +227,91 @@ options
 
 </td><td>
 
-{ valUnit?: undefined \| [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.CENTIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MIL](../enums/ESYS_Unit.md)<!-- -->; deviation?: undefined \| number; comparisonSize?: undefined \| number }
+{ valUnit?: [ESYS\_Unit.MIL](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) \| [ESYS\_Unit.CENTIMETER](../enums/ESYS_Unit.md)<!-- -->; deviation?: number; comparisonSize?: number; }
 
 </td><td>
 
-_(Optional)_ Comparison options
+_(Optional)_ 对比参数
 
 </td></tr>
 </tbody></table>
 
 ## Returns
 
-Promise&lt;[ISYS\_PcbComparisonResponse](../interfaces/ISYS_PcbComparisonResponse.md)<!-- -->&gt;
+Promise&lt;[ISYS\_ComparisonResponse](../interfaces/ISYS_ComparisonResponse.md)<!-- -->&gt;
 
 PCB comparison response: when `success = true`<!-- -->, `data` is the comparison result; when `success = false`<!-- -->, `error` contains the error code and message
 
 ## Remarks
 
-ADD since EDA v4.2
+ADD since EDA v3.2.205 / EDA v4.1.62
+
+### schematiccomparison
+
+# SYS\_Tool.schematicComparison() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+Schematic comparison
+
+## Signature
+
+```typescript
+function schematicComparison(
+	schematicUuid1: string,
+	schematicUuid2: string,
+): Promise<ISYS_ComparisonResponse>;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+schematicUuid1
+
+</td><td>
+
+string
+
+</td><td>
+
+原理图 1 UUID
+
+</td></tr>
+<tr><td>
+
+schematicUuid2
+
+</td><td>
+
+string
+
+</td><td>
+
+原理图 2 UUID
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+Promise&lt;[ISYS\_ComparisonResponse](../interfaces/ISYS_ComparisonResponse.md)<!-- -->&gt;
+
+Schematic comparison result
+
+## Remarks
+
+ADD since EDA v3.2.205 / EDA v4.1.62

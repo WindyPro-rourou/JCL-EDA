@@ -532,17 +532,11 @@ Modify Polygon
 function modify(
 	primitiveId: string | ISCH_PrimitivePolygon,
 	property: {
-		line?: undefined | number[];
-		color?: undefined | null | string;
-		fillColor?: undefined | null | string;
-		lineWidth?: undefined | null | number;
-		lineType?:
-			| undefined
-			| null
-			| ESCH_PrimitiveLineType.SOLID
-			| ESCH_PrimitiveLineType.DASHED
-			| ESCH_PrimitiveLineType.DOTTED
-			| ESCH_PrimitiveLineType.DOT_DASHED;
+		line?: Array<number>;
+		color?: string | null;
+		fillColor?: string | null;
+		lineWidth?: number | null;
+		lineType?: ESCH_PrimitiveLineType | null;
 	},
 ): Promise<ISCH_PrimitivePolygon | undefined>;
 ```
@@ -581,7 +575,7 @@ property
 
 </td><td>
 
-{ line?: undefined \| number\[\]; color?: undefined \| null \| string; fillColor?: undefined \| null \| string; lineWidth?: undefined \| null \| number; lineType?: undefined \| null \| [ESCH\_PrimitiveLineType.SOLID](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DASHED](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DOTTED](../enums/ESCH_PrimitiveLineType.md) \| [ESCH\_PrimitiveLineType.DOT\_DASHED](../enums/ESCH_PrimitiveLineType.md) }
+{ line?: Array&lt;number&gt;; color?: string \| null; fillColor?: string \| null; lineWidth?: number \| null; lineType?: [ESCH\_PrimitiveLineType](../enums/ESCH_PrimitiveLineType.md) \| null }
 
 </td><td>
 

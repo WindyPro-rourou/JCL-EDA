@@ -706,20 +706,16 @@ Modify Binary embedded object
 function modify(
 	primitiveId: string | IPCB_PrimitiveObject,
 	property: {
-		layer?:
-			| undefined
-			| EPCB_LayerId.TOP_SILKSCREEN
-			| EPCB_LayerId.BOTTOM_SILKSCREEN
-			| EPCB_LayerId.DOCUMENT;
-		topLeftX?: undefined | number;
-		topLeftY?: undefined | number;
-		binaryData?: undefined | string;
-		width?: undefined | number;
-		height?: undefined | number;
-		rotation?: undefined | number;
-		mirror?: undefined | false | true;
-		fileName?: undefined | string;
-		primitiveLock?: undefined | false | true;
+		layer?: TPCB_LayersOfObject;
+		topLeftX?: number;
+		topLeftY?: number;
+		binaryData?: string;
+		width?: number;
+		height?: number;
+		rotation?: number;
+		mirror?: boolean;
+		fileName?: string;
+		primitiveLock?: boolean;
 	},
 ): Promise<IPCB_PrimitiveObject | undefined>;
 ```
@@ -758,7 +754,7 @@ property
 
 </td><td>
 
-{ layer?: undefined \| [EPCB\_LayerId.TOP\_SILKSCREEN](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.BOTTOM\_SILKSCREEN](../enums/EPCB_LayerId.md) \| [EPCB\_LayerId.DOCUMENT](../enums/EPCB_LayerId.md)<!-- -->; topLeftX?: undefined \| number; topLeftY?: undefined \| number; binaryData?: undefined \| string; width?: undefined \| number; height?: undefined \| number; rotation?: undefined \| number; mirror?: undefined \| false \| true; fileName?: undefined \| string; primitiveLock?: undefined \| false \| true }
+{ layer?: [TPCB\_LayersOfObject](../types/TPCB_LayersOfObject.md)<!-- -->; topLeftX?: number; topLeftY?: number; binaryData?: string; width?: number; height?: number; rotation?: number; mirror?: boolean; fileName?: string; primitiveLock?: boolean }
 
 </td><td>
 

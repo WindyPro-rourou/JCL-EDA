@@ -310,7 +310,7 @@ Import multilingual
 ## Signature
 
 ```typescript
-function importMultilingual(language: string, source: ISYS_LanguageKeyValuePairs): boolean;
+function importMultilingual(language: string, source: TSYS_LanguageKeyValuePairs): boolean;
 ```
 
 ## Parameters
@@ -347,7 +347,7 @@ source
 
 </td><td>
 
-[ISYS\_LanguageKeyValuePairs](../types/ISYS_LanguageKeyValuePairs.md)
+[TSYS\_LanguageKeyValuePairs](../types/TSYS_LanguageKeyValuePairs.md)
 
 </td><td>
 
@@ -393,7 +393,7 @@ Import multilingual: specify namespace and language
 function importMultilingualLanguage(
 	namespace: string,
 	language: string,
-	source: ISYS_LanguageKeyValuePairs,
+	source: TSYS_LanguageKeyValuePairs,
 ): boolean;
 ```
 
@@ -444,7 +444,7 @@ source
 
 </td><td>
 
-[ISYS\_LanguageKeyValuePairs](../types/ISYS_LanguageKeyValuePairs.md)
+[TSYS\_LanguageKeyValuePairs](../types/TSYS_LanguageKeyValuePairs.md)
 
 </td><td>
 

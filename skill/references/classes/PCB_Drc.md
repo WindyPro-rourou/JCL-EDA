@@ -854,6 +854,10 @@ Promise&lt;boolean&gt;
 
 Whether the DRC check passed
 
+## Remarks
+
+`includeVerboseError=true` 时返回 \*\*分组树\*\*，顶层数组长度是错误 \*\*类别数\*\* 而非错误总数； `includeVerboseError=false` 直接返回门禁布尔值（非交互执行方式：`check(strict, false, false)`<!-- -->）
+
 ## Example
 
 ```javascript

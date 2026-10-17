@@ -75,7 +75,7 @@ Discretize a single polygon into point data
 ## Signature
 
 ```typescript
-function discretize(options?: IPCB_DiscretizeOptions): Promise<Array<IPCB_DiscretizedPoint>>;
+function discretize(options?: IPCB_DiscretizeOptions): Promise<Array<IPCB_DiscretizedPoint> | null>;
 ```
 
 ## Parameters
@@ -110,7 +110,7 @@ _(Optional)_ Discretization options
 
 ## Returns
 
-Promise&lt;Array&lt;[IPCB\_DiscretizedPoint](../interfaces/IPCB_DiscretizedPoint.md)<!-- -->&gt;&gt;
+Promise&lt;Array&lt;[IPCB\_DiscretizedPoint](../interfaces/IPCB_DiscretizedPoint.md)<!-- -->&gt; \| null&gt;
 
 Discretized point data
 

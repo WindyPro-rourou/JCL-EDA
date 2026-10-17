@@ -35,7 +35,7 @@ Description
 
 </td><td>
 
-**_(BETA)_** Get Shortcut key data
+**_(BETA)_** 获取快捷键数据
 
 </td></tr>
 <tr><td>
@@ -46,7 +46,7 @@ Description
 
 </td><td>
 
-**_(BETA)_** Get all Shortcut key data
+**_(BETA)_** 获取所有快捷键数据
 
 </td></tr>
 <tr><td>
@@ -68,7 +68,7 @@ Description
 
 </td><td>
 
-**_(BETA)_** Register shortcut key
+**_(BETA)_** 注册快捷键
 
 </td></tr>
 <tr><td>
@@ -90,7 +90,7 @@ Description
 
 </td><td>
 
-**_(BETA)_** Unregister a shortcut key
+**_(BETA)_** 反注册快捷键
 
 </td></tr>
 <tr><td>
@@ -116,7 +116,7 @@ Description
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Get Shortcut key data
+获取快捷键数据
 
 ## Signature
 
@@ -149,7 +149,7 @@ string
 
 </td><td>
 
-Shortcut key ID. To get shortcut keys registered by other extensions, concatenate the extension UUID as a prefix. Format: `<extension UUID>.<shortcut key ID>`
+快捷键 ID，如需获取其它扩展注册的快捷键，请在前缀处拼接扩展 UUID，格式为：`<扩展 UUID>.<快捷键 ID>`
 
 </td></tr>
 </tbody></table>
@@ -158,15 +158,15 @@ Shortcut key ID. To get shortcut keys registered by other extensions, concatenat
 
 [ISYS\_ShortcutKeyDataWithUserDefinedShortcutKey](../interfaces/ISYS_ShortcutKeyDataWithUserDefinedShortcutKey.md) \| undefined
 
-The obtained shortcut key data
+获取到的快捷键数据
 
 ## Remarks
 
-This API allows getting shortcut key data of other extensions. Simply concatenate the shortcut key ID in the specified format
+本接口允许获取其它扩展的快捷键数据，仅需按格式拼接快捷键 ID
 
-This API cannot get system shortcut key data
+本接口无法获取系统快捷键数据
 
-Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error` ADD since EDA v4.2
+注意：本接口仅扩展有效，在独立脚本环境内调用将始终 `throw Error` ADD since EDA v4.2
 
 ### getall
 
@@ -174,7 +174,7 @@ Note: This API is only valid for extensions. Calling it in a standalone script e
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Get all Shortcut key data
+获取所有快捷键数据
 
 ## Signature
 
@@ -186,15 +186,15 @@ function getAll(): Record<string, ISYS_ShortcutKeyDataWithUserDefinedShortcutKey
 
 Record&lt;string, [ISYS\_ShortcutKeyDataWithUserDefinedShortcutKey](../interfaces/ISYS_ShortcutKeyDataWithUserDefinedShortcutKey.md)<!-- -->&gt;
 
-The obtained shortcut key data
+获取到的快捷键数据
 
 ## Remarks
 
-This API will get all shortcut key data of this extension
+本接口将会获取本扩展的所有快捷键数据
 
-This API cannot get system shortcut key data
+本接口无法获取系统快捷键数据
 
-Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error` ADD since EDA v4.2
+注意：本接口仅扩展有效，在独立脚本环境内调用将始终 `throw Error` ADD since EDA v4.2
 
 ### getshortcutkeys
 
@@ -217,8 +217,8 @@ function getShortcutKeys(
 	Array<{
 		shortcutKey: TSYS_ShortcutKeys;
 		title: string;
-		documentType: ESYS_ShortcutKeyEffectiveEditorRange[];
-		scene: ESYS_ShortcutKeyEffectiveEditorScene[];
+		documentType: Array<ESYS_ShortcutKeyEffectiveEditorRange>;
+		scene: Array<ESYS_ShortcutKeyEffectiveEditorScene>;
 	}>
 >;
 ```
@@ -255,7 +255,7 @@ _(Optional)_ Whether Contain system shortcut key
 
 ## Returns
 
-Promise&lt;Array&lt;{ shortcutKey: [TSYS\_ShortcutKeys](../types/TSYS_ShortcutKeys.md)<!-- -->; title: string; documentType: [ESYS\_ShortcutKeyEffectiveEditorRange](../enums/ESYS_ShortcutKeyEffectiveEditorRange.md)<!-- -->\[\]; scene: [ESYS\_ShortcutKeyEffectiveEditorScene](../enums/ESYS_ShortcutKeyEffectiveEditorScene.md)<!-- -->\[\] }&gt;&gt;
+Promise&lt;Array&lt;{ shortcutKey: [TSYS\_ShortcutKeys](../types/TSYS_ShortcutKeys.md)<!-- -->; title: string; documentType: Array&lt;[ESYS\_ShortcutKeyEffectiveEditorRange](../enums/ESYS_ShortcutKeyEffectiveEditorRange.md)<!-- -->&gt;; scene: Array&lt;[ESYS\_ShortcutKeyEffectiveEditorScene](../enums/ESYS_ShortcutKeyEffectiveEditorScene.md)<!-- -->&gt; }&gt;&gt;
 
 Shortcut key list
 
@@ -282,7 +282,7 @@ console.log('首条快捷键：', JSON.stringify(sample));
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Register shortcut key
+注册快捷键
 
 ## Signature
 
@@ -315,7 +315,7 @@ string
 
 </td><td>
 
-Shortcut key ID. The extension UUID will be automatically concatenated as a prefix
+快捷键 ID，将会自动拼接上扩展 UUID 作为前缀
 
 </td></tr>
 <tr><td>
@@ -328,7 +328,7 @@ props
 
 </td><td>
 
-Shortcut key data
+快捷键数据
 
 </td></tr>
 </tbody></table>
@@ -337,19 +337,19 @@ Shortcut key data
 
 boolean
 
-Register whether it is successful
+注册是否成功
 
 ## Remarks
 
-The `shortcutKey` passed in when registering a shortcut key here is only the default shortcut key. Users can modify it in settings
+此处注册快捷键时传入的 `shortcutKey` 仅为默认快捷键，用户可以在设置中修改
 
-If the shortcut key conflicts with a system shortcut key, the system shortcut key will take precedence
+如若该快捷键与系统快捷键冲突，系统快捷键将会优先生效
 
-To modify registered shortcut key information, you can call this API directly and pass the complete shortcut key data to be modified in `props`
+如果需要修改已注册的快捷键信息，可以直接调用本接口，并在 `props` 中传入完整的需要修改的快捷键数据
 
-This API cannot modify system shortcut keys
+本接口无法修改系统快捷键
 
-Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error` ADD since EDA v4.2
+注意：本接口仅扩展有效，在独立脚本环境内调用将始终 `throw Error` ADD since EDA v4.2
 
 ### registershortcutkey
 
@@ -496,7 +496,7 @@ console.log('反注册还原返回：', removed);
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Unregister a shortcut key
+反注册快捷键
 
 ## Signature
 
@@ -529,7 +529,7 @@ string
 
 </td><td>
 
-Shortcut key ID. To unregister shortcut keys registered by other extensions, concatenate the extension UUID as a prefix. Format: `<extension UUID>.<shortcut key ID>`
+快捷键 ID，如需反注册其它扩展注册的快捷键，请在前缀处拼接扩展 UUID，格式为：`<扩展 UUID>.<快捷键 ID>`
 
 </td></tr>
 </tbody></table>
@@ -538,15 +538,15 @@ Shortcut key ID. To unregister shortcut keys registered by other extensions, con
 
 boolean
 
-Whether the unregistration was successful
+反注册是否成功
 
 ## Remarks
 
-This API allows unregistering shortcut keys of other extensions. Simply concatenate the shortcut key ID in the specified format
+本接口允许反注册其它扩展的快捷键，仅需按格式拼接快捷键 ID
 
-This API cannot unregister system shortcut keys
+本接口无法反注册系统快捷键
 
-Note: This API is only valid for extensions. Calling it in a standalone script environment will always `throw Error` ADD since EDA v4.2
+注意：本接口仅扩展有效，在独立脚本环境内调用将始终 `throw Error` ADD since EDA v4.2
 
 ### unregistershortcutkey
 

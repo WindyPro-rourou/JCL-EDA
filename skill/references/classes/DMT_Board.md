@@ -238,6 +238,10 @@ Promise&lt;string \| undefined&gt;
 
 Board name, if it is `undefined` creation fails
 
+## Remarks
+
+`schematicUuid` 必须传 \*\*原理图实体 UUID\*\*（传图页 UUID 将会 \*\*返回 `undefined`<!-- -->\*\*）
+
 ## Example
 
 ```javascript

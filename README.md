@@ -75,7 +75,7 @@ git clone https://github.com/WindyPro-rourou/JCL-EDA.git node_modules/@windypro-
 
 **界面适配（DSH 0.1.x / 0.2 桌面端）**：面板注册进 shell 的 **`shell.overlay` 槽位**（`position:absolute` + `z-index:30`，可拖拽调宽 120–760px 并记忆），入口是会话头部的 **header 工具位 pill**（0.2 桌面端左侧栏为槽位托管）；同时保留 0.1.x 侧边栏 DOM 入口与降级挂载。视觉优先复用宿主 UI 组件库 `@deepseek-ai/dsh-client-ui-primitives` + `--dsw-alias-*` 主题令牌——**不再使用遮挡式的 fixed 9999 覆盖层**。
 
-**限制（诚实说明）**：离线生成器支持 **9 种符号 + 6 个模板**（LED 点亮/分压/RC 延时/二极管续流/电池开关 LED/去耦/开关演示），更复杂符号（三极管/IC 等）待扩展；云端实时生成能力以官方 `eda.*` API 为准（**已知边界见 `docs/eda-conversation-skill.md` 附五缺陷速查表**：importChanges/setNetlist 不可靠、板框无 API、getNetlist('EasyEDA') 挂起、getAll 间歇失败等）。
+**限制（诚实说明）**：离线生成器支持 **9 种符号 + 6 个模板**（LED 点亮/分压/RC 延时/二极管续流/电池开关 LED/去耦/开关演示），更复杂符号（三极管/IC 等）待扩展；云端实时生成能力以官方 `eda.*` API 为准（**已知边界见 `docs/eda-conversation-skill.md` 附五缺陷速查表**：importChanges/setNetlist 不可靠、getNetlist('EasyEDA') 挂起、getAll 间歇失败等）。**v0.1.5 起**：官方 skill 知识库升级到 **1.1.56**（131 类），接入新能力——**PCB 板框改用 `pcb_PrimitivePolyline`**（官方新 Remarks 明确）、自动布线限制（900s 硬上限 / force 弹窗）、`SYS_ExternalApi` / `PCB_ImageTool` 等新类；同时新增**自动更新检测**（每小时查 npm dist-tags，有新版时在面板与系统提示里提醒）。
 
 ## 如何运行 / 开发
 

@@ -25,7 +25,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[createProject(projectFriendlyName, projectName, teamUuid, folderUuid, description, collaborationMode)](./DMT_Project.md)
+[createProject(projectFriendlyName, projectName, teamUuid, folderUuid, description, collaborationMode, fileFormat)](./DMT_Project.md)
 
 </td><td>
 
@@ -69,6 +69,17 @@ Get Project property
 </td></tr>
 <tr><td>
 
+[getReadyState(projectUuid)](./DMT_Project.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 获取工程的就绪状态
+
+</td></tr>
+<tr><td>
+
 [moveProjectToFolder(projectUuid, folderUuid)](./DMT_Project.md)
 
 </td><td>
@@ -87,6 +98,17 @@ Move a project to a folder
 </td><td>
 
 Open project
+
+</td></tr>
+<tr><td>
+
+[waitForReady(projectUuid, timeoutMs)](./DMT_Project.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 等待工程就绪
 
 </td></tr>
 </tbody></table>
@@ -113,6 +135,7 @@ function createProject(
 	folderUuid?: string,
 	description?: string,
 	collaborationMode?: EDMT_ProjectCollaborationMode,
+	fileFormat?: EDMT_ProjectFileFormat,
 ): Promise<string | undefined>;
 ```
 
@@ -209,6 +232,19 @@ collaborationMode
 _(Optional)_ Project collaboration mode. If the team permission does not require the project to set a collaboration mode, this parameter will be ignored
 
 </td></tr>
+<tr><td>
+
+fileFormat
+
+</td><td>
+
+[EDMT\_ProjectFileFormat](../enums/EDMT_ProjectFileFormat.md)
+
+</td><td>
+
+_(Optional)_ 工程文件格式，缺省为 `EPRJ3`<!-- -->；仅在客户端半离线 / 全离线模式生效，在线环境将忽略该参数
+
+</td></tr>
 </tbody></table>
 
 ## Returns
@@ -216,6 +252,10 @@ _(Optional)_ Project collaboration mode. If the team permission does not require
 Promise&lt;string \| undefined&gt;
 
 Project UUID, if it is `undefined` creation fails
+
+## Remarks
+
+新建工程 \*\*不初始化任何文档\*\*（`getAllBoardsInfo` 等返回空数组）， 需显式创建 schematic / pcb / board / 首页后再使用
 
 ## Example
 
@@ -416,6 +456,60 @@ Brief project properties. If it is `undefined`<!-- -->, the retrieval failed
 
 This API can only read brief project properties. For the detailed project tree, use the [getCurrentProjectInfo](./DMT_Project.md) API
 
+### getreadystate
+
+# DMT\_Project.getReadyState() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+获取工程的就绪状态
+
+## Signature
+
+```typescript
+function getReadyState(projectUuid?: string): Promise<EDMT_ProjectReadyState>;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+projectUuid
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ 工程 UUID 或客户端工程文件路径，如若不指定，则默认为当前工程
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+Promise&lt;[EDMT\_ProjectReadyState](../enums/EDMT_ProjectReadyState.md)<!-- -->&gt;
+
+目标工程的就绪状态
+
+## Remarks
+
+返回工程的就绪阶段（未加载 / 加载中 / 就绪 / 失败），无需依赖业务数据推断 ADD since EDA v4.1.79
+
 ### moveprojecttofolder
 
 # DMT\_Project.moveProjectToFolder() method
@@ -571,3 +665,70 @@ const opened = await eda.dmt_Project.openProject(projectUuid);
 
 console.log('opened:', opened);
 ```
+
+### waitforready
+
+# DMT\_Project.waitForReady() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+等待工程就绪
+
+## Signature
+
+```typescript
+function waitForReady(projectUuid?: string, timeoutMs?: number): Promise<boolean>;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+projectUuid
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ 工程 UUID 或客户端工程文件路径，如若不指定，则默认为当前工程
+
+</td></tr>
+<tr><td>
+
+timeoutMs
+
+</td><td>
+
+number
+
+</td><td>
+
+_(Optional)_ 最长等待时间（毫秒），缺省为 60000
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+Promise&lt;boolean&gt;
+
+工程是否已在超时前就绪
+
+## Remarks
+
+阻塞等待目标工程数据加载完成，返回前不会误判「工程为空」；超过 `timeoutMs` 仍未就绪时返回 `false` ADD since EDA v4.1.79

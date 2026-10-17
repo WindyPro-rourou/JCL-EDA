@@ -223,7 +223,7 @@ function addPrimitiveEventListener(
 	eventType: 'all' | ESCH_PrimitiveEventType,
 	callFn: (
 		eventType: ESCH_PrimitiveEventType,
-		props: { primitiveIds: string[] },
+		props: { primitiveIds: Array<string> },
 	) => void | Promise<void>,
 	onlyOnce?: boolean,
 ): void;
@@ -276,7 +276,7 @@ callFn
 
 </td><td>
 
-(eventType: [ESCH\_PrimitiveEventType](../enums/ESCH_PrimitiveEventType.md)<!-- -->, props: { primitiveIds: string\[\] }) =&gt; void \| Promise&lt;void&gt;
+(eventType: [ESCH\_PrimitiveEventType](../enums/ESCH_PrimitiveEventType.md)<!-- -->, props: { primitiveIds: Array&lt;string&gt; }) =&gt; void \| Promise&lt;void&gt;
 
 </td><td>
 

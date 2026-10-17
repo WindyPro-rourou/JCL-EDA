@@ -56,6 +56,26 @@ function makeEnv() {
   return { exports, documentStub, get lastRoot() { return lastRoot } }
 }
 
+/** /status payload samples the panel can receive (update fields included). */
+const SAMPLES = {
+  eda_status: {
+    ready: false, backend: 'official-easyeda-bridge', state: 'idle', connected: false, port: 0,
+    health: '', offlineCapable: true, supportedTypes: ['resistor', 'led'], bridgeInstalled: false,
+    bridgeScript: '', extUrl: '', error: '', version: '0.1.4',
+    latestVersion: '0.1.9', updateAvailable: true, note: '',
+  },
+}
+
+/** Flatten a rendered tree into its text content. */
+function collectText(node, out = []) {
+  if (node === null || node === undefined) return out
+  if (Array.isArray(node)) { for (const n of node) collectText(n, out); return out }
+  if (typeof node === 'string' || typeof node === 'number') { out.push(String(node)); return out }
+  if (typeof node !== 'object') return out
+  for (const c of node.children ?? []) collectText(c, out)
+  return out
+}
+
 /** Recursively invoke function components (a mini renderer) — throws on any
  *  ReferenceError/undefined call inside a component body. */
 function renderElement(node, depth = 0) {
@@ -116,3 +136,19 @@ test('client bundle: panel styles use host tokens + overlay-safe positioning (no
   assert.doesNotMatch(src, /z-index:\s*9999/, 'must not use the old 9999 fixed overlay z-index')
   assert.match(src, /dsh-client-ui-primitives/, 'must try the host UI kit first')
 })
+
+test('client bundle: update pill renders only for a newer version and copies the upgrade command', () => {
+  const { exports } = makeEnv()
+  assert.equal(typeof exports.UpdatePill, 'function', 'update pill must be exported for the runtime test')
+
+  const node = exports.UpdatePill({ status: SAMPLES.eda_status })
+  assert.ok(node, 'update pill must render when updateAvailable === true')
+  assert.match(collectText(node).join(' '), /v0\.1\.9 可更新/)
+  assert.match(node.props.title, /dsh plugin --profile desktop add @windypro-rourou\/dsh-eda@latest/)
+
+  // Up to date / unknown status → nothing rendered (no empty chrome).
+  assert.equal(exports.UpdatePill({ status: { ...SAMPLES.eda_status, updateAvailable: false } }), null)
+  assert.equal(exports.UpdatePill({ status: { ...SAMPLES.eda_status, latestVersion: '' } }), null)
+  assert.equal(exports.UpdatePill({ status: null }), null)
+})
+

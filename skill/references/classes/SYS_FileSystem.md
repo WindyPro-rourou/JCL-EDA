@@ -159,6 +159,28 @@ Get a file from the extension
 </td></tr>
 <tr><td>
 
+[openReadFilePathDialog(filenameExtensions, multiFiles)](./SYS_FileSystem.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 打开读取文件路径窗口
+
+</td></tr>
+<tr><td>
+
+[openReadFilePathDialog(filenameExtensions, multiFiles)](./SYS_FileSystem.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 打开读取文件路径窗口
+
+</td></tr>
+<tr><td>
+
 [openReadFolderDialog()](./SYS_FileSystem.md)
 
 </td><td>
@@ -166,6 +188,17 @@ Get a file from the extension
 </td><td>
 
 **_(BETA)_** Open the read-folder dialog
+
+</td></tr>
+<tr><td>
+
+[openReadFolderPathDialog()](./SYS_FileSystem.md)
+
+</td><td>
+
+</td><td>
+
+**_(BETA)_** 打开读取目录路径窗口
 
 </td></tr>
 <tr><td>
@@ -203,7 +236,7 @@ Save File
 </td></tr>
 <tr><td>
 
-[saveFileToFileSystem(uri, fileData, fileName, force)](./SYS_FileSystem.md)
+[saveFileToFileSystem(uri, fileData, fileName)](./SYS_FileSystem.md)
 
 </td><td>
 
@@ -770,6 +803,10 @@ Promise&lt;Array&lt;File&gt; \| undefined&gt;
 
 File format file array
 
+## Remarks
+
+本接口需要打开浏览器模态窗口，在用户于页面上进行最后一次操作的时间节点开始计算， 达到 5000ms（部分浏览器时效）后将无法使用 JavaScript 脚本唤起窗口，这是浏览器的限制
+
 ## Example
 
 ```javascript
@@ -851,6 +888,150 @@ Promise&lt;File \| undefined&gt;
 
 File format file
 
+### openreadfilepathdialog
+
+# SYS\_FileSystem.openReadFilePathDialog() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+打开读取文件路径窗口
+
+## Signature
+
+```typescript
+function openReadFilePathDialog(
+	filenameExtensions?: string | Array<string>,
+	multiFiles?: true,
+): Promise<Array<string>>;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+filenameExtensions
+
+</td><td>
+
+string \| Array&lt;string&gt;
+
+</td><td>
+
+_(Optional)_ 文件扩展名
+
+</td></tr>
+<tr><td>
+
+multiFiles
+
+</td><td>
+
+true
+
+</td><td>
+
+_(Optional)_ 是否允许读取多文件；受客户端协议限制，当前仅支持单选，`multiFiles=true` 时将返回单元素数组
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+Promise&lt;Array&lt;string&gt;&gt;
+
+文件路径数组
+
+## Remarks
+
+ADD since EDA v3.2.201 注意：本接口仅客户端有效，在浏览器环境内调用将始终 `throw Error`
+
+/ EDA v4.1.54
+
+### openreadfilepathdialog_1
+
+# SYS\_FileSystem.openReadFilePathDialog() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+打开读取文件路径窗口
+
+## Signature
+
+```typescript
+function openReadFilePathDialog(
+	filenameExtensions?: string | Array<string>,
+	multiFiles?: false,
+): Promise<string | undefined>;
+```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+filenameExtensions
+
+</td><td>
+
+string \| Array&lt;string&gt;
+
+</td><td>
+
+_(Optional)_ 文件扩展名
+
+</td></tr>
+<tr><td>
+
+multiFiles
+
+</td><td>
+
+false
+
+</td><td>
+
+_(Optional)_ 是否允许读取多文件；受客户端协议限制，当前仅支持单选，`multiFiles=true` 时将返回单元素数组
+
+</td></tr>
+</tbody></table>
+
+## Returns
+
+Promise&lt;string \| undefined&gt;
+
+文件路径
+
+## Remarks
+
+ADD since EDA v3.2.201 注意：本接口仅客户端有效，在浏览器环境内调用将始终 `throw Error`
+
+/ EDA v4.1.54
+
 ### openreadfolderdialog
 
 # SYS\_FileSystem.openReadFolderDialog() method
@@ -874,6 +1055,32 @@ All read files and their path information
 ## Remarks
 
 developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/webkitdirectory \| MDN<!-- -->} ADD since EDA v4.2
+
+### openreadfolderpathdialog
+
+# SYS\_FileSystem.openReadFolderPathDialog() method
+
+> This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
+
+打开读取目录路径窗口
+
+## Signature
+
+```typescript
+function openReadFolderPathDialog(): Promise<string | undefined>;
+```
+
+## Returns
+
+Promise&lt;string \| undefined&gt;
+
+目录路径
+
+## Remarks
+
+ADD since EDA v3.2.201 注意：本接口仅客户端有效，在浏览器环境内调用将始终 `throw Error`
+
+/ EDA v4.1.54
 
 ### readfilefromfilesystem
 
@@ -1085,7 +1292,6 @@ function saveFileToFileSystem(
 	uri: string,
 	fileData: File | Blob,
 	fileName?: string,
-	force?: boolean,
 ): Promise<boolean>;
 ```
 
@@ -1143,19 +1349,6 @@ string
 _(Optional)_ File name
 
 </td></tr>
-<tr><td>
-
-force
-
-</td><td>
-
-boolean
-
-</td><td>
-
-_(Optional)_ Force write (overwrite the file if it exists)
-
-</td></tr>
 </tbody></table>
 
 ## Returns
@@ -1169,3 +1362,5 @@ Whether the write operation was successful. If overwriting is not allowed but th
 Note 1: This API is only valid for clients. Calling it in a browser environment will always `throw Error`
 
 Note 2: This API requires the user to enable the extension external interaction permission, if not enabled, it will always `throw Error`
+
+注意 3：CLI 本地文件写入\*\*不做路径白名单校验\*\*、不受 `APP_PROJECT_DIR` 限制；`uri` 结尾带斜杠 `/`<!-- -->（Windows 为反斜杠 `\`<!-- -->）识别为目录，`force` 控制是否覆盖已存在文件

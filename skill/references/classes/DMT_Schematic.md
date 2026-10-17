@@ -454,6 +454,10 @@ Promise&lt;string \| undefined&gt;
 
 Schematic UUID, if it is `undefined` creation fails
 
+## Remarks
+
+不传 `boardName` 时 \*\*会自动创建一块 Board\*\*（此后直接调用 `createBoard()` 会得到 2 块板）， 如需游离原理图请显式管理 Board 归属
+
 ## Example
 
 ```javascript
@@ -1284,10 +1288,7 @@ Modify the title block of a schematic sheet
 ```typescript
 function modifySchematicPageTitleBlock(
 	showTitleBlock?: boolean,
-	titleBlockData?: Record<
-		string,
-		{ showTitle?: undefined | false | true; showValue?: undefined | false | true; value?: any }
-	>,
+	titleBlockData?: Record<string, { showTitle?: boolean; showValue?: boolean; value?: any }>,
 ): Promise<boolean>;
 ```
 
@@ -1325,7 +1326,7 @@ titleBlockData
 
 </td><td>
 
-Record&lt;string, { showTitle?: undefined \| false \| true; showValue?: undefined \| false \| true; value?: any }&gt;
+Record&lt;string, { showTitle?: boolean; showValue?: boolean; value?: any }&gt;
 
 </td><td>
 
@@ -1343,6 +1344,10 @@ Whether the modification was successful. If `showTitleBlock` and `titleBlockData
 ## Remarks
 
 `titleBlockData` only needs to pass in any title block items to be modified as `key`<!-- -->, along with the values to modify them to. Any unrecognized title block items will be ignored, and any unpassed items and values will remain in their default state
+
+注意事项：
+
+- 图页尺寸是 \*\*硬约束\*\*（如 A4 = 1170×825，单位 10mil），明细项 `Size` 非法会抛 `TypeError`<!-- -->； - `titleBlockData` 的合法 key 含 `Size` / `Company` 等，明细项的 `showTitle` / `showValue` / `value` \*\*三个字段缺一不可\*\*
 
 ## Example
 

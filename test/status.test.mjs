@@ -17,7 +17,7 @@ import { validateJsonSchemaValue } from '@deepseek-ai/dsh-tools'
 import { apply } from '../lib/index.js'
 
 /** Build a stub cordis ctx plus the capture arrays, and mount the plugin. */
-function mountPlugin(config = {}) {
+function mountPlugin(config = {}, applyFn = apply) {
   const routes = []
   const tools = []
   const sections = []
@@ -36,8 +36,10 @@ function mountPlugin(config = {}) {
     effect: (fn) => fn() ?? (() => {}),
   }
   // autoStartBridge off: unit tests must not touch the real (possibly live) bridge.
-  apply(ctx, {
+  // checkUpdates off: the npm registry must never be contacted from a unit test.
+  applyFn(ctx, {
     autoStartBridge: false,
+    checkUpdates: false,
     activityFile: join(tmpdir(), `eda-act-status-${process.pid}.jsonl`),
     ...config,
   })
@@ -51,6 +53,18 @@ function mountPlugin(config = {}) {
 
 const findTool = (tools, name) => tools.find((t) => t.name === name)
 const findRoute = (routes, path) => routes.find((r) => r.path === path)
+
+let freshSeq = 0
+/**
+ * Mount a FRESH module instance (cache-busted import) so the module-level
+ * update cache (`latestVersion` / `lastVersionCheck`) is pristine — another
+ * test file may already have run apply() and refreshed it in this process.
+ */
+async function mountFreshPlugin(config = {}) {
+  freshSeq += 1
+  const { apply: freshApply } = await import(`../lib/index.js?fresh=${process.pid}-${freshSeq}`)
+  return mountPlugin(config, freshApply)
+}
 
 test('eda_status tool is registered on the stub ctx', () => {
   const { tools } = mountPlugin()
@@ -84,10 +98,36 @@ test('eda_status output schema is strict and render emits a text block', () => {
   assert.equal(tool.output.schema.additionalProperties, false)
   assert.ok(tool.output.schema.required.includes('ready'))
   assert.ok(tool.output.schema.required.includes('backend'))
-  const blocks = tool.output.render({}, { ready: false, backend: 'not-wired', version: '0.1.0', note: 'EDA后端尚未接入' })
+  assert.equal(tool.output.schema.properties.latestVersion.type, 'string')
+  assert.equal(tool.output.schema.properties.updateAvailable.type, 'boolean')
+  const blocks = tool.output.render({}, {
+    ready: false, backend: 'not-wired', version: '0.1.0',
+    latestVersion: '0.1.9', updateAvailable: true,
+  })
   assert.equal(blocks.length, 1)
   assert.equal(blocks[0].type, 'text')
   assert.match(blocks[0].text, /not-wired/)
+  assert.match(blocks[0].text, /0\.1\.9 可更新/)
+})
+
+test('eda_status reports update fields as safe defaults before any npm check', async () => {
+  // Fresh module + checkUpdates:false → the cache never ran, so the status
+  // defaults must be latestVersion:'' and updateAvailable:false (offline-safe).
+  const { tools, sections } = await mountFreshPlugin()
+  const tool = findTool(tools, 'eda_status')
+  const result = await tool.execute({}, { signal: new AbortController().signal })
+  assert.equal(typeof result.latestVersion, 'string')
+  assert.equal(result.latestVersion, '')
+  assert.equal(typeof result.updateAvailable, 'boolean')
+  assert.equal(result.updateAvailable, false)
+  const violations = validateJsonSchemaValue(tool.output.schema, result, 'value')
+  assert.deepEqual(violations, [], `output schema violations: ${violations.join('; ')}`)
+  // Dynamic system section: no update → exactly the base guidance, no blank line.
+  const section = sections.find((s) => s.name === 'plugin:dsh-eda')
+  assert.equal(typeof section.text, 'function')
+  const text = section.text({})
+  assert.equal(/\n{2,}/.test(text), false)
+  assert.doesNotMatch(text, /更新提醒|可更新/)
 })
 
 test('status route is registered as kind:exact at /api/dsh-eda/status', () => {
@@ -120,6 +160,8 @@ test('status route handler answers 200 with valid JSON for a loopback GET', asyn
   assert.equal(json.ready, false)
   assert.equal(json.backend, 'official-easyeda-bridge')
   assert.match(json.version, /^\d+\.\d+\.\d+$/, 'version should track the package manifest (semver)')
+  assert.equal(typeof json.latestVersion, 'string')
+  assert.equal(json.updateAvailable, false)
 })
 
 test('status route handler rejects a non-GET request with 405', async () => {
@@ -147,4 +189,55 @@ test('provide exposes the eda handle; section is registered', () => {
   assert.ok(provided.eda, 'expected ctx.provide("eda", ...) to be captured')
   assert.equal(provided.eda.status().backend, 'official-easyeda-bridge')
   assert.ok(sections.some((s) => s.name === 'plugin:dsh-eda' && s.order === 153))
+})
+
+test('update check route is exact+POST and degrades quietly when the registry is unreachable', async () => {
+  // Fresh module → no cached dist-tags, so the degraded response is deterministic.
+  const { routes } = await mountFreshPlugin()
+  const route = findRoute(routes, '/api/dsh-eda/update/check')
+  assert.ok(route, 'expected route /api/dsh-eda/update/check')
+  assert.equal(route.kind, 'exact')
+
+  const makeRes = () => {
+    let head = null
+    let body = null
+    return {
+      res: {
+        writeHead: (status, headers) => { head = { status, headers } },
+        end: (chunk) => { body = chunk },
+      },
+      get head() { return head },
+      get json() { return JSON.parse(body) },
+    }
+  }
+
+  // GET must be rejected (the check is a POST-triggered refresh).
+  {
+    const capture = makeRes()
+    await route.handler({
+      socket: { remoteAddress: '127.0.0.1' }, headers: { host: 'localhost:3080' },
+      method: 'GET', url: '/api/dsh-eda/update/check',
+    }, capture.res)
+    assert.equal(capture.head.status, 405)
+    assert.deepEqual(capture.json, { error: 'method not allowed' })
+  }
+
+  // Offline: fetch rejects → ok:false + error, never a thrown request.
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async () => { throw new Error('offline') }
+  try {
+    const capture = makeRes()
+    await route.handler({
+      socket: { remoteAddress: '127.0.0.1' }, headers: { host: 'localhost:3080' },
+      method: 'POST', url: '/api/dsh-eda/update/check',
+    }, capture.res)
+    assert.equal(capture.head.status, 200)
+    assert.equal(capture.json.ok, false)
+    assert.match(capture.json.error, /offline/)
+    assert.equal(typeof capture.json.latestVersion, 'string')
+    assert.equal(capture.json.updateAvailable, false)
+    assert.equal(capture.json.text, '')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
 })

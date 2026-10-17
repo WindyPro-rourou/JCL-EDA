@@ -33,6 +33,8 @@ MULTI\_PAGE\_PDF
 
 </td><td>
 
+单个多页 PDF
+
 </td></tr>
 <tr><td>
 
@@ -44,6 +46,8 @@ MULTIPLE\_SINGLE\_PAGE\_PDF
 
 </td><td>
 
+多个单页 PDF（将会输出包含所有分解图层 PDF 文件的压缩包）
+
 </td></tr>
 <tr><td>
 
@@ -54,6 +58,8 @@ SINGLE\_PAGE\_PDF
 `'merged'`
 
 </td><td>
+
+单个单页 PDF（将会输出包含每层一个 PDF 文件的压缩包）
 
 </td></tr>
 </tbody></table>

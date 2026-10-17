@@ -298,7 +298,7 @@ Create Device
 ```typescript
 function create(
 	component:
-		| { libraryType?: undefined | ELIB_LibraryType.DEVICE; libraryUuid: string; uuid: string }
+		| { libraryType?: ELIB_LibraryType.DEVICE; libraryUuid: string; uuid: string }
 		| ILIB_DeviceItem
 		| ILIB_DeviceSearchItem
 		| { libraryType: ELIB_LibraryType.SYMBOL; libraryUuid: string; uuid: string }
@@ -335,7 +335,7 @@ component
 
 </td><td>
 
-{ libraryType?: undefined \| [ELIB\_LibraryType.DEVICE](../enums/ELIB_LibraryType.md)<!-- -->; libraryUuid: string; uuid: string } \| [ILIB\_DeviceItem](../interfaces/ILIB_DeviceItem.md) \| [ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem.md) \| { libraryType: [ELIB\_LibraryType.SYMBOL](../enums/ELIB_LibraryType.md)<!-- -->; libraryUuid: string; uuid: string } \| [ILIB\_SymbolItem](../interfaces/ILIB_SymbolItem.md) \| [ILIB\_SymbolSearchItem](../interfaces/ILIB_SymbolSearchItem.md)
+{ libraryType?: [ELIB\_LibraryType.DEVICE](../enums/ELIB_LibraryType.md)<!-- -->; libraryUuid: string; uuid: string } \| [ILIB\_DeviceItem](../interfaces/ILIB_DeviceItem.md) \| [ILIB\_DeviceSearchItem](../interfaces/ILIB_DeviceSearchItem.md) \| { libraryType: [ELIB\_LibraryType.SYMBOL](../enums/ELIB_LibraryType.md)<!-- -->; libraryUuid: string; uuid: string } \| [ILIB\_SymbolItem](../interfaces/ILIB_SymbolItem.md) \| [ILIB\_SymbolSearchItem](../interfaces/ILIB_SymbolSearchItem.md)
 
 </td><td>
 
@@ -441,6 +441,10 @@ Promise&lt;[ISCH\_PrimitiveComponent](./ISCH_PrimitiveComponent.md) \| undefined
 
 Device primitive object
 
+## Remarks
+
+- 引脚坐标可能不在布线栅格上（如出现 `698.5` 半格值），连接导线时两端须使用\*\*原始坐标\*\*，四舍五入会使端点散落为大量 `$xNnn` 短线； - `rotation` / `mirror` 必须填写\*\*真实值\*\*，硬编码 0 会使 90° 器件的引脚整体错位
+
 ## Example
 
 ```javascript
@@ -480,7 +484,7 @@ Create Reuse block symbol
 
 ```typescript
 function createCbbSymbol(
-	cbbSymbol: { libraryUuid: string; cbbUuid: string; uuid?: undefined | string },
+	cbbSymbol: { libraryUuid: string; cbbUuid: string; uuid?: string },
 	x: number,
 	y: number,
 	rotation?: number,
@@ -509,7 +513,7 @@ cbbSymbol
 
 </td><td>
 
-\{ libraryUuid: string; cbbUuid: string; uuid?: undefined \| string \}
+\{ libraryUuid: string; cbbUuid: string; uuid?: string \}
 
 </td><td>
 
@@ -1282,6 +1286,12 @@ Promise&lt;Array&lt;[ISCH\_PrimitiveComponent](./ISCH_PrimitiveComponent.md)<!--
 
 Array of Device primitive objects
 
+## Remarks
+
+`allSchematicPages=true` 时本接口\*\*不会主动加载未打开的图页\*\*，只返回已加载图页中的器件
+
+如需覆盖全部图页，请先打开所有图页（如逐页 `openDocument`<!-- -->）再调用
+
 ## Example
 
 ```javascript
@@ -1446,6 +1456,12 @@ Promise&lt;Array&lt;string&gt;&gt;
 
 Array of Device primitive IDs
 
+## Remarks
+
+`allSchematicPages=true` 时本接口 \*\*不会主动加载未打开的图页\*\*，只返回已加载图页中的器件
+
+如需覆盖全部图页，请先打开所有图页（如逐页 `openDocument`<!-- -->）再调用
+
 ## Example
 
 ```javascript
@@ -1522,20 +1538,20 @@ Modify Device
 function modify(
 	primitiveId: string | ISCH_PrimitiveComponent,
 	property: {
-		x?: undefined | number;
-		y?: undefined | number;
-		rotation?: undefined | number;
-		mirror?: undefined | false | true;
-		addIntoBom?: undefined | false | true;
-		addIntoPcb?: undefined | false | true;
-		designator?: undefined | null | string;
-		name?: undefined | null | string;
-		uniqueId?: undefined | null | string;
-		manufacturer?: undefined | null | string;
-		manufacturerId?: undefined | null | string;
-		supplier?: undefined | null | string;
-		supplierId?: undefined | null | string;
-		otherProperty?: undefined | Record<string, string | number | false | true>;
+		x?: number;
+		y?: number;
+		rotation?: number;
+		mirror?: boolean;
+		addIntoBom?: boolean;
+		addIntoPcb?: boolean;
+		designator?: string | null;
+		name?: string | null;
+		uniqueId?: string | null;
+		manufacturer?: string | null;
+		manufacturerId?: string | null;
+		supplier?: string | null;
+		supplierId?: string | null;
+		otherProperty?: Record<string, string | number | boolean>;
 	},
 ): Promise<ISCH_PrimitiveComponent | undefined>;
 ```
@@ -1574,7 +1590,7 @@ property
 
 </td><td>
 
-{ x?: undefined \| number; y?: undefined \| number; rotation?: undefined \| number; mirror?: undefined \| false \| true; addIntoBom?: undefined \| false \| true; addIntoPcb?: undefined \| false \| true; designator?: undefined \| null \| string; name?: undefined \| null \| string; uniqueId?: undefined \| null \| string; manufacturer?: undefined \| null \| string; manufacturerId?: undefined \| null \| string; supplier?: undefined \| null \| string; supplierId?: undefined \| null \| string; otherProperty?: undefined \| Record&lt;string, string \| number \| false \| true&gt; }
+{ x?: number; y?: number; rotation?: number; mirror?: boolean; addIntoBom?: boolean; addIntoPcb?: boolean; designator?: string \| null; name?: string \| null; uniqueId?: string \| null; manufacturer?: string \| null; manufacturerId?: string \| null; supplier?: string \| null; supplierId?: string \| null; otherProperty?: Record&lt;string, string \| number \| boolean&gt; }
 
 </td><td>
 
@@ -1638,7 +1654,7 @@ function placeCbbSchematicPage(
 	cbbSchematicPage: { libraryUuid: string; cbbUuid: string; uuid: string },
 	x: number,
 	y: number,
-	props?: { reimportWhenNameRepeated?: undefined | false | true },
+	props?: { reimportWhenNameRepeated?: boolean },
 ): Promise<boolean>;
 ```
 
@@ -1702,11 +1718,11 @@ props
 
 </td><td>
 
-\{ reimportWhenNameRepeated?: undefined \| false \| true \}
+\{ reimportWhenNameRepeated?: boolean \}
 
 </td><td>
 
-_(Optional)_ Placement parameters: `reimportWhenNameRepeated` - whether to re-import when a module with the same name exists, default `true`<!-- -->. ADD since EDA v4.2
+_(Optional)_ 放置参数：`reimportWhenNameRepeated` 当存在重名模块时是否重新引入，默认 `true` ADD since EDA v4.2
 
 </td></tr>
 </tbody></table>

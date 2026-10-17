@@ -930,7 +930,7 @@ function getBomFile(
 	fileName?: string,
 	fileType?: 'xlsx' | 'csv',
 	template?: string,
-	filterOptions?: Array<{ property: string; includeValue: string | false | true }>,
+	filterOptions?: Array<{ property: string; includeValue: boolean | string }>,
 	statistics?: Array<string>,
 	property?: Array<string>,
 	columns?: Array<IPCB_BomPropertiesTableColumns>,
@@ -997,7 +997,7 @@ filterOptions
 
 </td><td>
 
-Array&lt;{ property: string; includeValue: string \| false \| true }&gt;
+Array&lt;{ property: string; includeValue: boolean \| string }&gt;
 
 </td><td>
 
@@ -1577,6 +1577,8 @@ PCB fabrication file data
 
 You can use [SYS\_FileSystem.saveFile()](./SYS_FileSystem.md) API export the file to the local file system
 
+默认参数与编辑器「导出 PCB 制版文件」弹窗的 \*\*一键导出\*\* 选项保持一致（单位 `MM`<!-- -->、数字格式 `4:5`<!-- -->、导出板内真实使用的层及钻孔图层等）
+
 ## Example
 
 ```javascript
@@ -1591,7 +1593,7 @@ const gerberFile = await eda.pcb_ManufactureData.getGerberFile(
     'MyBoard_Gerber',
     false,
     ESYS_Unit.MILLIMETER,
-    { integerNumber: 2, decimalNumber: 6 }
+    { integerNumber: 4, decimalNumber: 6 }
 );
 if (gerberFile) {
     await eda.sys_FileSystem.saveFile(gerberFile,'Gerber.zip');
@@ -2005,10 +2007,10 @@ function getOpenDatabaseDoublePlusFile(
 	fileName?: string,
 	unit?: ESYS_Unit.INCH | ESYS_Unit.MILLIMETER,
 	otherData?: {
-		metallizedDrilledHoles?: undefined | false | true;
-		nonMetallizedDrilledHoles?: undefined | false | true;
-		drillTable?: undefined | false | true;
-		flyingProbeTestFile?: undefined | false | true;
+		metallizedDrilledHoles?: boolean;
+		nonMetallizedDrilledHoles?: boolean;
+		drillTable?: boolean;
+		flyingProbeTestFile?: boolean;
 	},
 	layers?: Array<{ layerId: EPCB_LayerId; mirror: boolean }>,
 	objects?: Array<{ objectName: string }>,
@@ -2062,7 +2064,7 @@ otherData
 
 </td><td>
 
-\{ metallizedDrilledHoles?: undefined \| false \| true; nonMetallizedDrilledHoles?: undefined \| false \| true; drillTable?: undefined \| false \| true; flyingProbeTestFile?: undefined \| false \| true \}
+\{ metallizedDrilledHoles?: boolean; nonMetallizedDrilledHoles?: boolean; drillTable?: boolean; flyingProbeTestFile?: boolean \}
 
 </td><td>
 
@@ -2269,24 +2271,22 @@ function getPdfFile(
 	outputMethod?: EPCB_PdfOutputMethod,
 	contentConfig?: { displayAttributesAsMenu: boolean; showOutlineOnly: boolean },
 	watermark?: {
-		show?: undefined | false | true;
-		content?: undefined | string;
-		styleConfig?:
-			| undefined
-			| {
-				color: string;
-				transparency: 'Opaque' | '75%' | '50%' | '25%';
-				font: string;
-				fontSize: {
-					unit: ESYS_Unit.MILLIMETER | ESYS_Unit.INCH | ESYS_Unit.MIL;
-					value: number;
-				};
-				style: { bold: boolean; italic: boolean; underline: boolean };
-				slope: 0 | 45 | 90;
-				denseness: 'Single' | 'Sparse' | 'Std' | 'Dense';
+		show?: boolean;
+		content?: string;
+		styleConfig?: {
+			color: string;
+			transparency: 'Opaque' | '75%' | '50%' | '25%';
+			font: string;
+			fontSize: {
+				unit: ESYS_Unit.INCH | ESYS_Unit.MIL | ESYS_Unit.MILLIMETER;
+				value: number;
 			};
+			style: { bold: boolean; italic: boolean; underline: boolean };
+			slope: 0 | 45 | 90;
+			denseness: 'Single' | 'Sparse' | 'Std' | 'Dense';
+		};
 	},
-	graphPageConfig?: Array<Record<string, any>>,
+	graphPageConfig?: Array<{ checked: boolean; name: string }>,
 ): Promise<File | undefined>;
 ```
 
@@ -2350,7 +2350,7 @@ watermark
 
 </td><td>
 
-{ show?: undefined \| false \| true; content?: undefined \| string; styleConfig?: undefined \| { color: string; transparency: 'Opaque' \| '75%' \| '50%' \| '25%'; font: string; fontSize: { unit: [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md) \| [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MIL](../enums/ESYS_Unit.md)<!-- -->; value: number }; style: { bold: boolean; italic: boolean; underline: boolean }; slope: 0 \| 45 \| 90; denseness: 'Single' \| 'Sparse' \| 'Std' \| 'Dense' } }
+{ show?: boolean; content?: string; styleConfig?: { color: string; transparency: 'Opaque' \| '75%' \| '50%' \| '25%'; font: string; fontSize: { unit: [ESYS\_Unit.INCH](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MIL](../enums/ESYS_Unit.md) \| [ESYS\_Unit.MILLIMETER](../enums/ESYS_Unit.md)<!-- -->; value: number }; style: { bold: boolean; italic: boolean; underline: boolean }; slope: 0 \| 45 \| 90; denseness: 'Single' \| 'Sparse' \| 'Std' \| 'Dense' } }
 
 </td><td>
 
@@ -2363,7 +2363,7 @@ graphPageConfig
 
 </td><td>
 
-Array&lt;Record&lt;string, any&gt;&gt;
+Array&lt;{ checked: boolean; name: string }&gt;
 
 </td><td>
 

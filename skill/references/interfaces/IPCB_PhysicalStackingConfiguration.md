@@ -1,6 +1,6 @@
 # IPCB\_PhysicalStackingConfiguration interface
 
-Physical stacking configuration
+物理叠层配置
 
 ## Signature
 
@@ -39,7 +39,7 @@ number
 
 </td><td>
 
-Total layer count
+总叠层数
 
 </td></tr>
 <tr><td>
@@ -54,7 +54,7 @@ Array&lt;Record&lt;string, unknown&gt;&gt;
 
 </td><td>
 
-Stacking list
+叠层列表
 
 </td></tr>
 <tr><td>
@@ -69,7 +69,7 @@ string
 
 </td><td>
 
-Physical stacking configuration name
+物理叠层配置名称
 
 </td></tr>
 </tbody></table>
@@ -82,7 +82,7 @@ Physical stacking configuration name
 
 # IPCB\_PhysicalStackingConfiguration.layerCount property
 
-Total layer count
+总叠层数
 
 ## Signature
 
@@ -94,7 +94,7 @@ layerCount: number;
 
 # IPCB\_PhysicalStackingConfiguration.list property
 
-Stacking list
+叠层列表
 
 ## Signature
 
@@ -106,7 +106,7 @@ list: Array<Record<string, unknown>>;
 
 # IPCB\_PhysicalStackingConfiguration.name property
 
-Physical stacking configuration name
+物理叠层配置名称
 
 ## Signature
 

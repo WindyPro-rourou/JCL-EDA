@@ -1,6 +1,6 @@
 # ISYS\_ShortcutKeyDataWithCallFn interface
 
-Shortcut key data with CallFn
+包含 CallFn 的快捷键数据
 
 ## Signature
 

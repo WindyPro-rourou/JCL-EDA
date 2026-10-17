@@ -112,7 +112,7 @@ Get the offset coordinate of the canvas origin relative to the data origin
 
 </td><td>
 
-**_(BETA)_** Query the current canvas update calculation status
+**_(BETA)_** 查询当前画布更新计算状态
 
 </td></tr>
 <tr><td>
@@ -255,7 +255,7 @@ Start the ratline calculation function
 
 </td><td>
 
-**_(BETA)_** Start canvas update calculation
+**_(BETA)_** 开始画布更新计算
 
 </td></tr>
 <tr><td>
@@ -277,7 +277,7 @@ Stop the ratline calculation function
 
 </td><td>
 
-**_(BETA)_** Stop canvas update calculation
+**_(BETA)_** 停止画布更新计算
 
 </td></tr>
 <tr><td>
@@ -288,7 +288,7 @@ Stop the ratline calculation function
 
 </td><td>
 
-**_(BETA)_** Trigger a canvas update calculation
+**_(BETA)_** 触发一次画布更新计算
 
 </td></tr>
 <tr><td>
@@ -330,7 +330,9 @@ Auto layout result
 
 ## Remarks
 
-ADD since EDA v3.2.162
+ADD since EDA v3.2.150 本接口预期将会执行较长时间，可以尝试异步处理或增加超时时限
+
+/ EDA v4.1.66
 
 ### autorouting
 
@@ -384,7 +386,13 @@ Auto routing result
 
 ## Remarks
 
-If no parameters are passed in, auto routing will be performed for all unrouted nets ADD since EDA v3.2.162
+ADD since EDA v3.2.150 If no parameters are passed in, auto routing will be performed for all unrouted nets
+
+本接口预期将会执行较长时间，可以尝试异步处理或增加超时时限
+
+注意事项： - 本接口内部存在固定的 900 秒（15 分钟）硬上限，CLI 的 `--timeout` 参数无法覆盖该上限； - 超时或失败后，中间几何结果不会提交（超时后调用 `save()` 图元可能仍为 0/0），如需保留中间结果请改用  作业模型； - `props.layers` 必须传入\*\*启用层\*\*（`layerStatus !== NOT_USED`<!-- -->），传停用层会被静默忽略
+
+/ EDA v4.1.66
 
 ## Example
 
@@ -678,7 +686,7 @@ The units here are data-level units, which are equivalent to mil on the canvas l
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Query the current canvas update calculation status
+查询当前画布更新计算状态
 
 ## Signature
 
@@ -692,11 +700,11 @@ function getCanvasUpdateCalculationStatus(): Promise<
 
 Promise&lt;[EPCB\_DocumentCanvasUpdateCalculationActiveStatus](../enums/EPCB_DocumentCanvasUpdateCalculationActiveStatus.md) \| undefined&gt;
 
-Canvas update calculation function status
+画布更新计算功能状态
 
 ## Remarks
 
-Canvas update calculation includes canvas render updates, property panel updates, etc. ADD since EDA v4.2
+画布更新计算包括画布渲染更新、属性面板更新等 ADD since EDA v4.2
 
 ### getcurrentfilterconfiguration
 
@@ -1195,6 +1203,10 @@ Promise&lt;boolean&gt;
 
 Whether the import operation was successful. If the import fails or the free PCB has no schematic UUID passed in, `false` is returned
 
+## Remarks
+
+如需尽可能不被弹窗阻断（CLI 调用时推荐），请传入 `force` 为 `true`<!-- -->，这样在不遇到严重错误时不会出现任何弹窗； `force=true` 会跳过确认弹窗并自动全量导入，且等待导入完成后再返回（非交互执行方式，见 [参数 \`force\`](./PCB_Document.md)<!-- -->）
+
 ## Example
 
 ```javascript
@@ -1447,6 +1459,10 @@ Promise&lt;boolean&gt;
 
 Whether the save operation was successful. Errors such as save failure and upload failure all return `false`
 
+## Remarks
+
+在 headless / 无头环境下，本接口可能返回 `true` 但实际未真正落盘（如网络 / 上传链路异常）， 对落盘结果敏感的流程应通过 [文件系统接口](./SYS_FileSystem.md) 二次核验
+
 ## Example
 
 ```javascript
@@ -1605,7 +1621,7 @@ await eda.dmt_Pcb.deletePcb(pcbUuid);
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Start canvas update calculation
+开始画布更新计算
 
 ## Signature
 
@@ -1617,13 +1633,13 @@ function startCanvasUpdateCalculation(): Promise<boolean>;
 
 Promise&lt;boolean&gt;
 
-Whether the operation is successful
+操作是否成功
 
 ## Remarks
 
-Canvas update calculation includes canvas render updates, property panel updates, etc.
+画布更新计算包括画布渲染更新、属性面板更新等
 
-If you do not understand the meaning of this switch, do not call this API for any operation ADD since EDA v4.2
+如若不理解该开关的含义，请勿调用本接口进行任何操作 ADD since EDA v4.2
 
 ### stopcalculatingratline
 
@@ -1670,7 +1686,7 @@ await eda.dmt_Pcb.deletePcb(pcbUuid);
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Stop canvas update calculation
+停止画布更新计算
 
 ## Signature
 
@@ -1682,13 +1698,13 @@ function stopCanvasUpdateCalculation(): Promise<boolean>;
 
 Promise&lt;boolean&gt;
 
-Whether the operation is successful
+操作是否成功
 
 ## Remarks
 
-Canvas update calculation includes canvas render updates, property panel updates, etc.
+画布更新计算包括画布渲染更新、属性面板更新等
 
-If you do not understand the meaning of this switch, do not call this API for any operation ADD since EDA v4.2
+如若不理解该开关的含义，请勿调用本接口进行任何操作 ADD since EDA v4.2
 
 ### triggercanvasupdatecalculation
 
@@ -1696,7 +1712,7 @@ If you do not understand the meaning of this switch, do not call this API for an
 
 > This API is provided as a beta preview for developers and may change based on feedback that we receive. Do not use this API in a production environment.
 
-Trigger a canvas update calculation
+触发一次画布更新计算
 
 ## Signature
 
@@ -1708,13 +1724,13 @@ function triggerCanvasUpdateCalculation(): Promise<boolean>;
 
 Promise&lt;boolean&gt;
 
-Whether the operation is successful
+操作是否成功
 
 ## Remarks
 
-Canvas update calculation includes canvas render updates, property panel updates, etc.
+画布更新计算包括画布渲染更新、属性面板更新等
 
-If you do not understand the meaning of this switch, do not call this API for any operation ADD since EDA v4.2
+如若不理解该开关的含义，请勿调用本接口进行任何操作 ADD since EDA v4.2
 
 ### zoomtoboardoutline
 

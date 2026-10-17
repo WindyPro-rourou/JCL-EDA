@@ -521,7 +521,11 @@ function getAllClassificationTree(
 	libraryUuid: string,
 	libraryType: ELIB_LibraryType,
 ): Promise<
-	Array<{ name: string; uuid: string; children?: undefined | { name: string; uuid: string }[] }>
+	Array<{
+		name: string;
+		uuid: string;
+		children?: Array<{ name: string; uuid: string }> | undefined;
+	}>
 >;
 ```
 
@@ -570,7 +574,7 @@ Library type
 
 ## Returns
 
-Promise&lt;Array&lt;{ name: string; uuid: string; children?: undefined \| { name: string; uuid: string }\[\] }&gt;&gt;
+Promise&lt;Array&lt;{ name: string; uuid: string; children?: Array&lt;{ name: string; uuid: string }&gt; \| undefined }&gt;&gt;
 
 Tree structure data composed of classification information
 
@@ -753,7 +757,7 @@ Get the name of the classification at the specified index
 function getNameByIndex(
 	classificationIndex: ILIB_ClassificationIndex,
 ): Promise<
-	| { primaryClassificationName: string; secondaryClassificationName?: undefined | string }
+	| { primaryClassificationName: string; secondaryClassificationName?: string | undefined }
 	| undefined
 >;
 ```
@@ -790,7 +794,7 @@ Classification index
 
 ## Returns
 
-Promise&lt;{ primaryClassificationName: string; secondaryClassificationName?: undefined \| string } \| undefined&gt;
+Promise&lt;{ primaryClassificationName: string; secondaryClassificationName?: string \| undefined } \| undefined&gt;
 
 Name of the two-level classification
 
@@ -844,7 +848,7 @@ function getNameByUuid(
 	primaryClassificationUuid: string,
 	secondaryClassificationUuid?: string,
 ): Promise<
-	| { primaryClassificationName: string; secondaryClassificationName?: undefined | string }
+	| { primaryClassificationName: string; secondaryClassificationName?: string | undefined }
 	| undefined
 >;
 ```
@@ -920,7 +924,7 @@ _(Optional)_ Secondary classification UUID. If not specified, only the primary c
 
 ## Returns
 
-Promise&lt;{ primaryClassificationName: string; secondaryClassificationName?: undefined \| string } \| undefined&gt;
+Promise&lt;{ primaryClassificationName: string; secondaryClassificationName?: string \| undefined } \| undefined&gt;
 
 Name of the two-level classification
 

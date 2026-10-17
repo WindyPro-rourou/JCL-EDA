@@ -144,38 +144,29 @@ Auto layout
 
 ```typescript
 function autoLayout(props?: {
-	uuids?: undefined | string[];
-	netlist?:
-		| undefined
-		| {
-			component: Record<
-				string,
-				{
-					pinInfoMap: Record<
-						string,
-						{
-							name: string;
-							number: string;
-							net: string;
-							props: { 'Pin Number': string };
-						}
-					>;
-				}
-			>;
-		};
-	designatorDeviceTypeMap?:
-		| undefined
-		| Record<
+	uuids?: Array<string>;
+	netlist?: {
+		component: Record<
 			string,
-			| 'resistor'
-			| 'capacitor'
-			| 'inductive'
-			| 'diode'
-			| 'triode'
-			| 'oscillator'
-			| 'chip'
-			| 'otherDevice'
+			{
+				pinInfoMap: Record<
+					string,
+					{ name: string; number: string; net: string; props: { 'Pin Number': string } }
+				>;
+			}
 		>;
+	};
+	designatorDeviceTypeMap?: Record<
+		string,
+		| 'resistor'
+		| 'capacitor'
+		| 'inductive'
+		| 'diode'
+		| 'triode'
+		| 'oscillator'
+		| 'chip'
+		| 'otherDevice'
+	>;
 }): Promise<any>;
 ```
 
@@ -200,7 +191,7 @@ props
 
 </td><td>
 
-{ uuids?: undefined \| string\[\]; netlist?: undefined \| { component: Record&lt;string, { pinInfoMap: Record&lt;string, { name: string; number: string; net: string; props: { 'Pin Number': string } }&gt; }&gt; }; designatorDeviceTypeMap?: undefined \| Record&lt;string, 'resistor' \| 'capacitor' \| 'inductive' \| 'diode' \| 'triode' \| 'oscillator' \| 'chip' \| 'otherDevice'&gt; }
+{ uuids?: Array&lt;string&gt;; netlist?: { component: Record&lt;string, { pinInfoMap: Record&lt;string, { name: string; number: string; net: string; props: { 'Pin Number': string } }&gt; }&gt; }; designatorDeviceTypeMap?: Record&lt;string, 'resistor' \| 'capacitor' \| 'inductive' \| 'diode' \| 'triode' \| 'oscillator' \| 'chip' \| 'otherDevice'&gt; }
 
 </td><td>
 
@@ -250,38 +241,29 @@ Auto routing
 
 ```typescript
 function autoRouting(props?: {
-	uuids?: undefined | string[];
-	netlist?:
-		| undefined
-		| {
-			component: Record<
-				string,
-				{
-					pinInfoMap: Record<
-						string,
-						{
-							name: string;
-							number: string;
-							net: string;
-							props: { 'Pin Number': string };
-						}
-					>;
-				}
-			>;
-		};
-	designatorDeviceTypeMap?:
-		| undefined
-		| Record<
+	uuids?: Array<string>;
+	netlist?: {
+		component: Record<
 			string,
-			| 'resistor'
-			| 'capacitor'
-			| 'inductive'
-			| 'diode'
-			| 'triode'
-			| 'oscillator'
-			| 'chip'
-			| 'otherDevice'
+			{
+				pinInfoMap: Record<
+					string,
+					{ name: string; number: string; net: string; props: { 'Pin Number': string } }
+				>;
+			}
 		>;
+	};
+	designatorDeviceTypeMap?: Record<
+		string,
+		| 'resistor'
+		| 'capacitor'
+		| 'inductive'
+		| 'diode'
+		| 'triode'
+		| 'oscillator'
+		| 'chip'
+		| 'otherDevice'
+	>;
 }): Promise<any>;
 ```
 
@@ -306,7 +288,7 @@ props
 
 </td><td>
 
-{ uuids?: undefined \| string\[\]; netlist?: undefined \| { component: Record&lt;string, { pinInfoMap: Record&lt;string, { name: string; number: string; net: string; props: { 'Pin Number': string } }&gt; }&gt; }; designatorDeviceTypeMap?: undefined \| Record&lt;string, 'resistor' \| 'capacitor' \| 'inductive' \| 'diode' \| 'triode' \| 'oscillator' \| 'chip' \| 'otherDevice'&gt; }
+{ uuids?: Array&lt;string&gt;; netlist?: { component: Record&lt;string, { pinInfoMap: Record&lt;string, { name: string; number: string; net: string; props: { 'Pin Number': string } }&gt; }&gt; }; designatorDeviceTypeMap?: Record&lt;string, 'resistor' \| 'capacitor' \| 'inductive' \| 'diode' \| 'triode' \| 'oscillator' \| 'chip' \| 'otherDevice'&gt; }
 
 </td><td>
 
@@ -324,6 +306,8 @@ Auto routing result
 ## Remarks
 
 If no parameters are passed in, auto routing will be performed for all unrouted nets
+
+注意事项： - 网表键以 `getState_UniqueId()` 为准：新建元件在 `save()` 前可能返回空串，导致与网表键对不上； 如需稳定键，请先 `save()` 或显式传入 `props.netlist` 自建网表源； - netflag / netport 图元需要零长度锚点导线才能生效（缺失时端口 / 旗标不生效），自动布线前请确保锚点导线已补齐
 
 ## Example
 
@@ -788,6 +772,10 @@ function save(): Promise<boolean>;
 Promise&lt;boolean&gt;
 
 Whether the save operation was successful. Errors such as save failure and upload failure all return `false`
+
+## Remarks
+
+在 headless / 无头环境下，本接口可能返回 `true` 但实际未真正落盘（如网络 / 上传链路异常）， 对落盘结果敏感的流程应通过 [文件系统接口](./SYS_FileSystem.md) 二次核验
 
 ## Example
 

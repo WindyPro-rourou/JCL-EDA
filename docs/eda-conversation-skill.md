@@ -303,6 +303,7 @@ const bomFile = await eda.sch_ManufactureData.getBomFile('我的_BOM', 'xlsx', u
   仍为空；`pcb_Net.getNetlist('JLCEDA')` 的 `components` 仍为 `{}`；PCB DRC 随即报
   **Netlist Error（Import Changes 不一致）**，且**清空画布也不消失**（元数据层残留）。
   → **不要用它作为"画 PCB"的路径**。
+- 📌 官方 1.1.56 文档补充说明：`importChanges` **建议传 `force=true` 避免弹窗阻断**（"跳过确认弹窗并自动全量导入，且等待导入完成后再返回"）；但**该方法签名仍为 `importChanges(uuid?)`——没有 force 参数**（文档与签名矛盾，待官方澄清）。调用前先按"UI 弹窗"路径确认编辑器行为。
 - ✅ **正确姿势（实测可跑、网表正确）**：直接在 PCB 上放
   ```js
   const dev = (await eda.lib_Device.search('LED'))[0];       // 或 {libraryUuid, uuid}
@@ -455,7 +456,7 @@ await eda.pcb_PrimitiveComponent.delete(pcbIds); await eda.pcb_PrimitiveVia.dele
 | `sch_Drc.check()` / `pcb_Drc.check()` 无参只返回布尔 | 无详情 | 用 `check(true, false, true)` |
 | 网表/BOM 返回 `{}` | File 对象被 JSON 序列化 | `await f.text()`（网表）/ arrayBuffer→base64（BOM xlsx） |
 | `getAll` 报「获取所有器件失败」 | 间歇性 | 重试 3 次（间隔 700ms） |
-| PCB 板框（layer 11）`pcb_PrimitiveLine.create` 四组参数全失败 | 官方无绘制 API | 板框人工/导入获得 |
+| PCB 板框（layer 11）`pcb_PrimitiveLine.create` 四组参数全失败 | 线接口仅铜层；**官方 1.1.56 起明确：板框须用 `pcb_PrimitivePolyline`**（`polygon = pcb_MathPolygon.createPolygon([x,y,'L',x2,y2,…])`，再 `pcb_PrimitivePolyline.create('', 11, polygon, 10)`） | 板框改用 Polyline；`pcb_PrimitiveLine` 非铜层（丝印/阻焊/机械）仍不可用 |
 | PCB 非铜层（丝印3/阻焊5/助焊7/装配9/机械13…）用 Line 建不出「无法创建直线图元」 | `pcb_PrimitiveLine.create` 实际只接受铜层（1/2/内层） | 铜层 **BOTTOM(2) 实测可用**（双层走线✓）；非铜层 Line 受限；`pcb_PrimitiveString.create`（丝印文本）实测**挂起 30s**——勿用于自动流程 |
 | 原理图 DRC verbose 只有聚合 `[{type,count}]` | 明细在 UI 面板 | 结合 UI 查看；PCB 版有嵌套详情 |
 | 直放 PCB 元件焊盘无网络 | 电气级未互联 | 画布级可用；电气网络级待官方改进 |
