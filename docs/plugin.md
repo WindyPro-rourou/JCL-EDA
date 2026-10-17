@@ -37,6 +37,7 @@ git clone https://github.com/WindyPro-rourou/dsh-code-studio.git node_modules/@w
 | 版本更新 | 每小时查 npm `dist-tags.latest`；有新版时**系统提示追加独立提醒段 + 面板顶部「vX 可更新」pill**（点击复制升级命令）；`POST /api/dsh-eda/update/check` 可强制检查；`eda_status` 返回 `latestVersion/updateAvailable` |
 | 知识库 | 官方 easyeda-api-skill **1.1.56**（131 类）随包 vendored（`skill/`），`eda_skill_read` 可读；`~/.dsh/eda/bridge` 桥同步 1.1.56 |
 | 新能力 | PCB 板框用 `pcb_PrimitivePolyline` + `pcb_MathPolygon.createPolygon`（官方 1.1.56 Remarks）；自动布线 900s 硬上限 / force 弹窗；`SYS_ExternalApi` / `PCB_ImageTool` 等新类 |
+| 全链路 | 原理图 20 类元件/连线/网标/DRC（详细数组）/网表 → `eda_sch_to_pcb`（可靠替代 importChanges）→ 板框/过孔/走线/铺铜/丝印/装配/DRC → **`eda_export` 打样交付包**（Gerber+BOM+坐标+信息）；下单需人工（官方无下单 API）。实测问题清单见 `docs/eda-conversation-skill.md` 附十 |
 
 ## 测试 / 自检（当前全绿）
 

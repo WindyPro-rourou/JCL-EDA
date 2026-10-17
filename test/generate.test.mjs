@@ -68,6 +68,8 @@ test('工具返回值与声明 schema 一致（成功+失败路径，防未声�
     ['eda_verify', {}],                          // 未连接 → 失败路径
     ['eda_trace', {}],                           // 未连接 → 失败路径
     ['eda_task', { action: 'list' }],            // 未连接 → 失败路径
+    ['eda_export', {}],                          // 未连接 → 失败路径
+    ['eda_sch_to_pcb', {}],                      // 未连接 → 失败路径
     ['eda_skill_read', { doc: 'SKILL.md' }],     // 离线可读 → 成功路径
   ]
   for (const [name, args] of cases) {

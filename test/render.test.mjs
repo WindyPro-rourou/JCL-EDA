@@ -45,6 +45,8 @@ const SAMPLES = {
   eda_netflag: { ok: true, id: 'i', net: 'GND', x: 1, y: 2, error: '' },
   eda_save: { ok: true, saved: true, docType: 1, error: '' },
   eda_task: { ok: true, taskId: 't1', statusUrl: '/tasks/t1', status: 'completed', phase: 'routing', elapsedMs: 10, outcome: 'complete', result: '{}', errorText: '', events: ['a'], tasks: [{ id: 't1', status: 'completed', phase: 'routing', elapsedMs: 10, outcome: 'complete' }], error: '' },
+  eda_export: { ok: true, dir: 'C:/tmp/e', files: [{ kind: 'gerber', name: 'g.zip', size: 1024, path: 'C:/tmp/e/g.zip' }], errors: [], error: '' },
+  eda_sch_to_pcb: { ok: true, pcbUuid: 'p1', total: 2, placedOk: 1, placed: [{ designator: 'R1', ok: true, uuid: 'u1' }, { designator: 'C1', ok: false, err: 'no device' }], note: 'n', error: '' },
 }
 
 test('所有工具的 render 必须返回数组（ContentBlock[]）——对象形态会崩主进程', () => {

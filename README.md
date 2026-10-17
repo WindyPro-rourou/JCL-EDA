@@ -52,18 +52,21 @@ git clone https://github.com/WindyPro-rourou/JCL-EDA.git node_modules/@windypro-
 └─ package.json                   ← @windypro-rourou/dsh-eda（files 含 lib/src/patch；npm i github:… 即装）
 ```
 
-## 已注册的 agent 工具（21 个）
+## 已注册的 agent 工具（24 个）
 
 | 工具 | 用途 |
 |---|---|
-| `eda_status` | 插件/官方桥状态（装没装 / 端口 / 是否就绪） |
+| `eda_status` | 插件/官方桥状态（装没装 / 端口 / 是否就绪 / 新版本提示） |
 | `eda_template_list` / `eda_translate_request` | 模板卡目录 / 中文需求→结构化草稿（离线兜底用） |
 | `eda_generate_schematic_json` | **离线兜底**：需求/模板 → 可导入标准版原理图 JSON + 结构/连通性校验（**9 种符号**：电阻/LED/电容/二极管/开关/电感/晶振/电池/保险丝 + 网络标签） |
 | `eda_bridge_install` / `eda_backend_connect` | 一键安装官方桥 / 启动·连接官方桥 |
 | `eda_exec` | **云端实时生成的双手**：执行任意官方 `eda.*` 代码（需已连接；自动记录新建图元→可撤回） |
+| `eda_task` | **后台任务**：长操作（自动布线/大导出/批量写回）提交与查询（桥异步补丁：/tasks、/routing，超时返回 taskId 且迟到结果保留） |
+| `eda_export` | **打样交付包**：一键导出 Gerber zip + BOM + 坐标文件（Pick&Place）+ PCB 信息到本地目录 |
+| `eda_sch_to_pcb` | **原理图→PCB 复制**：读原理图器件 `getState_Component()` → 在 PCB 网格放置（可靠替代不可用的 `importChanges`） |
 | `eda_place` / `eda_wire` / `eda_netflag` / `eda_save` | **确定性封装**：搜索+定位+放置一体（返回引脚坐标）/ 引脚级连线（自动校验）/ 电源地网络标志 / 保存当前文档 |
 | `eda_pick_spot` | **框内定位**：读页面尺寸+已有图元 → 返回互不冲突的框内网格空位（sch/pcb 双模式） |
-| `eda_capabilities` | **能力清单**：官方 eda.* API 结构化目录（域/方法/用法/坑/实测片段）——agent 主动查询 |
+| `eda_capabilities` | **能力清单**：官方 eda.* API 结构化目录（含层能力矩阵/全链路实测/坑）——agent 主动查询 |
 | `eda_board_overview` | **画板全览**：当前文档图元/网络/页面尺寸摘要（agent 的眼睛，画前画后都可用） |
 | `eda_trace` | **现场截图**：缩放适配 → PNG 存 `~/.dsh/eda/shots/`（效果确认/视觉留档） |
 | `eda_snapshot` | **紧急保存**：画板现场（`.epro2`+SVG 预览+网表/BOM）+ 动作日志 → `~/.dsh/eda/snapshots/` |
