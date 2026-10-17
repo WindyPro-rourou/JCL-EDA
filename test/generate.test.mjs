@@ -78,8 +78,22 @@ test('工具返回值与声明 schema 一致（成功+失败路径，防未声�
       () => validateJsonSchemaValue(tool.output.schema, res),
       `${name} 返回值违反声明 schema（含未声明字段或类型不符）`,
     )
+    // DSH 的 value 快照要求 lossless JSON：不允许对象里带 undefined 属性
+    // （历史 bug：eda_task get 返回 elapsedMs: undefined → "value is not lossless JSON"）
+    assertNoUndefined(res, name)
   }
 })
+
+/** Recursively assert no `undefined` property values exist on an object graph. */
+function assertNoUndefined(value, label, path = '$') {
+  if (value === undefined) assert.fail(`${label}: ${path} 是 undefined（snapshot 会拒绝）`)
+  if (value === null || typeof value !== 'object') return
+  if (Array.isArray(value)) { value.forEach((v, i) => assertNoUndefined(v, label, `${path}[${i}]`)); return }
+  for (const [k, v] of Object.entries(value)) {
+    assert.notEqual(v, undefined, `${label}: ${path}.${k} 是 undefined（snapshot 会拒绝）`)
+    assertNoUndefined(v, label, `${path}.${k}`)
+  }
+}
 
 test('eda_generate_schematic_json: 不识别的需求 → ok:false 且有明确提示', async () => {
   const { tools } = mountPlugin()
