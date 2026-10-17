@@ -574,3 +574,50 @@ SKILL.md 只放少量示例；完整逐接口文档在 `references/`，并明确
 6. **不可写层**：57 飞线（全部图元失败）、12 多层（仅 Region/Fill）、11 板框（仅 Polyline、
    Text/Fill/Region/Line/Arc 均不可）。
 
+## 附十：从 0 到可打样的全链路复测（2026-10-18，独立测试工程）
+
+**测试环境**：新建工程 `EDA-AutoTest-20261017200035`（Board2 = Schematic2 + PCB2），
+全部操作经官方桥**异步任务**（`/tasks`）执行；测后已删测试板（`deleteBoard`/`deleteSchematic`/`deletePcb` 均可清理）。
+
+### 链路结果（逐段）
+| 段 | 操作 | 结果 |
+|---|---|---|
+| 建工程 | `dmt_Project.createProject('EDA-AutoTest-…')` | ✅ 返回 true（工程创建，**上下文切换有延迟**，需 openProject/等待） |
+| 建文档 | `dmt_Schematic.createSchematic()` / `dmt_Pcb.createPcb()`（**无参**） | ✅ 返回 uuid（**传 boardName 会返回 null**） |
+| 关联 | `dmt_Board.createBoard(schUuid, pcbUuid)` | ✅ 返回 Board2 |
+| 原理图放件 | 20 类元件搜索 + `sch_PrimitiveComponent.create(dev, x, y, undefined, 0, false, true, true)` | ✅ **20/20**（R/C/L/D/LED/Q/MOS/晶振/电池/保险丝/轻触开关/排针/USB/ESP32/AMS1117/MPU6050/继电器/蜂鸣器/电解电容…） |
+| 连线/网标/netport | `sch_PrimitiveWire.create([...])` / `createNetFlag` / stub+`createNetPort` | ✅（netport 必须**先画 stub 线**再放） |
+| 原理图 DRC | `sch_Drc.check(true,false,true)` | ✅ **返回详细数组**（rule + primitives + name；旧"只有聚合"结论过时） |
+| 网表 | `sch_ManufactureData.getNetlistFile()` + `f.text()` | ✅ 80KB `.enet` JSON |
+| **原理图→PCB 同步** | `pcb_Document.importChanges()` | ❌ **仍不可靠**：返回 true 但 PCB **0 元件**（网表 815B 空壳） |
+| PCB 放置 | `pcb_PrimitiveComponent.create(dev, 1, x, y)` | ✅ **19/20**（0402 关键词搜索无结果） |
+| PCB 板框 | `pcb_PrimitivePolyline.create('', 11, pcb_MathPolygon.createPolygon([...]), 10)` | ✅ layer=11 |
+| 过孔/走线 | `createVia` → 再 `pcb_PrimitiveLine.create`（**先过孔后走线**） | ✅ |
+| 铺铜/丝印/装配 | Fill(1) / String(3) / Polyline(9) | ✅ |
+| PCB DRC | `pcb_Drc.check(true,false,true)` | ✅ 嵌套详情（Clearance Error / obj1…） |
+| **导出** | `getGerberFile()` / `getBomFile()` / `getPickAndPlaceFile()` / `getPcbInfoFile()` | ✅ **全部成功**：Gerber zip 69KB（2–3s）、BOM xlsx 8.2KB、PnP 10.3KB、Info 724B |
+| 保存 | `sch_Document.save()` / `pcb_Document.save()` | ✅ |
+
+### 问题清单（必须知道的坑，已按严重度排序）
+1. **`importChanges()` 不可用**（最高优先）：返回 `true` 但 PCB 0 元件 → **PCB 必须在 PCB 上直接放件**；
+   原理图只用于设计视图/网表/BOM/DRC。`getManufactureData()` 也会挂起（4 分钟 unknown）。
+2. **引脚/焊盘读取 API**：正确是 **`getAllPinsByPrimitiveId(id)`**（原理图与 PCB 都可用）；
+   `get(id).getAllPins()`（PCB）返回非数组、`getState_Pin` 为 null——别再试这两个。
+3. **`createSchematic(boardName)` / `createPcb(boardName)` 传 boardName → null**；用**无参**调用。
+4. **位号不自动分配**：放件后多为 `R?`/`C?`/`U?` → BOM 前需 `modify` 设置位号或人工整理。
+5. **`lib_Device.search` 会误命中/空结果**：如 `0402WGF1001T5E` 命中 "3M"、部分关键词第二次无结果 →
+   搜索后必须校验 `device.name` 与封装；建议用**准确型号**并在放置后回读。
+6. **PCB 放置坐标 = 元件原点**（封装有偏移，实测出现负坐标）→ 放后回读 `getState_X/Y` 校正，
+   板框要按**全部图元实际坐标**计算（含负值）。
+7. `dmt_Project.createProject` 后**上下文切换慢**；`getAllProjectsUuid()` 可能返回空 →
+   建完工程用 `openProject(uuid)` + 等待，或直接复用当前工程建测试板（可删除）。
+8. `sch_Drc.check(true,false,true)` **现在返回详细数组**（规则/图元）；**DRC 不幂等**——每轮只跑一次。
+9. 网表/BOM：`getNetlistFile()`/`getBomFile()` 返回 `File`，必须 `await f.text()` / `arrayBuffer`；
+   PCB BOM 与原理图 BOM 分开导出。
+10. 清理：**没有 `deleteProject`**（工程只能手动删）；`deleteBoard`/`deleteSchematic`/`deletePcb` 可删测试文档。
+
+### 结论
+**"从 0 到可打样"的全链路：可自动生成**（原理图 20 类 100%、PCB 19/20 放置、板框/过孔/走线/铺铜/丝印/装配/DRC/4 类导出 100%）；
+**真正卡住的只有 3 处**：`importChanges`（改用直接放件）、位号分配、焊盘/引脚 APIs；
+**下单**仍需人工（官方无下单 API）。
+
