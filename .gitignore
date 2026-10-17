@@ -15,3 +15,6 @@ Thumbs.db
 
 # dev scratch (one-off probes/diags; keep only reusable tools in scripts/)
 scratch/
+
+# large upstream clone kept only for local diffing
+vendor/
