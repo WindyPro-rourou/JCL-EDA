@@ -645,3 +645,18 @@ SKILL.md 只放少量示例；完整逐接口文档在 `references/`，并明确
   4. 复杂页批量（如 30 件 × 24.5s ≈ 12 分钟）**不推荐在 UI 会话里同步做**。
 - 另：`openDocument(其他工程的页面)` 无效（会停留在当前工程）——**必须先 `openProject(uuid)` 再打开页面**；`openProject` 生效有**数秒延迟**（轮询确认）。
 
+### 附十之三：能力对照表争议项复核（2026-10-18，逐项实测）
+
+| 项 | 复核结论 | 证据/说明 |
+|---|---|---|
+| 板框层 11 | ✅ 可用 | `pcb_PrimitivePolyline.create('', 11, polygon, 10)` 一次成功、回读 11、删除正常 |
+| PCB 元件移动（保网络） | ✅ 可用 | `setState_X/Y` + `done()`；网络与网表不变 |
+| 走线/原理图导线/网络标签 | ✅ 可用 | 三类 `create` 均返回 id |
+| 网表导出 | ✅ 可用 | JLCEDA 格式：37 网络 / 53 元件 |
+| **放新元件"挂死"** | ⚠️ **不是挂死，是慢** | 复杂页（esp32 P1，53 part/214 图元）：单件 **24.5s**；空页 **300ms**（80×）。工具超时已提高（place 120s / wire,netflag 60s / sch_to_pcb 600s）。"任务永远 submitted"多为**窗口重连后旧任务**（重连会清任务表）。 |
+| **原生自动布线** | ⚠️ **需要扩展支持 routing-v1** | `/health` 显示桥 capabilities 含 `routing-v1`；但 `/routing` 校验读 **EDA 扩展注册时上报的 capabilities**——当前扩展未上报 → `409 Connected gateway does not support routing-v1; install the updated extension`。**更新 Run API Gateway 扩展**后重连即可用；替代：`pcb_Document.autoRouting`（原生，900s 硬上限）。 |
+| **新建原理图文档** | ✅ 页可用；`waitForReady=false` 不代表失败 | `createSchematicPage` → `openDocument` → `getAll` 实测正常（新页含图框 sheet 元件）；`dmt_Project.waitForReady(projectUuid, ms)` 检查的是**工程就绪**，返回 false ≠ 页面未加载。 |
+| **拷贝 Schematic1 只有图框** | ❌ 未能复现（copySchematic 完整复制） | 实测 `copySchematic('3521f31e…')` 副本含 **214 图元 / 53 part**（与原页一致），可删除。若看到"只有图框"，可能是 **copySchematicPage（页面级）** 或副本**尚未渲染完**（打开后需等待 2-3s）。 |
+
+**补充**：`copySchematic` **不支持跨工程**（参数 schematicUuid 必须在当前工程内，否则返回 undefined）。
+
