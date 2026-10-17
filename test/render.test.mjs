@@ -44,6 +44,7 @@ const SAMPLES = {
   eda_wire: { ok: true, primitives: ['a'], note: '', error: '' },
   eda_netflag: { ok: true, id: 'i', net: 'GND', x: 1, y: 2, error: '' },
   eda_save: { ok: true, saved: true, docType: 1, error: '' },
+  eda_task: { ok: true, taskId: 't1', statusUrl: '/tasks/t1', status: 'completed', phase: 'routing', elapsedMs: 10, outcome: 'complete', result: '{}', errorText: '', events: ['a'], tasks: [{ id: 't1', status: 'completed', phase: 'routing', elapsedMs: 10, outcome: 'complete' }], error: '' },
 }
 
 test('所有工具的 render 必须返回数组（ContentBlock[]）——对象形态会崩主进程', () => {

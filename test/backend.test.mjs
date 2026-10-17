@@ -61,6 +61,34 @@ test('official bridge: unknown action id without code → clear error', async (t
   assert.match(res.error, /未知动作/)
 })
 
+test('official bridge: timed-out /execute returns taskId (late result retained, not cancelled)', async (t) => {
+  const mock = await startMock()
+  const b = makeBackend(mock.port)
+  t.after(() => { b.dispose(); mock.child.kill() })
+  await b.start()
+  const res = await b.execute('return await TIMEOUT_TASK()', 4000)
+  assert.equal(res.ok, false)
+  assert.equal(res.taskId, 'task-timeout', 'HTTP 504 body taskId must be surfaced')
+  assert.match(res.error, /未取消|taskId/)
+})
+
+test('official bridge: submitTask → 202 taskId; getTask/listTasks read the task surface', async (t) => {
+  const mock = await startMock()
+  const b = makeBackend(mock.port)
+  t.after(() => { b.dispose(); mock.child.kill() })
+  await b.start()
+  const sub = await b.submitTask('return await eda.pcb_Document.autoRouting();')
+  assert.equal(sub.ok, true)
+  assert.match(sub.taskId, /^task-/)
+  const got = await b.getTask(sub.taskId)
+  assert.equal(got.ok, true)
+  assert.equal(got.task.status, 'completed')
+  assert.equal(got.task.result.outcome, 'complete')
+  const list = await b.listTasks()
+  assert.equal(list.ok, true)
+  assert.ok(Array.isArray(list.tasks) && list.tasks.length >= 1)
+})
+
 test('callTool when not connected returns a friendly not-connected error', async () => {
   const b = new EdaBackend({ spawnBridge: false, discoveryPorts: [58999] })
   const res = await b.callTool('sch.drc', {})

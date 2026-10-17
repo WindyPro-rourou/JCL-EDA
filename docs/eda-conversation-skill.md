@@ -488,3 +488,52 @@ guide/、user-guide/、format/）。**规划任何画板动作前**：`eda_skill
 **线上权威源**：官方「扩展 API 参考」https://prodocs.easyeda.com/cn/api/reference/pro-api.html
 （与 vendored 同代文档；线上存在更新差异时以 prodocs 为准，并留意反馈。）
 
+## 附八：官方 Issues 里的解决方案（2026-10 汇总）
+
+来源：<https://github.com/easyeda/easyeda-api-skill/issues>（我们自己的 #14 也在此列）。
+
+### #16 — 桥的 30s 固定上限 / 迟到结果 / 窗口选择崩溃（已实用化）
+- 问题：桥删除固定 30s 后的执行请求；PCB 布线的迟到结果丢失；窗口选择响应引用未定义
+  `activeWindowId` 导致请求挂起。
+- 解决方案（社区补丁，`git apply` 可干净应用到 1.1.56）：
+  - 新增 `POST /tasks`（202 + taskId）、`GET /tasks/<id>`、`GET /tasks`、
+    `POST /routing`（自动布线/清除，需 gateway 声明 routing-v1）；
+  - `/execute` 超时改为 **HTTP 504 + taskId**（任务**不取消**、迟到结果保留）；
+  - 修复窗口选择响应。
+- 本插件已：应用补丁到本地桥、`eda_exec` 解析 504 taskId、新增 **`eda_task`** 工具
+  （submit/get/list）。
+- 出处：`easyeda-api-skill` #16（asmoyou 的 commit `2c0a8a5`）。
+
+### #23 — PCB 批量写回与 DRC 实测（7 条，含绕过法）
+1. **先建走线、后建过孔 → 不连接**（660 条 Connection Error）→ **一律先建过孔、后建走线**。
+2. **改铜皮后铺铜不自动重建 → DRC 虚假错误** → DRC 前对每块铺铜 `rebuildCopperRegion()`
+   并 `pcb_Document.save()`。
+3. `getDsnFile()` 导出与实际板不一致（层号数字、via 重复、铺铜缺失、坐标取整偏差）。
+4. **DRC 条目 `obj1.suffix` 不是图元 ID**（`get()` 返回全 null）→ 真 ID 在 `objs` 数组。
+5. 封装内槽孔 Region 读不到（`pcb_PrimitiveRegion.getAll()` 不含封装内；`lib_Footprint.get` 失败）。
+6. 桥错误序列化只有 `[object Object]` → 需要 message/stack（新版补丁已改善 errorDetails）。
+7. `get(id)` 返回对象字段多 null → 用 `getState_*()`。
+
+### #9 — 不要用网络端口坐标判定引脚悬空
+`SCH_PrimitiveComponent.getAll()` 返回的是 net-port 的符号锚点/主体位置，**不是箭头尖端
+的电气接触点**（偏移 15–20 单位以上）。判定连接应：
+1. 用 `getAllPinsByPrimitiveId()` 读真实 pinNumber/pinName；
+2. 用 net-port 符号几何+旋转推算接触点，或走 wire 端点/文档连通性；
+3. 无法确认时报告 **unverified**，不要报 floating。
+
+### #6 — 多个"文档未写"的运行时事实
+1. **enum 全局不总注入**（`EPCB_LayerId` 等可能 undefined）→ 取不到时回退字面值（见 enums/*.md 数值）。
+2. `sch_PrimitiveWire.create()` 坐标必须是**扁平数组** `[x1,y1,x2,y2,…]`（嵌套对会失败/错几何）。
+3. **net label/port 不能直接放在引脚坐标上**（会悬空）→ 从引脚画**短 stub 线**，标签放 stub 末端。
+4. **DRC 不幂等**：重复运行会累积 UI 标记、膨胀计数 → 一轮验证只跑一次；PCB DRC 返回 boolean，
+   SCH DRC（ERC）返回形状随版本变化（bool 或 `[{type,count}]`）。
+5. 并发：桥的"活动文档"是**每窗口单例** → 写前先 `openDocument()`；`windowId` 重连会 rotate
+   （文档 UUID 稳定）。
+
+### #2 — 更新已有 netport 的网络
+`toAsync().setState_Net(newNet).done()` 会把网络清空（不是更新）→ **删除原 netport 再
+`createNetPort` 重建**（同坐标）才可靠。
+
+### #8 — 官方回复：Skill 文档在 references 里
+SKILL.md 只放少量示例；完整逐接口文档在 `references/`，并明确"本仓库禁用 PR（自动流水线产物）"。
+
