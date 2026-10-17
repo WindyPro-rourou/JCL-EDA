@@ -621,3 +621,14 @@ SKILL.md 只放少量示例；完整逐接口文档在 `references/`，并明确
 **真正卡住的只有 3 处**：`importChanges`（改用直接放件）、位号分配、焊盘/引脚 APIs；
 **下单**仍需人工（官方无下单 API）。
 
+### 附十之一：原理图→PCB 复制（`eda_sch_to_pcb`）的正确实现（2026-10-18 实测）
+- 原理图器件：`getState_Component()` 返回 **`{libraryUuid, uuid, name}`**（结构正确），但
+  `pcb_PrimitiveComponent.create()` **不接受**这个对象（raw 与 `{libraryUuid,uuid}` 都报 `[object Object]`）；
+- **正确路径**：取 `component.name`（如 `0603WAF1001T5E`）→ `lib_Device.search(name)` → 取第一个
+  `ILIB_DeviceItem` → `pcb_PrimitiveComponent.create(dev, 1, x, y)`（3/3 实测成功）；
+- **必须先打开原理图页**再 `sch_PrimitiveComponent.getAll()`：在 PCB 文档上调用会报
+  「获取所有器件失败」（不是间歇问题，是文档类型不对）；
+- `getState_Name()` 返回 `={Value}`（不可用）→ 用 `component.name`；
+- 放置后 PCB 元件数可回读校验；位号仍为 `R?/U?`（未分配）。
+- 已封装为 **`eda_sch_to_pcb`** 工具（自动切原理图→读器件→切 PCB→search→放置→保存）。
+
