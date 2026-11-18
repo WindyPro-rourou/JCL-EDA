@@ -60,6 +60,8 @@ jobs:
 
       - name: Publish to npm
         if: steps.token.outputs.present == 'true'
-        run: node scripts/publish.mjs
+        # --soft-auth：token 失效/无权限时输出 warning 并跳过，不让 tag 流水线变红。
+        # 打包/校验类错误仍会正常失败。
+        run: node scripts/publish.mjs --soft-auth
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

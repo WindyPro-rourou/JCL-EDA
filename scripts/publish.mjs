@@ -14,6 +14,8 @@ import { existsSync } from 'node:fs'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(HERE, '..')
 const DRY = process.argv.includes('--dry')
+/** --soft-auth：认证失败（token 过期/无权限）时警告并跳过，不让 CI 变红。 */
+const SOFT_AUTH = process.argv.includes('--soft-auth')
 const PKG_NAME = process.argv.find((a) => a.startsWith('--pkg-name='))?.slice('--pkg-name='.length) ?? null
 if (PKG_NAME) console.log('发布名覆盖:', PKG_NAME)
 
@@ -78,8 +80,22 @@ try {
   if (DRY) {
     console.log('[dry] 未发布。校验通过。')
   } else {
-    const pub = run(['publish', '--access', 'public', '--tag', 'latest'], work)
-    console.log('PUBLISHED:', (pub || '').slice(0, 300))
+    try {
+      const pub = run(['publish', '--access', 'public', '--tag', 'latest'], work)
+      console.log('PUBLISHED:', (pub || '').slice(0, 300))
+    } catch (err) {
+      const text = String(err?.stderr ?? err?.stdout ?? err?.message ?? err)
+      // 认证类失败（token 失效/无权限/需 2FA）与打包无关：CI 里优雅降级为警告，
+      // 否则一个过期 token 会让整条 tag 流水线变红、掩盖真正的测试结果。
+      const isAuth = /\b(401|403|404|E401|E403|E404|EOTP|EAUTH)\b|Unauthorized|Forbidden|not in this registry|two-factor|2FA/i.test(text)
+      if (SOFT_AUTH && isAuth) {
+        console.log('::warning title=npm 发布被跳过::NPM_TOKEN 无效或无发布权限（401/403/404）——请在 npmjs.com → Access Tokens 重新生成 Automation/bypass-2FA token，更新 data\\portable-secrets.env 后重跑。')
+        console.log('[soft-auth] 认证失败，已跳过发布（包已通过全部校验，可在修复 token 后手动 npm publish）。')
+        console.log(text.slice(0, 400))
+      } else {
+        throw err
+      }
+    }
   }
 } finally {
   await rm(work, { recursive: true, force: true })
