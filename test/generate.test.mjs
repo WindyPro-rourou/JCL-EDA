@@ -24,7 +24,7 @@ function mountPlugin(config = {}) {
   }
   // autoStartBridge off: unit tests must not touch the real (possibly live) bridge.
   // activityFile: tests must never write the user's real timeline.
-  apply(ctx, { autoStartBridge: false, activityFile: join(tmpdir(), `eda-act-gen-${process.pid}.jsonl`), ...config })
+  apply(ctx, { autoStartBridge: false, checkUpdates: false, activityFile: join(tmpdir(), `eda-act-gen-${process.pid}.jsonl`), ...config })
   // Isolate: unreachable discovery range, no spawn, short timeouts.
   if (provided.eda?.backend) {
     provided.eda.backend.discoveryPorts = [58999]

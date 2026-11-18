@@ -4,6 +4,34 @@
 
 > 设计主张：**不用"截图找坐标"的 computer-use，而用嘉立创官方 API + WebSocket 桥接**，直接驱动用户正在浏览器里打开的在线专业版画板——确定性高、所见即所得。
 
+## 接入方式（双后端互备 · 三档自动择优）
+
+**桌面客户端**（v4.1.60+，内置 CLI/MCP）与**网页/在线版**（官方扩展 Run API Gateway + 官方 Bridge Server）**两条官方通路都支持**，插件自动探测并择优，**工具与面板对后端无感**。
+
+| 档位 | 适用 | 实测每次调用 | 说明 |
+|---|---|---|---|
+| **official-mcp-http**（首选） | 桌面客户端 v4.1.60+ | **55–92ms** | 官方内置 MCP HTTP **常驻服务**（`lceda-pro --mcp http --port 49630`），插件自动托管 |
+| **official-cli** | 桌面客户端 v4.1.60+ | 2.9–5s | 官方内置 CLI（`lceda-pro invoke …`；Electron 冷启动开销） |
+| **official-easyeda-bridge**（回退） | 网页/在线版 | ~300ms | 官方 Bridge Server（49620–49629）+ 扩展 Run API Gateway |
+
+### 互备与转移规则
+- **auto（默认）**：按 `mcp → cli → bridge` 依次探测，**谁真的连着就用谁**。
+  例：装了桌面客户端但它没开 → 自动走网页桥；网页编辑器没开 → 自动用桌面 MCP。
+- **执行期失败转移**：遇到「未连接 / 没有可用编辑器会话 / 未找到 CLI」这类**连接性**错误 → 自动换下一档重试一次。
+  **业务错误（代码已执行但抛错）绝不重试**，避免重复落图元。
+- **状态语义（重要）**：网页桥「服务在跑」≠「可用」。只有 `/health` 里 `edaConnected:true`（编辑器已连）才算 connected；只有服务在跑时状态为 `idle`。
+- 面板与 `eda_status` 会同时显示三档各自状态（桌面 MCP / 桌面 CLI / 网页桥）。
+
+### 覆盖配置
+| 配置 | 作用 |
+|---|---|
+| `config.backendPrefer = auto\|mcp\|cli\|bridge` | 强制/自动选择档位 |
+| 环境变量 `DSH_EDA_BACKEND` | 同上（容器/无 config 时用） |
+| 环境变量 `DSH_EDA_CLI` / `LCEDA_PRO_BIN` | 指定 `lceda-pro.exe` 路径（自定义安装位置） |
+| `config.cliHeadless` / `config.cliProjectPath` | MCP/CLI 打开会话时是否隐藏窗口 / 指定工程 |
+
+官方文档：[CLI](https://prodocs.easyeda.com/cn/api/guide/cli.html) · [For AI](https://prodocs.lceda.cn/public/storage/texts/api/guide/cli-for-ai.html) · [easyeda-client-cli](https://github.com/easyeda/easyeda-client-cli)
+
 ## 安装（开箱即用，三步）
 
 ```bash

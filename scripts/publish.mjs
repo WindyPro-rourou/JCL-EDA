@@ -21,10 +21,16 @@ const npmCli = existsSync('C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\np
   ? 'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js'
   : 'npm'
 const run = (args, cwd = ROOT) => {
+  // 1) 显式 npm-cli.js（本机/自定义 node 安装）→ 用当前 node 直接跑，跨平台。
   if (npmCli.endsWith('.js')) {
     return execFileSync(process.execPath, [npmCli, ...args], { cwd, stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8', shell: false })
   }
-  return execFileSync('cmd.exe', ['/c', 'npm.cmd', ...args], { cwd, stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8', shell: false })
+  // 2) Windows 上 npm 是 npm.cmd（需要 cmd /c 包装）。
+  // 3) Linux/macOS（含 GitHub Actions ubuntu runner）直接执行 npm —— 绝不能调 cmd.exe。
+  if (process.platform === 'win32') {
+    return execFileSync('cmd.exe', ['/c', 'npm.cmd', ...args], { cwd, stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8', shell: false })
+  }
+  return execFileSync('npm', args, { cwd, stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8', shell: false })
 }
 const parseJsonOut = (text) => JSON.parse(text.slice(Math.min(text.indexOf('['), text.indexOf('{'))))
 

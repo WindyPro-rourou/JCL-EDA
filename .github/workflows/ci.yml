@@ -5,30 +5,61 @@ on:
     branches: [main]
     tags: ['v*']
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          # Requires package-lock.json in the repo (added alongside the
+          # @deepseek-ai/dsh-tools devDependency). Previously this failed with
+          # "Dependencies lock file is not found" — every run was red.
           cache: npm
-      - run: npm run check
-      - run: npm run test:json
-      - run: npm run test:plugin
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check
+        run: npm run check
+
+      - name: Offline generator tests
+        run: npm run test:json
+
+      - name: Plugin tests (selfcheck + 86 unit tests)
+        run: npm run test:plugin
 
   publish:
+    # Only on a version tag, and only after the test job is green.
     if: startsWith(github.ref, 'refs/tags/v')
     needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
-      - run: node scripts/publish.mjs
+
+      - name: Check NPM_TOKEN secret
+        id: token
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "::warning title=NPM_TOKEN missing::仓库未配置 NPM_TOKEN secret，跳过 npm 发布（Settings → Secrets and variables → Actions 添加后重跑本 job）"
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: steps.token.outputs.present == 'true'
+        run: node scripts/publish.mjs
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
