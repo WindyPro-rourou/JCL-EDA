@@ -41,8 +41,13 @@ test('findCliExecutable: PATH → 候选路径 → null', () => {
   assert.equal(findCliExecutable({ env: { PATH: '' }, pathDirs: [], candidates: [cand], useRegistry: false, exists: never }), null)
 })
 
-test('defaultCliCandidates: 覆盖便携布局（lichuang_eda）且非空', () => {
+test('defaultCliCandidates: Windows 上覆盖便携布局；非 Windows 交给 PATH（不返回盘符路径）', () => {
   const list = defaultCliCandidates()
+  if (process.platform !== 'win32') {
+    // Linux/macOS：官方安装包把可执行文件放进 PATH，不做盘符扫描。
+    assert.deepEqual(list, [], '非 Windows 不应产出 Windows 盘符候选')
+    return
+  }
   assert.ok(list.length > 0)
   assert.ok(list.some((p) => /lichuang_eda/i.test(p)), '应含本机实测的 lichuang_eda 布局')
   assert.ok(list.some((p) => /easyeda-pro/.test(p)))
